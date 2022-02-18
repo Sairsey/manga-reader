@@ -1,8 +1,10 @@
 # manga-reader
 Team-lead: 
-- Diana Kozhevnikova
+- Diana Kozhevnikova;
+
 Tech-lead: 
-- Vladimir Parusov
+- Vladimir Parusov;
+
 F_cking sl_ _es: 
 - Sachuk Alexander;
 - Popov Ivan;
