@@ -5,7 +5,7 @@ Team-lead:
 Tech-lead: 
 - Vladimir Parusov:
 
-Ebuchie slavyane 
+Staff: 
 - Sachuk Alexander;
 - Popov Ivan;
 - Kungurov Fedor
