@@ -29,5 +29,5 @@ In this file you can see our working pipeline and our commit rules.
 ### 7) Create Pull Request
 > Pull Request must be from yours "feature_*" branch to "develop" branch.
 
-### 9) Процесс ревью (посмотри на замечания)
+### 9) Review Proccess (Please watch important notes)
 > If Tech lead during review accepted your changes - go to 10). Otherwise fix what Tech lead doesnt like and complete steps 5, 6, 8, 9 again.
