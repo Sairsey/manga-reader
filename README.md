@@ -3,9 +3,10 @@ Team-lead:
 - Diana Kozhevnikova;
 
 Tech-lead: 
-- Vladimir Parusov;
+- Vladimir Parusov:
 
-F_cking sl_ _es: 
+Ebuchie slavyane 
 - Sachuk Alexander;
 - Popov Ivan;
-- Kungurov Fedor.
+- Kungurov Fedor
+
