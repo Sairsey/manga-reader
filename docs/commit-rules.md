@@ -1,33 +1,33 @@
 # Commit-rules
-В данном файле рассматривается общий план работы и договоренности о коммитах.
-## Общий план работы
-1) Отметить задачу на Azure Dev Board как Doing
-2) Переключиться в web версии github на develop ветку
-3) Создать в web версии github свою ветку 
-4) Склонировать свою ветку себе на локальный компьютер
-5) Выполнить задачу
-6) Закоммитить в свою ветку
-7) Создать пул реквест
-8) Написать Техлиду
-9) Процесс ревью (посмотри на замечания)
-10) Отметь задачу как Done 
+In this file you can see our working pipeline and our commit rules.
+## Working Pipeline
+1) Check your task in Azure Dev Board as Doing
+2) Change in web version of github active branch to develop
+3) Create in web version of github new branch from develop branch
+4) Pull your branch on yours PC
+5) Complete your task
+6) Commit to your branch
+7) Create Pull Request
+8) Write a message to Tech Lead
+9) Review Proccess (Please watch important notes)
+10) Check your task in Azure Dev Board as Done
 
-## Важные замечания по пунктам
-### 2) Переключиться в web версии github на develop ветку
-> Если вам удобнее, можете просто перейти по ссылке https://github.com/Sairsey/manga-reader/tree/develop
+## Important notes
+### 2) Change in web version of github active branch to develop
+> If it is easier for you, you can just use this link https://github.com/Sairsey/manga-reader/tree/develop
 
-### 3) Создать в web версии github свою ветку
-> Ветка должна иметь имя в формате "feature_<name>", где name достаточно понятно объясняет название фичи, которую вы реализовываете. Например feature_library_screen или feature_create_readme.
+### 3) Create in web version of github new branch from develop branch
+> Your branch must have name in format "feature_<name>", Where 'name' clearly explains feature you are doing. For example: feature_library_screen or feature_create_readme.
 
-### 6) Закоммитить в свою ветку
-> Все коммиты должны быть написаны на английском языке в формате:
+### 6) Commit to your branch
+> All commits must be written on English in format:
 ```
 <commit message> AB#<Azure issue number>
 ```
-> где commit message достаточно понятно описывает то что вы сделали. Например "Fixed plus button on library screen AB#123"
+> Where "commit message" clearly explains what you have done. For example: "Fixed plus button on library screen AB#123"
 
-### 7) Создать пул реквест
-> Пул реквест должен быть в develop ветку из вашей ветки.
+### 7) Create Pull Request
+> Pull Request must be from yours "feature_*" branch to "develop" branch.
 
 ### 9) Процесс ревью (посмотри на замечания)
-> Если Техлид согласился с вашими изменениями - перейди к пункту 10, иначе прочитай что не понравилось Техлиду, исправь это у себя и повтори выполнения пунктов 5, 6, 8, 9
+> If Tech lead during review accepted your changes - go to 10). Otherwise fix what Tech lead doesnt like and complete steps 5, 6, 8, 9 again.

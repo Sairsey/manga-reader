@@ -5,13 +5,13 @@
 # Code style:    
   1) Every figure "{" must be on same string. 
  ```Kotlin
-      fun foo(a : Int) {
+      fun Foo(a : Int) {
 	      ...
       }
  ```
   2) Single if-else must be with " { ... }".     
  ```Kotlin
-      fun foo(a : Int) {
+      fun Foo(a : Int) {
 	    if (n > 0) {
          ...
         }
@@ -78,11 +78,11 @@
  ```
  9) Leave blank lines between functions and between expression groups.
   ```Kotlin
-   fun foo() {
+   fun Foo() {
     ...
    }
                           // Empty line
-   fun bar() {
+   fun Bar() {
     ...
    }
  ```
