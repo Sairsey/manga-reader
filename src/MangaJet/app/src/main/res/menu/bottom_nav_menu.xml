@@ -13,17 +13,17 @@
 
     <item
         android:id="@+id/navigation_search"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="?android:attr/actionModeWebSearchDrawable"
         android:title="@string/title_search" />
 
     <item
         android:id="@+id/navigation_updates"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@android:drawable/ic_dialog_alert"
         android:title="@string/title_updates" />
 
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/title_settings" />
 
 </menu>
