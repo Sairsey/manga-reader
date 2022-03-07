@@ -1,4 +1,4 @@
-package com.example.mangajet.ui.home
+package com.mangajet.mangajet.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,4 +1,4 @@
-package com.example.mangajet
+package com.mangajet.mangajet
 
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -7,7 +7,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.mangajet.databinding.ActivityMainBinding
+import com.mangajet.mangajet.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

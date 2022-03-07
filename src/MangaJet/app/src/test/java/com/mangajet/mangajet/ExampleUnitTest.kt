@@ -1,4 +1,4 @@
-package com.example.mangajet
+package com.mangajet.mangajet
 
 import org.junit.Test
 
