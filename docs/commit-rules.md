@@ -9,8 +9,9 @@ In this file you can see our working pipeline and our commit rules.
 6) Commit to your branch
 7) Create Pull Request
 8) Write a message to Tech Lead
-9) Review Proccess (Please watch important notes)
-10) Check your task in Azure Dev Board as Done
+9) Check your task in Azure Dev Board as Review
+10) Review Proccess (Please watch important notes)
+11) Check your task in Azure Dev Board as Done
 
 ## Important notes
 ### 2) Change in web version of github active branch to develop
@@ -29,5 +30,5 @@ In this file you can see our working pipeline and our commit rules.
 ### 7) Create Pull Request
 > Pull Request must be from yours "feature_*" branch to "develop" branch.
 
-### 9) Review Proccess (Please watch important notes)
-> If Tech lead during review accepted your changes - go to 10). Otherwise fix what Tech lead doesnt like and complete steps 5, 6, 8, 9 again.
+### 10) Review Proccess (Please watch important notes)
+> If Tech lead during review accepted your changes - go to 11). Otherwise fix what Tech lead doesnt like and complete steps 5, 6, 8, 10 again.
