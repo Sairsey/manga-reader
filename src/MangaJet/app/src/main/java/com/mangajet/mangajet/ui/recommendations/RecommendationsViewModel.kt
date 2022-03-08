@@ -5,9 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class RecommendationsViewModel : ViewModel() {
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is dashboard Fragment"
+    class Manga(newName: String, newDescr: String) {
+        val name : String = newName
+        val descr : String = newDescr
     }
-    val text: LiveData<String> = _text
+
+    val mangas = listOf(Manga("RecommendedManga1", "descr1"),
+        Manga("RecommendedManga2", "descr2"),
+        Manga("RecommendedManga3", "descr3"))
+    val mangasNames = listOf("RecommendedManga1", "RecommendedManga2", "RecommendedManga3")
 }

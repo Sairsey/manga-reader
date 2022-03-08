@@ -5,9 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class HistoryViewModel : ViewModel() {
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is history Fragment"
+    class Manga(newName: String, newDescr: String) {
+        val name : String = newName
+        val descr : String = newDescr
     }
-    val text: LiveData<String> = _text
+
+    val mangas = listOf(Manga("manga1", "descr1"),
+                        Manga("manga2", "descr2"),
+                        Manga("manga3", "descr3"))
+    val mangasNames = listOf("manga1", "manga2", "manga3")
 }

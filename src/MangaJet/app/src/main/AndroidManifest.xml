@@ -10,13 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MangaJet">
         <activity
-            android:name=".AuthorizationSecondActivity"
+            android:name=".authorization.AuthorizationActivity"
             android:exported="false" />
         <activity
-            android:name=".MangaReaderThirdActivity"
+            android:name=".mangareader.MangaReaderActivity"
             android:exported="false" />
         <activity
-            android:name=".AboutMangaSecondActivity"
+            android:name=".aboutmanga.AboutMangaActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
