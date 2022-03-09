@@ -80,7 +80,7 @@ def get_content(html):
         )
     return mangas
 
-#function to search titles by name and put result in json file
+#function to search titles by name
 def get_mangas_by_name():
     print("Please, write name of the manga you are looking for")
     title_name = input()
@@ -131,7 +131,6 @@ def check_input(index, max_index):
 
 #function to download chapters of manga number in order
 def load_manga(manga, number):
-    print(manga.url)
     html = get_html(manga.url)
     html.encoding = 'utf-8'
     soup = BeautifulSoup(html.text, 'html.parser')
@@ -189,7 +188,7 @@ if __name__ == "__main__":
             break
     manga_to_download = mangas[int(manga_index) - 1]
     #ask what chapter to download
-    print(f'{manga_to_download.manga_name} have {manga_to_download.number_of_chapters}')
+    print(f'{manga_to_download.manga_name} have {manga_to_download.number_of_chapters} chapters')
     while True:
         print('Input a number of chapter to download')
         chapter_number = input()
