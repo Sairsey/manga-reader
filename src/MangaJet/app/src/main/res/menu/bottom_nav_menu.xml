@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/navigation_history"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/history__1_"
         android:title="@string/title_history" />
 
     <item
         android:id="@+id/navigation_recommendations"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/feedback__1_"
         android:title="@string/title_recommendations" />
 
     <item
@@ -18,12 +18,12 @@
 
     <item
         android:id="@+id/navigation_updates"
-        android:icon="@android:drawable/ic_dialog_alert"
+        android:icon="@drawable/update__1_"
         android:title="@string/title_updates" />
 
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/settings__1_"
         android:title="@string/title_settings" />
 
 </menu>
