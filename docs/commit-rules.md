@@ -25,7 +25,7 @@ In this file you can see our working pipeline and our commit rules.
 ```
 <commit message> AB#<Azure issue number>
 ```
-> Where "commit message" clearly explains what you have done. For example: "Fixed plus button on library screen AB#123"
+> Where "commit message" starts with **uppercase verb in past simple** and clearly explains what you have done. For example: "Fixed plus button on library screen AB#123"
 
 ### 7) Create Pull Request
 > Pull Request must be from yours "feature_*" branch to "develop" branch.
