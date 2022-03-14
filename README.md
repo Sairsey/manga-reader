@@ -13,7 +13,7 @@ List of features:
 ### Description of advantages over peers
 In comperison with other manga reader applications (for example, mobile version of mangalib, Manga Reader Comic Reader) MangaJet has following advantages:
 + MangaJet supports recommendation system based on tags system that recommends manga not from one source but from all availible. This is our killer feature
-+ No ads or monetization methods (for now)
++ No ads or In-App purchases
 + Authorization feature is also something unique for manga readers
 + Other manga readers in our opinion have primitive and outdated design. Our team thinks that our design is more modern and convenient. We want to use only eye pleasing colors in nice color combination and refrain from using an acute angles in design
 ## Staff
