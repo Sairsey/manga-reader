@@ -1,7 +1,5 @@
 package com.mangajet.mangajet.ui.recommendations
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class RecommendationsViewModel : ViewModel() {
