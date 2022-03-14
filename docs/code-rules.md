@@ -2,7 +2,11 @@
   1) In 3 days before deadline must be test and review.     
   2) No "magic" numbers and constants in code. Everything must be in enums, defines or special variables.   
   3) Use global variables only after team discussion.    
-# Code style:    
+# Code style:
+  We use [detekt](https://detekt.dev/comments.html "detekt") codestyle with some additions/changes.
+# Additional rules:
+ 
+  
   1) Every figure "{" must be on same string. 
  ```Kotlin
       fun Foo(a : Int) {
@@ -21,36 +25,34 @@
       }
  ```
   3) Naming.
-  *	camelCase for: local variables, class members
-  *	PascalCase for: functions
-  *	snake_case for: data types (except types declared in the libraries used)
+  * camelCase starting with word 'is', 'has', are' for : boolean properties
+  *	camelCase for: functions, function parameters, members, local variables, class members
+  *	PascalCase for: classes
   *	UPPER_CASE for: global constants, enumerations elements, macro constants
  ```Kotlin
       val PI_CONSTANT = 3.1415926;
       
-      class my_class {
+      class MyClass {
           var memberData : Int
-    	  fun ProcessData() {
+    	  fun processData() {
     	  }
       };
       
-      fun Foo(a : Int) {
+      fun foo(accelValue : Int) {
 		 val maxNumber = 0
          val ballForceThrow = 0.0
       }
       
-      fun OpenFile() {
+      fun openFile() {
       ...
       }
  ```
   4) Indentation
   *	Use only spaces, 4 spaces
   *	Any inner block must be indented
-  *	Data access specifiers ("public", "protected", "private") has same indentation as class
-  *	"case" markers has same indentation as "switch" block
   ```Kotlin
-  class my_class {
-      public fun ProcessData() {
+  class MyClass {
+      public fun processData() {
           when (memberData) {
           0 -> memberData++
           1 -> memberData--
@@ -78,18 +80,18 @@
  ```
  9) Leave blank lines between functions and between expression groups.
   ```Kotlin
-   fun Foo() {
+   fun foo() {
     ...
    }
                           // Empty line
-   fun Bar() {
+   fun bar() {
     ...
    }
  ```
  10) Each function and each class must be started with comment, which will explain in simple way what this function/class do.
    ```Kotlin
    // parse string to array of tokens. Returns true in case of success and false otherwise
-   fun Parser(s : String) {
+   fun parser(s : String) {
     ...
    }
  ```
