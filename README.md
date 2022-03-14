@@ -2,11 +2,20 @@
 Manga reader project, SPbSTU 2022.
 
 ### Product description
-Manga reader is an app for reading manga. Our app aims to make reading manga easier. The app will be an aggregator of several sites that will be parsed, so we get manga. In addition to the reading function, the app will also save your reading history and get updates from the manga you're reading, as well as save selected chapters.
-
+MangaJet is an app for reading manga. Our team aims to make reading manga easier. The app is an aggregator of several manga sites.
+List of features:
++ Reading feature: User can read manga freely if internet connection is stable
++ Searching feature: User can find specific manga by its name
++ Recommendation feature: User gets reccomendations based on readed manga
++ History feature: User's reading history is saved
++ Downloading feature: User can download specific chapters of manga to local storage
++ Authorization feature: User can log in to sites that we parse to get manga, so user gets acces to age-restricted manga 
 ### Description of advantages over peers
-The main difference between this application and its counterparts is the system of recommendations based on the read, authorization and a more beautiful design.
-
+In comperison with other manga reader applications (for example, mobile version of mangalib, Manga Reader Comic Reader) MangaJet has next advantages:
++ MangaJet supports recommendation system based on tags system that recommends manga not from one source but from all availible. This is our unique feature
++ No ads or monitization methods (for now)
++ Authorization feature is also something unique for manga readers
++ Other manga readers in our opinion have primitive and outdated design. Our team thinks that our design is more modern and convenient. We want to use only eye pleasing colors in nice color combination and refrain from using an acute angles in design.
 ## Staff
 + Kozhevnikova Diana
 + Kungurov Fedor
