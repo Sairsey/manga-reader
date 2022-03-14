@@ -3,23 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_history">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.mangajet.mangajet.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_history"
+        android:name="com.mangajet.mangajet.ui.history.HistoryFragment"
+        android:label="@string/title_history"
+        tools:layout="@layout/history_fragment" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.mangajet.mangajet.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_recommendations"
+        android:name="com.mangajet.mangajet.ui.recommendations.RecommendationsFragment"
+        android:label="@string/title_recommendations"
+        tools:layout="@layout/recommendations_fragment" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.mangajet.mangajet.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_search"
+        android:name="com.mangajet.mangajet.ui.search.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/search_fragment" />
+    <fragment
+        android:id="@+id/navigation_updates"
+        android:name="com.mangajet.mangajet.ui.updates.UpdatesFragment"
+        android:label="@string/title_updates"
+        tools:layout="@layout/updates_fragment" />
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.mangajet.mangajet.ui.settings.SettingFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/settings_fragment" />
 </navigation>

@@ -2,14 +2,14 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>NewLineAtEndOfFile:DashboardFragment.kt$com.mangajet.mangajet.ui.dashboard.DashboardFragment.kt</ID>
-    <ID>NewLineAtEndOfFile:DashboardViewModel.kt$com.mangajet.mangajet.ui.dashboard.DashboardViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:DashboardFragment.kt$com.mangajet.mangajet.ui.recommendations.DashboardFragment.kt</ID>
+    <ID>NewLineAtEndOfFile:DashboardViewModel.kt$com.mangajet.mangajet.ui.recommendations.DashboardViewModel.kt</ID>
     <ID>NewLineAtEndOfFile:ExampleInstrumentedTest.kt$com.mangajet.mangajet.ExampleInstrumentedTest.kt</ID>
     <ID>NewLineAtEndOfFile:ExampleUnitTest.kt$com.mangajet.mangajet.ExampleUnitTest.kt</ID>
-    <ID>NewLineAtEndOfFile:HomeFragment.kt$com.mangajet.mangajet.ui.home.HomeFragment.kt</ID>
-    <ID>NewLineAtEndOfFile:HomeViewModel.kt$com.mangajet.mangajet.ui.home.HomeViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:HomeFragment.kt$com.mangajet.mangajet.ui.history.HomeFragment.kt</ID>
+    <ID>NewLineAtEndOfFile:HomeViewModel.kt$com.mangajet.mangajet.ui.history.HomeViewModel.kt</ID>
     <ID>NewLineAtEndOfFile:MainActivity.kt$com.mangajet.mangajet.MainActivity.kt</ID>
-    <ID>NewLineAtEndOfFile:NotificationsFragment.kt$com.mangajet.mangajet.ui.notifications.NotificationsFragment.kt</ID>
-    <ID>NewLineAtEndOfFile:NotificationsViewModel.kt$com.mangajet.mangajet.ui.notifications.NotificationsViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationsFragment.kt$com.mangajet.mangajet.ui.search.NotificationsFragment.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationsViewModel.kt$com.mangajet.mangajet.ui.search.NotificationsViewModel.kt</ID>
   </CurrentIssues>
 </SmellBaseline>

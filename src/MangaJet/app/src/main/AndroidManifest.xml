@@ -10,7 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MangaJet">
         <activity
-            android:name="com.mangajet.mangajet.MainActivity"
+            android:name=".authorization.AuthorizationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mangareader.MangaReaderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".aboutmanga.AboutMangaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
