@@ -1,6 +1,6 @@
 package com.mangajet.mangajet.data
 
-//dummy class which Implementation will be done later
+// class that represents one page of manga's chapter
 class MangaPage {
     val i = 1// to fool detect
 }
