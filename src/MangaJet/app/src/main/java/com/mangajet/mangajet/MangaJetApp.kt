@@ -2,7 +2,7 @@ package com.mangajet.mangajet
 
 import android.app.Application
 
-// insertion point for our app
+// Insertion point for our app
 class MangaJetApp: Application() {
     override fun onCreate() {
         super.onCreate()
