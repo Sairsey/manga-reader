@@ -28,7 +28,7 @@ class MangaChapter {
         if (pagesNumber == -1)
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)
-            throw Exception("Bad page index")
+            throw ArrayIndexOutOfBoundsException("Bad page index")
         return manga.library.getChapterPage(manga.id, id, pageNumber)
     }
 }
