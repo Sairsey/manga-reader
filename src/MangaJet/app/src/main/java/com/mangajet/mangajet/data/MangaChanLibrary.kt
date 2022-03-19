@@ -18,7 +18,7 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get Manga class by its id(name)
-    override fun getMangaByName(id: String): Manga {
+    override fun createMangaById(id: String): Manga {
         return Manga(this, id)
     }
 
@@ -146,7 +146,7 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get array of MangaChapter classes by manga's id(name)
-    override fun getMangasChaptersByName(manga: Manga): Array<MangaChapter> {
+    override fun getMangaChapters(manga: Manga): Array<MangaChapter> {
         val url = resource + "/manga/" + manga.id
         val text = WebAccessor.getTextSync(url, headers)
 

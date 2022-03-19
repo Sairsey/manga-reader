@@ -8,7 +8,7 @@ abstract class AbstractLibrary {
     abstract fun getURL(): String
 
     // Function to get Manga class by its id(name)
-    abstract fun getMangaByName(id: String): Manga
+    abstract fun createMangaById(id: String): Manga
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
@@ -18,7 +18,7 @@ abstract class AbstractLibrary {
     abstract fun getMangaInfo(id: String): String
 
     // Function to get array of MangaChapter classes by manga's id(name)
-    abstract fun getMangasChaptersByName(manga: Manga): Array<MangaChapter>
+    abstract fun getMangaChapters(manga: Manga): Array<MangaChapter>
 
     // Function to get number of pages in specific manga and specific chapter by their ids(names)
     abstract fun getChaptersNumOfPages(mangaID: String, chapterID: String): Int
