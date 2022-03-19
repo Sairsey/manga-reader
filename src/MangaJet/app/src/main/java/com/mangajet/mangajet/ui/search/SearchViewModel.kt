@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
+// Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
     class Manga(newName: String, newDescr: String) {
-        val name : String = newName
-        val descr : String = newDescr
+        val name: String = newName
+        val descr: String = newDescr
     }
 
     val mangas = listOf(Manga("FoundedManga1", "descr1"),

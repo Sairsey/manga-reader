@@ -9,6 +9,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.mangajet.mangajet.databinding.ActivityMainBinding
 
+// Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

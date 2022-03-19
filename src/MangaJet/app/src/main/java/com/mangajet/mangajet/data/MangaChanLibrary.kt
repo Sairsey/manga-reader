@@ -13,18 +13,18 @@ class MangaChanLibrary : AbstractLibrary() {
         "accept" to "*/*")
 
     // Function to get Url
-    override fun getURL(): String {
+    override fun getURL() : String {
         return resource
     }
 
     // Function to get Manga class by its id(name)
-    override fun createMangaById(id: String): Manga {
+    override fun createMangaById(id: String) : Manga {
         return Manga(this, id)
     }
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
-    override fun searchManga(id: String, amount: Int, offset: Int): Array<Manga> {
+    override fun searchManga(id: String, amount: Int, offset: Int) : Array<Manga> {
         val newId = id.replace(' ', '+')
         val url = resource + "/?do=search&subaction=search&story=" + newId
         val text = WebAccessor.getTextSync(url, headers)
@@ -33,8 +33,7 @@ class MangaChanLibrary : AbstractLibrary() {
 
         val res = ArrayList<Manga>()
 
-        while (f != -1)
-        {
+        while (f != -1) {
             f = text.indexOf("h2", f)
             f = text.indexOf("<a", f)
             f = text.indexOf("manga/", f) + "manga".length + 1
@@ -50,7 +49,7 @@ class MangaChanLibrary : AbstractLibrary() {
     // Helper class for some functions
     private class MangaChanLibraryHelper {
         // Retrieve title image URL
-        fun getTitleImageURL(text : String): String {
+        fun getTitleImageURL(text : String) : String {
             var f = text.indexOf("manga_images")
             f = text.indexOf("img", f)
             f = text.indexOf("src=\"", f) + "src=\"".length
@@ -59,7 +58,7 @@ class MangaChanLibrary : AbstractLibrary() {
         }
 
         // Retrieve name of manga
-        fun getName(text : String): String {
+        fun getName(text : String) : String {
             var f = text.indexOf("name_row")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
@@ -68,7 +67,7 @@ class MangaChanLibrary : AbstractLibrary() {
         }
 
         // Retrieve russian name of manga
-        fun getRusName(text : String): String {
+        fun getRusName(text : String) : String {
             var f = text.indexOf("name_row")
             f = text.indexOf("(", f) + 1
             val s = text.indexOf(")", f)
@@ -76,7 +75,7 @@ class MangaChanLibrary : AbstractLibrary() {
         }
 
         // Retrieve description
-        fun getDescr(text : String): String {
+        fun getDescr(text : String) : String {
             var f = text.indexOf("<div id=\"description\"")
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
@@ -84,7 +83,7 @@ class MangaChanLibrary : AbstractLibrary() {
         }
 
         // Retrieve author
-        fun getAuthor(text : String): String {
+        fun getAuthor(text : String) : String {
             var f = text.indexOf("mangatitle")
             f = text.indexOf("Автор", f)
             f = text.indexOf("<a", f)
@@ -94,7 +93,7 @@ class MangaChanLibrary : AbstractLibrary() {
         }
 
         // Retrieve tags
-        fun getTags(text : String): Array<String> {
+        fun getTags(text : String) : Array<String> {
             var f = text.indexOf("mangatitle")
             f = text.indexOf("Тэги", f)
             var s = text.indexOf("</span", f)
@@ -115,24 +114,9 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get info(name, author, genre, number of chapters...) about manga as JSON by its id(name)
-    override fun getMangaInfo(id: String): String {
+    override fun getMangaInfo(id: String) : String {
         val url = resource + "/manga/" + id
         val text = WebAccessor.getTextSync(url, headers)
-
-        /*
-        println("image " + MangaChanLibraryHelper().getImageURL(text))
-        println("name " + MangaChanLibraryHelper().getName(text))
-        println("Rus name " + MangaChanLibraryHelper().getRusName(text))
-
-        println("Tags:")
-        val tags = MangaChanLibraryHelper().getTags(text)
-        for (i in tags){
-            println(i)
-        }
-
-        println("Author: " + MangaChanLibraryHelper().getAuthor(text))
-        println("Descr: " + MangaChanLibraryHelper().getDescr(text))
-        */
 
         val json = JSONObject()
         json.put("name", MangaChanLibraryHelper().getName(text))
@@ -146,7 +130,7 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get array of MangaChapter classes by manga's id(name)
-    override fun getMangaChapters(manga: Manga): Array<MangaChapter> {
+    override fun getMangaChapters(manga: Manga) : Array<MangaChapter> {
         val url = resource + "/manga/" + manga.id
         val text = WebAccessor.getTextSync(url, headers)
 
@@ -179,7 +163,7 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get number of pages in specific manga and specific chapter by their ids(names)
-    override fun getChaptersNumOfPages(mangaID: String, chapterID: String): Int {
+    override fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int {
         val url = resource + "/online/" + chapterID
         val text = WebAccessor.getTextSync(url, headers)
 
@@ -194,7 +178,7 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get Manga Page class by its number, manga id and chapter id
-    override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int): MangaPage {
+    override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage {
         val url = resource + "/online/" + chapterID
         val text = WebAccessor.getTextSync(url, headers)
 

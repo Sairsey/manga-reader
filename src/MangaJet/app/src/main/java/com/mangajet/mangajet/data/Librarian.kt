@@ -10,6 +10,7 @@ object Librarian {
         Mangachan,
         Acomics
     }
+
     // Map for storing libraries names as keys and abstract libraries as value
     private val map = hashMapOf<LibraryName, AbstractLibrary?>()
 
@@ -22,7 +23,7 @@ object Librarian {
     }
 
     // Function to get abstractLibrary from map by key(enum)
-    public fun getLibrary(name: LibraryName): AbstractLibrary? {
+    public fun getLibrary(name: LibraryName) : AbstractLibrary? {
         return map[name]
     }
 

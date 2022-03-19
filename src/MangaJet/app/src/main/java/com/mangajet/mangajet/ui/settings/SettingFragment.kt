@@ -11,6 +11,7 @@ import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
+// Class which represents "Settings" fragment of MainActivity
 class SettingFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     companion object {
@@ -22,7 +23,7 @@ class SettingFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ) : View? {
         _binding = SettingsFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
