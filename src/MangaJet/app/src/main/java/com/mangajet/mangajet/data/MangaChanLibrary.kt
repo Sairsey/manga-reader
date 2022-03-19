@@ -118,21 +118,6 @@ class MangaChanLibrary : AbstractLibrary() {
         val url = resource + "/manga/" + id
         val text = WebAccessor.getTextSync(url, headers)
 
-        /*
-        println("image " + MangaChanLibraryHelper().getImageURL(text))
-        println("name " + MangaChanLibraryHelper().getName(text))
-        println("Rus name " + MangaChanLibraryHelper().getRusName(text))
-
-        println("Tags:")
-        val tags = MangaChanLibraryHelper().getTags(text)
-        for (i in tags){
-            println(i)
-        }
-
-        println("Author: " + MangaChanLibraryHelper().getAuthor(text))
-        println("Descr: " + MangaChanLibraryHelper().getDescr(text))
-        */
-
         val json = JSONObject()
         json.put("name", MangaChanLibraryHelper().getName(text))
         json.put("cover", MangaChanLibraryHelper().getTitleImageURL(text))
