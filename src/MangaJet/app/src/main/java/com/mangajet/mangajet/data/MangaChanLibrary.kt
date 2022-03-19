@@ -139,7 +139,6 @@ class MangaChanLibrary : AbstractLibrary() {
         json.put("cover", MangaChanLibraryHelper().getTitleImageURL(text))
         json.put("rus_name", MangaChanLibraryHelper().getRusName(text))
         json.put("author", MangaChanLibraryHelper().getAuthor(text))
-        json.put("image", MangaChanLibraryHelper().getTitleImageURL(text))
         json.put("description", MangaChanLibraryHelper().getDescr(text))
         val tagArray = JSONArray(MangaChanLibraryHelper().getTags(text))
         json.put("tags", tagArray)
