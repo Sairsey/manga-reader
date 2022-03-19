@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.RecommendationsFragmentBinding
 
+// Class which represents "Recommendations" fragment of MainActivity
 class RecommendationsFragment : Fragment() {
 
     private var _binding: RecommendationsFragmentBinding? = null
@@ -25,7 +26,7 @@ class RecommendationsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ) : View {
         val recommendedViewModel =
             ViewModelProvider(this).get(RecommendationsViewModel::class.java)
 

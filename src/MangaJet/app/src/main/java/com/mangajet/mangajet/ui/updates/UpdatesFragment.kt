@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.mangajet.mangajet.R
 
+// Class which represents "Updates" fragment of MainActivity
 class UpdatesFragment : Fragment() {
 
     companion object {

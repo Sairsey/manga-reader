@@ -4,8 +4,8 @@ import java.io.File
 
 // Class that represents one page of manga's chapter
 class MangaPage {
-    var url : String // url to online version of page
-    var localPath : String // Path to file in local storage
+    var url: String // url to online version of page
+    var localPath: String // Path to file in local storage
 
     // Constructor for Libraries
     constructor(link: String) {
@@ -19,8 +19,7 @@ class MangaPage {
 
     // Function for checking if page downloaded. If not - it will start to upload to storage
     fun upload() {
-        if (!StorageManager.isExist(this.localPath))
-        {
+        if (!StorageManager.isExist(this.localPath)) {
             StorageManager.download(this.url, this.localPath)
         }
     }

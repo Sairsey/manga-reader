@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
+// Class which represents "About Manga" Activity
 class AboutMangaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

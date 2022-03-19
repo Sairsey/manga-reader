@@ -16,6 +16,7 @@ import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 
+// Class which represents "History" fragment of MainActivity
 class HistoryFragment : Fragment() {
 
     private var _binding: HistoryFragmentBinding? = null
@@ -28,7 +29,7 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ) : View {
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 

@@ -5,8 +5,8 @@ import javax.net.ssl.ManagerFactoryParameters
 
 // Class that represents one chapter of specific, stores pages of this manga
 class MangaChapter {
-    public var manga : Manga      // Manga from which this chapter created
-    public var id : String        // Id of this Chapter
+    public var manga: Manga      // Manga from which this chapter created
+    public var id: String        // Id of this Chapter
     public var lastViewedPage = 0 // Number of last viewed page
     private var pagesNumber = -1  // Number of pages in this chapter
 

@@ -14,8 +14,8 @@ object WebAccessor {
     private val client = OkHttpClient()
 
     // Function to aquire things asyncroniously
-    fun getAsync(url : String, callback : Callback,
-                     headers : Map<String, String> = mapOf()) : Call {
+    fun getAsync(url: String, callback: Callback,
+                     headers: Map<String, String> = mapOf()) : Call {
 
         var preRequest = Request.Builder()
             .url(url)
@@ -37,7 +37,7 @@ object WebAccessor {
         val request = preRequest.build()
 
         // Make async call
-        val call : Call
+        val call: Call
         call = client.newCall(request)
 
         // Set callback
@@ -48,7 +48,7 @@ object WebAccessor {
 
     // Function to aquire text syncroniously
     // Note: Please use it if text are less then 1Mb
-    fun getTextSync(url : String, headers : Map<String, String> = mapOf()): String {
+    fun getTextSync(url: String, headers: Map<String, String> = mapOf()) : String {
         // We have here another android crazy stuff
         // Problem is that Android blocks sockets from main thread
         // So to get text syncroniously we need to
@@ -85,7 +85,7 @@ object WebAccessor {
     }
 
     // Function to aquire bytes via InputStream
-    fun getBytesStream(url : String, headers : Map<String, String> = mapOf()) : InputStream {
+    fun getBytesStream(url: String, headers: Map<String, String> = mapOf()) : InputStream {
 
         // We have here another android crazy stuff
         // Problem is that Android blocks sockets from main thread

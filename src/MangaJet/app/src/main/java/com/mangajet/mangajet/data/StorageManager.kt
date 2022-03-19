@@ -8,24 +8,24 @@ object StorageManager {
     var storageDirectory = "/MangaJet/data" // will be set from options I believe
 
     // Function which will say if path exist in local file
-    fun isExist(path : String) : Boolean {
+    fun isExist(path: String) : Boolean {
         path + ""
         return false
     }
 
     // Function which asynchronously start download from Internet to file
-    fun download(url : String, path : String){
+    fun download(url: String, path: String) {
         url + ""
         path + ""
     }
 
     // Function which will wait for specific file to load
-    fun await(path : String){
+    fun await(path: String){
         path + ""
     }
 
     // Function which will give File handler for specific path
-    fun getFile(path : String) : File? {
+    fun getFile(path: String) : File? {
         path + ""
         return null
     }
