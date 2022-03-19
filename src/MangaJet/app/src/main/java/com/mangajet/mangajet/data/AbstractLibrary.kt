@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.data
 
 // Abstract class that represents one site from which we parse manga
+@Suppress("UnnecessaryAbstractClass")
 abstract class AbstractLibrary {
 
     // Function to get Url
