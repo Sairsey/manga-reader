@@ -10,7 +10,8 @@ abstract class AbstractLibrary {
     // Function to get Manga class by its id(name)
     abstract fun getMangaByName(id: String): Manga
 
-    // Function to get array of Manga classes by its id(name), amount of mangas(optional) and offset from start(optional)
+    // Function to get array of Manga classes by its id(name), amount of mangas(optional)
+    // and offset from start(optional)
     abstract fun searchManga(id: String, amount: Int = 10, offset: Int = 0): Array<Manga>
 
     // Function to get info(name, author, genre, number of chapters...) about manga as JSON by its id(name)
