@@ -17,18 +17,20 @@ class MangaChapter {
     }
 
     // Function for safely retrieving amount of pages
+    // MAY THROW MangaJetException
     public fun getPagesNum() : Int {
         if (pagesNumber == -1)
-            pagesNumber = manga.library.getChaptersNumOfPages(manga.id, id)
+            pagesNumber = manga.library.getChaptersNumOfPages(manga.id, id) // Exception may be thrown here
         return pagesNumber
     }
 
     // Function for safely retrieving amount of pages
+    // MAY THROW MangaJetException, ArrayIndexOutOfBoundsException
     public fun getPage(pageNumber : Int) : MangaPage {
         if (pagesNumber == -1)
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)
-            throw ArrayIndexOutOfBoundsException("Bad page index")
-        return manga.library.getChapterPage(manga.id, id, pageNumber)
+            throw ArrayIndexOutOfBoundsException("Bad page index") // Exception may be thrown here
+        return manga.library.getChapterPage(manga.id, id, pageNumber) // Exception may be thrown here
     }
 }

@@ -4,11 +4,15 @@ package com.mangajet.mangajet.data
 object Librarian {
 
     // Enum class that represents names for parsed sites
-    enum class LibraryName{
-        Readmanga,
-        Mangalib,
-        Mangachan,
-        Acomics
+    enum class LibraryName(val resource: String){
+        Readmanga("https://readmanga.io"),
+        Mangalib("https://mangalib.me"),
+        Mangachan("https://manga-chan.me"),
+        Acomics("https://acomics.ru");
+
+        companion object {
+            fun from(findResource: String): LibraryName = LibraryName.values().first { it.resource == findResource}
+        }
     }
 
     // Map for storing libraries names as keys and abstract libraries as value
@@ -17,8 +21,8 @@ object Librarian {
     // Initializer block
     init {
         map[LibraryName.Readmanga] = null
-        map[LibraryName.Mangalib] = MangaChanLibrary()
-        map[LibraryName.Mangachan] = null
+        map[LibraryName.Mangalib] = null
+        map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = null
     }
 
