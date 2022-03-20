@@ -15,5 +15,11 @@ class MangaJetApp : Application() {
         WebAccessor.hashCode()
         Librarian.hashCode()
         StorageManager.hashCode()
+        //example of work
+        val manga = Librarian.getLibrary(Librarian.LibraryName.Mangalib)!!
+            .createMangaById("106438-my-dress-up-darling.html")
+        println("MangaInfo:")
+        manga.updateInfo()
+        manga.updateChapters()
     }
 }
