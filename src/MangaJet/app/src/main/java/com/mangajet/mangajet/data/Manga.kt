@@ -25,36 +25,40 @@ class Manga {
         this.id = id
     }
 
-    // Utility function to get some data from JSON string by tag nam
-    private fun getDataByTag(text: String, tag: String) : String {
-        val tagToFind = "$tag\":\""
-        var start = text.indexOf(tagToFind) + tagToFind.length
-        return text.subSequence(start, text.indexOf("\"", start)).toString()
+    // Utility function to fill data fields of manga class from json file
+    private fun fillMangaFromJSON(json: JSONObject){
+        this.originalName = json.optString("name")       // Get manga's name
+        this.cover = json.optString("cover")             // Get manga's cover
+        this.russianName = json.optString("rus_name")    // Get manga's russian name
+        this.author = json.optString("author")           // Get manga's author
+        this.description = json.optString("description") // Get manga's description
+            .replace("\\r", "")
+            .replace("\\n", "")
+            .replace("\\t", "")
+            .trim()
+        this.rating = json.optDouble("rating", 0.0) // Get rating
+        // Get tags
+        val tagsStr = json.optString("tags").toString()
+        this.tags = tagsStr.substring(1, tagsStr.length - 1)
+            .replace("\"", "")
+            .split(",").toTypedArray()
+    }
+
+    // Constructor from JSON string
+    // MAY THROW MangaJetException
+    constructor(jsonStr: String){
+        val json = JSONObject(jsonStr)
+        this.id = json.optString("id")
+        this.library = Librarian.getLibrary(Librarian.
+        LibraryName.from(json.optString("library")))!! // Exception may be thrown here
+        this.lastViewedChapter = json.optInt("lastViewedChapter", 0)
+        fillMangaFromJSON(json)
     }
 
     // Function to fill all manga info except chapters
     // MAY THROW MangaJetException
     fun updateInfo(){
-        val mangaInfo = library.getMangaInfo(id) // Exception may be thrown here
-        this.originalName = getDataByTag(mangaInfo, "name")           // Get manga's name
-        this.cover = getDataByTag(mangaInfo, "cover")                 // Get manga's cover
-        this.russianName = getDataByTag(mangaInfo, "rus_name")        // Get manga's russian name
-        this.author = getDataByTag(mangaInfo, "author")               // Get manga's author
-        val rating = getDataByTag(mangaInfo, "rating")                // Get manga's rating
-        if (rating.isEmpty())// Some libraries doesn't support rating system
-            this.rating = 0.0
-        else
-            this.rating = rating.toDouble()
-        this.description = getDataByTag(mangaInfo, "description")     // Get manga's description
-            .replace("\\r", "")
-            .replace("\\n", "")
-            .replace("\\t", "")
-            .trim()
-        //Get Tags
-        val tagToFind = "tags\":["
-        var start = mangaInfo.indexOf(tagToFind) + tagToFind.length
-        this.tags = mangaInfo.subSequence(start, mangaInfo.indexOf("]", start)).toString()
-            .replace("\"", "").split(",").toTypedArray()
+        fillMangaFromJSON(JSONObject(library.getMangaInfo(id))) // Exception may be thrown here
     }
 
     // Function to fill chapters array of manga
