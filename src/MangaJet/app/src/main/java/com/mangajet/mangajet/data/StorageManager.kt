@@ -6,6 +6,8 @@ import java.io.File
 // it also will map files from Android filesystem to ours filesystem
 object StorageManager {
     var storageDirectory = "/MangaJet/data" // will be set from options I believe
+    var readPermission = false
+    var writePermission = false
 
     // Function which will say if path exist in local file
     fun isExist(path: String) : Boolean {
