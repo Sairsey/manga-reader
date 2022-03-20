@@ -10,7 +10,7 @@ class MangaJetApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // We need to use WebAccessor and Librarian here,
+        // We need to use WebAccessor, Librarian and StorageManager here,
         // so they will be initialized at known time
         WebAccessor.hashCode()
         Librarian.hashCode()

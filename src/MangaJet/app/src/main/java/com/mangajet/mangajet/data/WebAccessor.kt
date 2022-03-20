@@ -58,19 +58,34 @@ object WebAccessor {
         var str = ""
 
         // Atomic counter
-        val countDownLatch = CountDownLatch(1);
+        val countDownLatch = CountDownLatch(1)
+
+        var isError = 0
+        var retCode = 0
 
         // Simple Callback which will return string
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 countDownLatch.countDown()
+                isError = 1
+                println(e.message) // for debugging purposes
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (response.isSuccessful)
-                        str = response.body!!.string()
+                    if (response.isSuccessful) {
+                        try {
+                            str = response.body!!.string()
+                        }
+                        catch (e: NullPointerException) {
+                            isError = 2
+                            retCode = 404
+                        }
+                    }
+                    else {
+                        isError = 3
+                        retCode = response.code
+                    }
                     countDownLatch.countDown()
                 }
             }
@@ -81,6 +96,13 @@ object WebAccessor {
 
         // And wait for it
         countDownLatch.await()
+
+        // Throw our exceptions in case we have any errors
+        if (isError == 1)
+            throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
+        else if (isError == 2 || isError == 3)
+            throw MangaJetException("Server dismissed our request with return code $retCode")
+
         return str
     }
 
@@ -96,18 +118,35 @@ object WebAccessor {
         var stream : InputStream = "".byteInputStream()
 
         // Atomic counter
-        val countDownLatch = CountDownLatch(1);
+        val countDownLatch = CountDownLatch(1)
+
+        var isError = 0
+        var retCode = 0
+
 
         // Simple Callback which will return string
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 countDownLatch.countDown()
+                isError = 1
+                println(e.message) // for debugging purposes
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    stream = response.body!!.byteStream()
+                    if (response.isSuccessful) {
+                        try {
+                            stream = response.body!!.byteStream()
+                        }
+                        catch (e: NullPointerException) {
+                            isError = 2
+                            retCode = 404
+                        }
+                    }
+                    else {
+                        isError = 3
+                        retCode = response.code
+                    }
                     countDownLatch.countDown()
                 }
             }
@@ -118,6 +157,13 @@ object WebAccessor {
 
         // And wait for it
         countDownLatch.await()
+
+        // Throw our exceptions in case we have any errors
+        if (isError == 1)
+            throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
+        else if (isError == 2 || isError == 3)
+            throw MangaJetException("Server dismissed our request with return code $retCode")
+
         return stream
     }
 }
