@@ -22,7 +22,7 @@ object Librarian {
     init {
         map[LibraryName.Readmanga] = null
         map[LibraryName.Mangalib] = null
-        map[LibraryName.Mangachan] = MangaChanLibrary()
+        map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = null
     }
 

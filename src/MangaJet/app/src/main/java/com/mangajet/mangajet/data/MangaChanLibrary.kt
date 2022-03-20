@@ -4,7 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 // Class that represents Manga-Chan.me library
-class MangaChanLibrary : AbstractLibrary() {
+class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     val resource = "https://manga-chan.me"
 
     val headers = mapOf(

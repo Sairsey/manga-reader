@@ -38,10 +38,12 @@ class Manga {
             .trim()
         this.rating = json.optDouble("rating", 0.0) // Get rating
         // Get tags
-        val tagsStr = json.optString("tags").toString()
-        this.tags = tagsStr.substring(1, tagsStr.length - 1)
-            .replace("\"", "")
-            .split(",").toTypedArray()
+        val tags = json.optJSONArray("tags")
+        val list = ArrayList<String>()
+        for(i in 0 until tags.length()){
+            list.add(tags.optString(i))
+        }
+        this.tags = list.toTypedArray()
     }
 
     // Constructor from JSON string
@@ -83,7 +85,7 @@ class Manga {
         json.put("tags", tagArray)
         json.put("chaptersAmount", this.chapters.size)
         if (this.lastViewedChapter < 0 || this.lastViewedChapter >= this.chapters.size)
-            throw ArrayIndexOutOfBoundsException("Bad last viewed chapter index")
+            this.lastViewedChapter = 0
         json.put("lastViewedChapter", this.lastViewedChapter)
         json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
         return json.toString()
