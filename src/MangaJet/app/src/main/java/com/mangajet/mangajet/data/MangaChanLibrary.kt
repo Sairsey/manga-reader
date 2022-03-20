@@ -156,7 +156,6 @@ class MangaChanLibrary : AbstractLibrary() {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
-                println(table.substring(f, s))
                 chapters.add(MangaChapter(manga, table.substring(f, s)))
                 f = table.indexOf("zaliv", f)
             }
