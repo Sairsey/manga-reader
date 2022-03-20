@@ -1,12 +1,13 @@
 package com.mangajet.mangajet.data
 
 // Abstract class that represents one site from which we parse manga
-@Suppress("UnnecessaryAbstractClass")
 abstract class AbstractLibrary(uniqueID: String) {
-    val id: String = uniqueID
+    private val url: String = uniqueID
 
     // Function to get Url
-    abstract fun getURL() : String
+    fun getURL() : String{
+        return url
+    }
 
     // Function to get Manga class by its id(name)
     abstract fun createMangaById(id: String) : Manga
