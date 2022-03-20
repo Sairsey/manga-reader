@@ -12,6 +12,14 @@ import java.util.concurrent.CountDownLatch
 // Singleton which will work with okHTTP to provide access to web resources
 object WebAccessor {
     private val client = OkHttpClient()
+    const val NOT_FOUND = 404
+
+    const val NO_ERROR = 0
+    const val IO_ERROR = 1
+    const val BODY_NULL_ERROR = 2
+    const val RET_CODE_ERROR = 3
+
+
 
     // Function to aquire things asyncroniously
     fun getAsync(url: String, callback: Callback,
@@ -58,19 +66,34 @@ object WebAccessor {
         var str = ""
 
         // Atomic counter
-        val countDownLatch = CountDownLatch(1);
+        val countDownLatch = CountDownLatch(1)
+
+        var isError = NO_ERROR
+        var retCode = 0
 
         // Simple Callback which will return string
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 countDownLatch.countDown()
+                isError = IO_ERROR
+                println(e.message) // for debugging purposes
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (response.isSuccessful)
-                        str = response.body!!.string()
+                    if (response.isSuccessful) {
+                        try {
+                            str = response.body!!.string()
+                        }
+                        catch (expected: NullPointerException) {
+                            isError = BODY_NULL_ERROR
+                            retCode = NOT_FOUND
+                        }
+                    }
+                    else {
+                        isError = RET_CODE_ERROR
+                        retCode = response.code
+                    }
                     countDownLatch.countDown()
                 }
             }
@@ -81,6 +104,13 @@ object WebAccessor {
 
         // And wait for it
         countDownLatch.await()
+
+        // Throw our exceptions in case we have any errors
+        if (isError == IO_ERROR)
+            throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
+        else if (isError == BODY_NULL_ERROR || isError == RET_CODE_ERROR)
+            throw MangaJetException("Server dismissed our request with return code $retCode")
+
         return str
     }
 
@@ -96,18 +126,34 @@ object WebAccessor {
         var stream : InputStream = "".byteInputStream()
 
         // Atomic counter
-        val countDownLatch = CountDownLatch(1);
+        val countDownLatch = CountDownLatch(1)
 
+        var isError = NO_ERROR
+        var retCode = 0
+        
         // Simple Callback which will return string
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 countDownLatch.countDown()
+                isError = IO_ERROR
+                println(e.message) // for debugging purposes
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    stream = response.body!!.byteStream()
+                    if (response.isSuccessful) {
+                        try {
+                            stream = response.body!!.byteStream()
+                        }
+                        catch (expected: NullPointerException) {
+                            isError = BODY_NULL_ERROR
+                            retCode = NOT_FOUND
+                        }
+                    }
+                    else {
+                        isError = RET_CODE_ERROR
+                        retCode = response.code
+                    }
                     countDownLatch.countDown()
                 }
             }
@@ -118,6 +164,13 @@ object WebAccessor {
 
         // And wait for it
         countDownLatch.await()
+
+        // Throw our exceptions in case we have any errors
+        if (isError == IO_ERROR)
+            throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
+        else if (isError == BODY_NULL_ERROR || isError == RET_CODE_ERROR)
+            throw MangaJetException("Server dismissed our request with return code $retCode")
+
         return stream
     }
 }

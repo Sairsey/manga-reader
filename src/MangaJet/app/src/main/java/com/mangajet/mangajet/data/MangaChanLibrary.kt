@@ -24,10 +24,11 @@ class MangaChanLibrary : AbstractLibrary() {
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
+    // MAY THROW MangaJetException
     override fun searchManga(id: String, amount: Int, offset: Int) : Array<Manga> {
         val newId = id.replace(' ', '+')
         val url = resource + "/?do=search&subaction=search&story=" + newId
-        val text = WebAccessor.getTextSync(url, headers)
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("class=\"content_row\"")
 
@@ -114,9 +115,10 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get info(name, author, genre, number of chapters...) about manga as JSON by its id(name)
+    // MAY THROW MangaJetException
     override fun getMangaInfo(id: String) : String {
         val url = resource + "/manga/" + id
-        val text = WebAccessor.getTextSync(url, headers)
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val json = JSONObject()
         json.put("name", MangaChanLibraryHelper().getName(text))
@@ -130,9 +132,10 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get array of MangaChapter classes by manga's id(name)
+    // MAY THROW MangaJetException
     override fun getMangaChapters(manga: Manga) : Array<MangaChapter> {
         val url = resource + "/manga/" + manga.id
-        val text = WebAccessor.getTextSync(url, headers)
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         // Find all tables
         val tables = ArrayList<String>()
@@ -162,9 +165,10 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get number of pages in specific manga and specific chapter by their ids(names)
+    // MAY THROW MangaJetException
     override fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int {
         val url = resource + "/online/" + chapterID
-        val text = WebAccessor.getTextSync(url, headers)
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("fullimg")
         f = text.indexOf("[", f)
@@ -177,9 +181,10 @@ class MangaChanLibrary : AbstractLibrary() {
     }
 
     // Function to get Manga Page class by its number, manga id and chapter id
+    // MAY THROW MangaJetException
     override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage {
         val url = resource + "/online/" + chapterID
-        val text = WebAccessor.getTextSync(url, headers)
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("fullimg")
         f = text.indexOf("[", f)
