@@ -51,8 +51,14 @@ class Manga {
     constructor(jsonStr: String){
         val json = JSONObject(jsonStr)
         this.id = json.optString("id")
-        this.library = Librarian.getLibrary(Librarian.
-        LibraryName.from(json.optString("library")))!! // Exception may be thrown here
+        try {
+            this.library = Librarian.getLibrary(
+                Librarian.LibraryName.from(json.optString("library"))
+            )!!
+        }
+        catch (expected: NullPointerException) {
+            throw MangaJetException("Unknown library")
+        }
         this.lastViewedChapter = json.optInt("lastViewedChapter", 0)
         fillMangaFromJSON(json)
     }
