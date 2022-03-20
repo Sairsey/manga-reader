@@ -7,6 +7,7 @@ import okhttp3.Callback
 import okhttp3.Call
 import okio.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
 
 // Singleton which will work with okHTTP to provide access to web resources
@@ -19,10 +20,8 @@ object WebAccessor {
     const val BODY_NULL_ERROR = 2
     const val RET_CODE_ERROR = 3
 
-
-
     // Function to aquire things asyncroniously
-    fun getAsync(url: String, callback: Callback,
+    private fun getAsync(url: String, callback: Callback,
                      headers: Map<String, String> = mapOf()) : Call {
 
         var preRequest = Request.Builder()
@@ -74,9 +73,9 @@ object WebAccessor {
         // Simple Callback which will return string
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                countDownLatch.countDown()
                 isError = IO_ERROR
                 println(e.message) // for debugging purposes
+                countDownLatch.countDown()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -114,36 +113,35 @@ object WebAccessor {
         return str
     }
 
-    // Function to aquire bytes via InputStream
-    fun getBytesStream(url: String, headers: Map<String, String> = mapOf()) : InputStream {
-
-        // We have here another android crazy stuff
-        // Problem is that Android blocks sockets from main thread
-        // So to get bytes syncroniously we need to
-        // do asyncronious request and wait for it.
-
-        // Default value
-        var stream : InputStream = "".byteInputStream()
-
+    // Xlass which represent async handler of streaming web data to some file
+    class Promise(outputStream: OutputStream) {
         // Atomic counter
-        val countDownLatch = CountDownLatch(1)
+        private var countDownLatch = CountDownLatch(1)
+        // Error state
+        private var isError = NO_ERROR
+        // HTTP return code
+        private var retCode = 0
+        // Stream in which we want to write
+        // private var outputStream : OutputStream
 
-        var isError = NO_ERROR
-        var retCode = 0
-
-        // Simple Callback which will return string
+        // Simple Callback which will fill outputStream
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                countDownLatch.countDown()
                 isError = IO_ERROR
                 println(e.message) // for debugging purposes
+                countDownLatch.countDown()
             }
 
+            @Suppress("NestedBlockDepth")
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (response.isSuccessful) {
                         try {
-                            stream = response.body!!.byteStream()
+                            response.body!!.byteStream().use { input ->
+                                outputStream.use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
                         }
                         catch (expected: NullPointerException) {
                             isError = BODY_NULL_ERROR
@@ -159,18 +157,29 @@ object WebAccessor {
             }
         }
 
+        // Function for synchronization
+        // MAY THROW MangaJetException
+        fun join() {
+            // wait for this promise
+            countDownLatch.await()
+
+            // Throw our exceptions in case we have any errors
+            if (isError == IO_ERROR)
+                throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
+            else if (isError == BODY_NULL_ERROR || isError == RET_CODE_ERROR)
+                throw MangaJetException("Server dismissed our request with return code $retCode")
+        }
+    }
+
+    // Function to aquire bytes via InputStream
+    fun writeBytesStream(url: String, outputStream: OutputStream, headers: Map<String, String> = mapOf()) : Promise {
+        // Create new promise
+        val myPromise = Promise(outputStream)
+
         // Make async call
-        val call = getAsync(url, callback, headers)
+        getAsync(url, myPromise.callback, headers)
 
-        // And wait for it
-        countDownLatch.await()
-
-        // Throw our exceptions in case we have any errors
-        if (isError == IO_ERROR)
-            throw MangaJetException("Connection lost. May be a problem with yours connectivity or timeout")
-        else if (isError == BODY_NULL_ERROR || isError == RET_CODE_ERROR)
-            throw MangaJetException("Server dismissed our request with return code $retCode")
-
-        return stream
+        // Return promise
+        return myPromise
     }
 }

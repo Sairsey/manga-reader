@@ -18,8 +18,8 @@ class MangaPage {
     }
 
     // Function for checking if page downloaded. If not - it will start to upload to storage
-    fun upload() {
-        if (!StorageManager.isExist(this.localPath)) {
+    fun upload(force: Boolean = false) {
+        if (force || !StorageManager.isExist(this.localPath)) {
             StorageManager.download(this.url, this.localPath)
         }
     }
@@ -32,6 +32,6 @@ class MangaPage {
         // wait if not loaded
         StorageManager.await(this.localPath)
 
-        return StorageManager.getFile(this.localPath)!!
+        return StorageManager.getFile(this.localPath)
     }
 }
