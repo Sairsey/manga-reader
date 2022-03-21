@@ -58,7 +58,7 @@ object StorageManager {
     // MAY THROW MangaJetException
     fun await(path: String){
         // If we already loaded this file - do not do anything
-        if (loadPromises.containsKey(path))
+        if (!loadPromises.containsKey(path))
             return
         loadPromises[path]?.join() // Exception may be thrown here
         loadPromises.remove(path)
