@@ -18,6 +18,7 @@ class MangaPage {
     }
 
     // Function for checking if page downloaded. If not - it will start to upload to storage
+    // MAY THROW MangaJetException
     fun upload(force: Boolean = false) {
         if (force || !StorageManager.isExist(this.localPath)) {
             StorageManager.download(this.url, this.localPath)
@@ -25,6 +26,7 @@ class MangaPage {
     }
 
     // Function will return File instance of this image
+    // MAY THROW MangaJetException
     fun getFile() : File {
         // safe-check
         upload()

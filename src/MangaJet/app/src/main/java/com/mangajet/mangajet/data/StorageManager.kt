@@ -31,14 +31,19 @@ object StorageManager {
         if (loadPromises.containsKey(path))
             return
 
-        // Create all directories
+        // Create file handle
         val file = File(storageDirectory + "/" + path)
-        file.mkdirs()
 
         // If file already already exist - delete it
         if (file.exists()) {
             file.delete()
         }
+
+        // Create all Directories
+        file.mkdirs()
+
+        // Delete our file, which was created as directory by file.mkdirs()
+        file.delete()
 
         // Create file
         if (!file.createNewFile())
