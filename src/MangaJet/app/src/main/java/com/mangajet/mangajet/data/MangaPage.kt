@@ -20,8 +20,8 @@ class MangaPage {
     // Function for checking if page downloaded. If not - it will start to upload to storage
     // MAY THROW MangaJetException
     fun upload(force: Boolean = false) {
-        if (force || !StorageManager.isExist(this.localPath)) {
-            StorageManager.download(this.url, this.localPath)
+        if (force || !StorageManager.isExist(this.localPath)) { // Exception may be thrown here
+            StorageManager.download(this.url, this.localPath) // Exception may be thrown here
         }
     }
 
@@ -29,11 +29,11 @@ class MangaPage {
     // MAY THROW MangaJetException
     fun getFile() : File {
         // safe-check
-        upload()
+        upload() // Exception may be thrown here
 
         // wait if not loaded
-        StorageManager.await(this.localPath)
+        StorageManager.await(this.localPath) // Exception may be thrown here
 
-        return StorageManager.getFile(this.localPath)
+        return StorageManager.getFile(this.localPath) // Exception may be thrown here
     }
 }
