@@ -7,35 +7,38 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import com.mangajet.mangajet.ui.history.HistoryViewModel
 
 // Class which represents "About Manga" Activity
 class AboutMangaActivity : AppCompatActivity() {
+    // In methods 'onCreate' we only init data in viewport. All other actions -> in onStart() or onResume() overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_manga_second)
 
-        val manga = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga("Клинок")[0]
+        // Call viewport to manage low speed downloading data in dat class
+        val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]      // Kavo????
+        aboutMangaViewmodel.initMangaData(intent)
+    }
 
-        manga.updateInfo()
+    override fun onStart() {
+        super.onStart()
+        val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
 
-        manga.updateChapters()
+        val cover = MangaPage(aboutMangaViewmodel.cover)
+        cover.upload()
 
-        val page = manga.chapters[manga.lastViewedChapter].getPage(1+1+1+1+1)
+        findViewById<TextView>(R.id.titleText).setText( aboutMangaViewmodel.origTitle + " (" +
+                                                        aboutMangaViewmodel.rusTitle + ")")
+        findViewById<TextView>(R.id.authorText).setText(aboutMangaViewmodel.author)
+        findViewById<TextView>(R.id.fullDescriptionText).setText(aboutMangaViewmodel.descr)
 
-        page.upload()
-
-        val cover = MangaPage(manga.cover)
-        cover.upload(true)
-
-        findViewById<TextView>(R.id.titleText).setText(manga.originalName + " (" + manga.russianName + ")")
-        findViewById<TextView>(R.id.authorText).setText(manga.author)
-        findViewById<TextView>(R.id.fullDescriptionText).setText(manga.description)
-
-        val imageFile = page.getFile()
+        val imageFile = cover.getFile()
 
         val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
         findViewById<ImageView>(R.id.coverManga).setImageBitmap(bitmap)
@@ -44,5 +47,9 @@ class AboutMangaActivity : AppCompatActivity() {
         buttonToRead.setOnClickListener{
             val intent = Intent(this, MangaReaderActivity::class.java)
             startActivity(intent)}
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }

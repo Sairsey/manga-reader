@@ -32,6 +32,7 @@ class SearchFragment : Fragment() {
 
         _binding = SearchFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        searchViewModel.initMangas()
 
         var listView = binding.searchViewList
         activity?.let {
@@ -44,6 +45,7 @@ class SearchFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                searchViewModel.packageMangaToIntent(id.toInt(), intent)
                 startActivity(intent)}
         }
 

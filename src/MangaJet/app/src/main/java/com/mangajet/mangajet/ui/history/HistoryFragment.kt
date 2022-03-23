@@ -36,6 +36,8 @@ class HistoryFragment : Fragment() {
         _binding = HistoryFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        historyViewModel.initMangas()
+
         var listView = binding.historyListview
         activity?.let {
             val adapter = ArrayAdapter<String>(
@@ -46,8 +48,8 @@ class HistoryFragment : Fragment() {
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
-                //val element = parent.getItemAtPosition(position) // The item that was clicked
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                historyViewModel.packageMangaToIntent(id.toInt(), intent)
                 startActivity(intent)}
         }
 

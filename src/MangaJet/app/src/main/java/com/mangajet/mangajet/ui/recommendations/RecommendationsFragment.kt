@@ -32,6 +32,7 @@ class RecommendationsFragment : Fragment() {
 
         _binding = RecommendationsFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        recommendedViewModel.initMangas()
 
         var listView = binding.recommendedListView
         activity?.let {
@@ -43,8 +44,8 @@ class RecommendationsFragment : Fragment() {
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
-                //val element = parent.getItemAtPosition(position) // The item that was clicked
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                recommendedViewModel.packageMangaToIntent(id.toInt(), intent)
                 startActivity(intent)}
         }
         return root
