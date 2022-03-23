@@ -69,10 +69,7 @@ class CacheSettingActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val sp = getDefaultSharedPreferences(this)
-        val theme = sp.getInt("THEME", R.style.Theme_MangaJet)
-        setTheme(theme)
-
+        setTitle(R.string.setting_cache)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheListAdapter()

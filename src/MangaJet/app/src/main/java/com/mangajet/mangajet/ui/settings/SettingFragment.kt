@@ -15,6 +15,7 @@ import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import com.mangajet.mangajet.ui.search.SearchViewModel
+import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
 
@@ -26,6 +27,7 @@ class SettingFragment : Fragment() {
         const val THEME_PICKER_ID = 0
         const val CACHE_ID = 1
         const val BACKUP_ID = 2
+        const val ABOUTAPP_ID = 3
     }
 
     private lateinit var viewModel: SettingViewModel
@@ -64,6 +66,10 @@ class SettingFragment : Fragment() {
                     }
                     Companion.BACKUP_ID -> {
                         var intent : Intent = Intent(it, CacheSettingActivity::class.java)
+                        startActivity(intent)
+                    }
+                    Companion.ABOUTAPP_ID -> {
+                        var intent : Intent = Intent(it, AboutAppActivity::class.java)
                         startActivity(intent)
                     }
                 }

@@ -8,5 +8,5 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 // Class which represents "Settings" ViewModel
 class SettingViewModel : ViewModel() {
     // only name settings
-    val dataOptionsNames = listOf("Theme picker", "Cache", "Backup and recovery")
+    val dataOptionsNames = listOf("Theme picker", "Cache", "Backup and recovery", "About app")
 }

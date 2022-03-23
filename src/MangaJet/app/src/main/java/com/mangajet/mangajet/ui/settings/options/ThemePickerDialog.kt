@@ -33,6 +33,7 @@ class ThemePickerDialog : DialogFragment() {
                         Companion.NIGHT -> setAppTheme(MODE_NIGHT_YES)
                         Companion.SYSTEM_THEME -> setAppTheme(MODE_NIGHT_FOLLOW_SYSTEM)
                     }
+                    dialog.cancel()
                 }
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
