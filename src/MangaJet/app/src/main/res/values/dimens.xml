@@ -2,4 +2,15 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">40dp</dimen>
     <dimen name="activity_vertical_margin">40dp</dimen>
+<<<<<<< Updated upstream
+=======
+
+    <!-- Inner block margins (in About manga activity) -->
+    <dimen name="inner_about_manga_vertical_margin">16dp</dimen>
+    <dimen name="inner_about_manga_horizontal_margin">16dp</dimen>
+
+    <!-- Inner block different options list (in settings activity) -->
+    <dimen name="inner_settings_vertical_margin">24dp</dimen>
+    <dimen name="inner_settings_horizontal_margin">16dp</dimen>
+>>>>>>> Stashed changes
 </resources>

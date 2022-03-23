@@ -71,4 +71,43 @@ object StorageManager {
             throw MangaJetException("Read permission not granted")
         return File(storageDirectory + "/" + path)
     }
+
+    // Function which will give File handler for specific path
+    private fun dirSize(dir: File): Long {
+        if (dir.exists()) {
+            var result: Long = 0
+            val fileList = dir.listFiles()
+            for (i in fileList!!.indices) {
+                if (fileList[i].isDirectory) {
+                    result += dirSize(fileList[i])
+                } else {
+                    result += fileList[i].length()
+                }
+            }
+            return result
+        }
+        return 0
+    }
+
+    fun usedStorageSizeInBytes(): Long {
+        val dir = File(storageDirectory)
+        if (dir.exists()) {
+            var result: Long = 0
+            val fileList = dir.listFiles()
+            for (i in fileList!!.indices) {
+                if (fileList[i].isDirectory) {
+                    result += dirSize(fileList[i])
+                } else {
+                    result += fileList[i].length()
+                }
+            }
+            return result
+        }
+        return 0
+    }
+
+    fun removeDirectory(path: String = ""): Boolean {
+        val f = File(storageDirectory + "/" + path)
+        return f.deleteRecursively()
+    }
 }
