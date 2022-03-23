@@ -7,6 +7,6 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 
 // Class which represents "Settings" ViewModel
 class SettingViewModel : ViewModel() {
-    // only 'Data options' layout settings
-    val dataOptionsNames = listOf("Cache", "Backup and recovery")
+    // only name settings
+    val dataOptionsNames = listOf("Theme picker", "Cache", "Backup and recovery")
 }

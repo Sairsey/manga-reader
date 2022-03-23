@@ -8,6 +8,6 @@
     <string name="title_AboutManga">About Manga</string>
 
     <!-- Strings, using in "Settings" activity -->
-    <string name="setting_DataSettings">Data settings</string>
+    <string name="setting_Settings">Settings</string>
     <string name="setting_cache">Cache options</string>
 </resources>

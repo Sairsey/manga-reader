@@ -1,20 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.MangaJet" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.MangaJetGreen" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/primary</item>
-        <item name="colorSecondaryVariant">@color/primary_dark</item>
+        <item name="colorSecondary">@color/green_primary</item>
+        <item name="colorSecondaryVariant">@color/green_primary_dark</item>
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="android:colorPrimary">@color/green_primary</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:windowBackground">@color/black</item>
         <item name="android:navigationBarColor">@color/true_black</item>

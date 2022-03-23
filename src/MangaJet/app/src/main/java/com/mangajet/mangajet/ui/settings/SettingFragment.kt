@@ -9,18 +9,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.fragment.app.FragmentManager
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import com.mangajet.mangajet.ui.search.SearchViewModel
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
+import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
 
 // Class which represents "Settings" fragment of MainActivity
 class SettingFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     companion object {
         fun newInstance() = SettingFragment()
+        const val THEME_PICKER_ID = 0
+        const val CACHE_ID = 1
+        const val BACKUP_ID = 2
     }
 
     private lateinit var viewModel: SettingViewModel
@@ -45,12 +50,24 @@ class SettingFragment : Fragment() {
 
             dataSettingsList.adapter = adapter
             dataSettingsList.setOnItemClickListener{ parent, view, position, id ->
-                var intent : Intent = Intent(it, CacheSettingActivity::class.java)
                 when (id.toInt()) {
-                    0 -> intent = Intent(it, CacheSettingActivity::class.java)
-                    1 -> intent = Intent(it, CacheSettingActivity::class.java)
+                    Companion.THEME_PICKER_ID -> {
+                        val myDialogFragment = ThemePickerDialog()
+                        val manager = fragmentManager
+                        if (manager != null) {
+                            myDialogFragment.show(manager, "myDialog")
+                        }
+                    }
+                    Companion.CACHE_ID -> {
+                        var intent : Intent = Intent(it, CacheSettingActivity::class.java)
+                        startActivity(intent)
+                    }
+                    Companion.BACKUP_ID -> {
+                        var intent : Intent = Intent(it, CacheSettingActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
-                startActivity(intent)}
+            }
         }
 
         return root
@@ -61,5 +78,4 @@ class SettingFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(SettingViewModel::class.java)
         // TODO Use the ViewModel
     }
-
 }
