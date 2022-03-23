@@ -25,7 +25,7 @@ class AboutMangaActivity : AppCompatActivity() {
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]      // Kavo????
         aboutMangaViewmodel.initMangaData(intent)
-
+        setTitle(aboutMangaViewmodel.origTitle)
         findViewById<TextView>(R.id.fullDescriptionText).movementMethod = ScrollingMovementMethod()
     }
 

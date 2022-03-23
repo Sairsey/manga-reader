@@ -10,17 +10,17 @@ import com.mangajet.mangajet.data.Manga
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
     var isInited = 0
-    val mangasNames = listOf("One piece", "Boku no hero academia", "Attack on titan")
+    val mangasNames = listOf("Гуль", "Гуль", "Гуль")
     var mangas : ArrayList<Manga> = arrayListOf()
 
     fun initMangas() {
         if (isInited == 0) {
             isInited = 1
-            for (name in mangasNames) {
-                mangas.add(
-                    Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
-                )
-            }
+            val mangasTmp =
+                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasNames[0])
+            mangas.add(mangasTmp[0])
+            mangas.add(mangasTmp[1])
+            mangas.add(mangasTmp[2])
         }
     }
 
