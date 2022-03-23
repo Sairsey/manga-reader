@@ -3,6 +3,8 @@ package com.mangajet.mangajet.aboutmanga
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.widget.Button
 import android.widget.Toast
 import com.mangajet.mangajet.R
