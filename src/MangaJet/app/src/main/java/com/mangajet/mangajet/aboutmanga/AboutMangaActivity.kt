@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -24,6 +25,8 @@ class AboutMangaActivity : AppCompatActivity() {
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]      // Kavo????
         aboutMangaViewmodel.initMangaData(intent)
+
+        findViewById<TextView>(R.id.fullDescriptionText).movementMethod = ScrollingMovementMethod()
     }
 
     override fun onStart() {
