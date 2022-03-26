@@ -18,6 +18,7 @@ import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import com.mangajet.mangajet.ui.search.SearchViewModel
 import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
+import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
 import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
 
 // Class which represents "Settings" fragment of MainActivity
@@ -25,10 +26,11 @@ class SettingFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     companion object {
         fun newInstance() = SettingFragment()
-        const val THEME_PICKER_ID = 0
-        const val CACHE_ID = 1
-        const val BACKUP_ID = 2
-        const val ABOUTAPP_ID = 3
+        const val AUTHORIZATION_ID = 0
+        const val THEME_PICKER_ID = 1
+        const val CACHE_ID = 2
+        const val BACKUP_ID = 3
+        const val ABOUTAPP_ID = 4
     }
 
     private lateinit var viewModel: SettingViewModel
@@ -54,6 +56,10 @@ class SettingFragment : Fragment() {
             dataSettingsList.adapter = adapter
             dataSettingsList.setOnItemClickListener{ parent, view, position, id ->
                 when (id.toInt()) {
+                    Companion.AUTHORIZATION_ID -> {
+                        var intent : Intent = Intent(it, MangaAuthorizationActivity::class.java)
+                        startActivity(intent)
+                    }
                     Companion.THEME_PICKER_ID -> {
                         val myDialogFragment = ThemePickerDialog()
                         val manager = fragmentManager

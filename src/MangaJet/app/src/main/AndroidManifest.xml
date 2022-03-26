@@ -14,8 +14,11 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.MangaJet">
+        android:theme="@style/Theme.MangaJet"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.settings.options.MangaAuthorizationActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.settings.options.AboutAppWebView"
             android:exported="false" />
