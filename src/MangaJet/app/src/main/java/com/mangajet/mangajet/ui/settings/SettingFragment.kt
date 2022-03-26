@@ -9,28 +9,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.fragment.app.FragmentManager
-import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
-import com.mangajet.mangajet.authorization.AuthorizationActivity
-import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
-import com.mangajet.mangajet.mangareader.MangaReaderActivity
-import com.mangajet.mangajet.ui.search.SearchViewModel
 import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
 import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
+import com.mangajet.mangajet.ui.settings.options.StoragePathDialog
+
 
 // Class which represents "Settings" fragment of MainActivity
 class SettingFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     companion object {
         fun newInstance() = SettingFragment()
+
         const val AUTHORIZATION_ID = 0
         const val THEME_PICKER_ID = 1
         const val CACHE_ID = 2
         const val BACKUP_ID = 3
-        const val ABOUTAPP_ID = 4
+        const val STORAGE_PATH_ID = 4
+        const val ABOUTAPP_ID = 5
     }
 
     private lateinit var viewModel: SettingViewModel
@@ -64,7 +62,7 @@ class SettingFragment : Fragment() {
                         val myDialogFragment = ThemePickerDialog()
                         val manager = fragmentManager
                         if (manager != null) {
-                            myDialogFragment.show(manager, "myDialog")
+                            myDialogFragment.show(manager, "Theme picker dialog")
                         }
                     }
                     Companion.CACHE_ID -> {
@@ -74,6 +72,13 @@ class SettingFragment : Fragment() {
                     Companion.BACKUP_ID -> {
                         var intent : Intent = Intent(it, CacheSettingActivity::class.java)
                         startActivity(intent)
+                    }
+                    Companion.STORAGE_PATH_ID -> {
+                        val myDialogFragment = StoragePathDialog()
+                        val manager = fragmentManager
+                        if (manager != null) {
+                            myDialogFragment.show(manager, "Storage path dialog")
+                        }
                     }
                     Companion.ABOUTAPP_ID -> {
                         var intent : Intent = Intent(it, AboutAppActivity::class.java)
