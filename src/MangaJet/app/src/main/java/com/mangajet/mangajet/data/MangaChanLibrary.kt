@@ -176,19 +176,30 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             }
         }
         chapters.reverse()
+        if (chapters.size == 0)
+            chapters.add(MangaChapter(manga, manga.id))
         return chapters.toTypedArray()
     }
+
+    // on some sites we might go to another URL
+    val secretURL = "http://ex-hentaidono.me"
 
     // Function to get number of pages in specific manga and specific chapter by their ids(names)
     // MAY THROW MangaJetException
     override fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int {
-        val url = getURL() + "/online/" + chapterID
+        var url = "/online/" + chapterID
+        if (getURL()[getURL().length - 1] == 'v')
+            url = secretURL + url + "?development_access=true"
+        else
+            url = getURL() + url
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("fullimg")
         f = text.indexOf("[", f)
-        val s = text.indexOf("]", f) - 1
+        val s = text.indexOf("]", f)
         var subtext = text.subSequence(f, s).toString() + "]"
+        if (subtext[subtext.length - 2] == ',')
+            subtext = subtext.dropLast(2) + "]"
 
         val json = JSONArray(subtext)
 
@@ -198,13 +209,19 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // Function to get Manga Page class by its number, manga id and chapter id
     // MAY THROW MangaJetException
     override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage {
-        val url = getURL() + "/online/" + chapterID
+        var url = "/online/" + chapterID
+        if (getURL()[getURL().length - 1] == 'v')
+            url = secretURL + url + "?development_access=true"
+        else
+            url = getURL() + url
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("fullimg")
         f = text.indexOf("[", f)
-        val s = text.indexOf("]", f) - 1
+        val s = text.indexOf("]", f)
         var subtext = text.subSequence(f, s).toString() + "]"
+        if (subtext[subtext.length - 2] == ',')
+            subtext = subtext.dropLast(2) + "]"
 
         val json = JSONArray(subtext)
         return MangaPage(json[pageNumber].toString())
