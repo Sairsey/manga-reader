@@ -188,7 +188,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // MAY THROW MangaJetException
     override fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int {
         var url = "/online/" + chapterID
-        if (getURL()[getURL().length - 1] == 'v')
+        if (getURL()[getURL().length - 2] == 'v')
             url = secretURL + url + "?development_access=true"
         else
             url = getURL() + url
@@ -210,7 +210,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // MAY THROW MangaJetException
     override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage {
         var url = "/online/" + chapterID
-        if (getURL()[getURL().length - 1] == 'v')
+        if (getURL()[getURL().length - 2] == 'v')
             url = secretURL + url + "?development_access=true"
         else
             url = getURL() + url
