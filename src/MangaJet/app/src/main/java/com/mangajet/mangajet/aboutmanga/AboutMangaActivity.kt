@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
@@ -16,7 +15,6 @@ class AboutMangaActivity : AppCompatActivity() {
 
         val buttonToRead = findViewById<Button>(R.id.openMangaReader)
         buttonToRead.setOnClickListener{
-            //Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show()}
             val intent = Intent(this, MangaReaderActivity::class.java)
             startActivity(intent)}
     }

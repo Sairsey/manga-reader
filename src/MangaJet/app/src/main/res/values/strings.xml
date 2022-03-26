@@ -5,5 +5,11 @@
     <string name="title_search">Search</string>
     <string name="title_updates">Updates</string>
     <string name="title_settings">Settings</string>
+    <string name="title_authorization">Authorization</string>
     <string name="title_AboutManga">About Manga</string>
+
+    <!-- Strings, using in "Settings" activity -->
+    <string name="setting_Settings">Settings</string>
+    <string name="setting_cache">Cache options</string>
+    <string name="setting_aboutapp">About app</string>
 </resources>

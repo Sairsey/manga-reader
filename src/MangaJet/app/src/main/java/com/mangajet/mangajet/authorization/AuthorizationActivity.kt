@@ -18,6 +18,8 @@ class AuthorizationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization_second)
 
+        setTitle(R.string.title_authorization)
+
         // Call viewmodel to init all elements
         val authorizationViewmodel = ViewModelProvider(this)[AuthorizationViewModel::class.java]
         authorizationViewmodel.initAuthScreen(intent)
