@@ -32,13 +32,19 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         val res = ArrayList<Manga>()
 
+        var index = 0
         while (f != -1) {
             f = text.indexOf("h2", f)
             f = text.indexOf("<a", f)
             f = text.indexOf("manga/", f) + "manga".length + 1
             val s = text.indexOf("\"", f)
-            res.add(Manga(this, text.subSequence(f, s).toString()))
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
             f = text.indexOf("class=\"content_row\"", f)
+            index++
         }
 
 
@@ -61,14 +67,22 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var f = text.indexOf("name_row")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
+            val sLast = text.indexOf("</a>", f) - 1
             val s = text.indexOf("(", f) - 1
+            if (s == -1 || s > sLast)
+                return text.subSequence(f, sLast).toString()
             return text.subSequence(f, s).toString()
         }
 
         // Retrieve russian name of manga
         fun getRusName(text : String) : String {
             var f = text.indexOf("name_row")
+            f = text.indexOf("<a", f)
+            f = text.indexOf(">", f) + 1
+            val sLast = text.indexOf("</a>", f) - 1;
             f = text.indexOf("(", f) + 1
+            if (f == -1 || f > sLast)
+                return ""
             val s = text.indexOf(")", f)
             return text.subSequence(f, s).toString()
         }
@@ -76,6 +90,8 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         // Retrieve description
         fun getDescr(text : String) : String {
             var f = text.indexOf("<div id=\"description\"")
+            if (f == -1)
+                return ""
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
             return text.subSequence(f, s).toString()
@@ -83,8 +99,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve author
         fun getAuthor(text : String) : String {
-            var f = text.indexOf("mangatitle")
-            f = text.indexOf("Автор", f)
+            var f = text.indexOf(">Автор")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
@@ -93,12 +108,14 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve tags
         fun getTags(text : String) : Array<String> {
+            val res = ArrayList<String>()
             var f = text.indexOf("mangatitle")
+            if (f == -1)
+                return res.toTypedArray()
             f = text.indexOf("Тэги", f)
             var s = text.indexOf("</span", f)
             val subtext = text.subSequence(f, s)
 
-            val res = ArrayList<String>()
 
             f = subtext.indexOf("<a")
             while (f != -1) {
