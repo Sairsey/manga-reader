@@ -40,9 +40,10 @@ class ClearCacheDialog : DialogFragment() {
 // Cache management Activity
 class CacheSettingActivity : AppCompatActivity() {
     companion object {
-        const val KILO = 1024.0
+        const val KILO = 1024.0     // Size of one Kilo
     }
 
+    // Function will return readable string with storage size
     private fun getStringSize(size: Long): String {
         if (size <= 0)
             return "0MB"
@@ -52,6 +53,7 @@ class CacheSettingActivity : AppCompatActivity() {
                              " " + units[digitGroups]
     }
 
+    // Function will fill cache list adapter
     fun fillCacheListAdapter() {
         val cacheSettingsList = findViewById<ListView>(R.id.cacheOptionsList)
         val adapter = ArrayAdapter<String> (
