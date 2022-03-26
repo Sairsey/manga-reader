@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.mangajet.mangajet.authorization.AuthorizationActivity
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
@@ -33,6 +34,7 @@ class SettingFragment : Fragment() {
             authorizationButt.setOnClickListener {
                 //Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show()}
                 val intent = Intent(tmpIt, AuthorizationActivity::class.java)
+                intent.putExtra("URL", Librarian.LibraryName.Mangachan.resource)
                 startActivity(intent)
             }
         }
