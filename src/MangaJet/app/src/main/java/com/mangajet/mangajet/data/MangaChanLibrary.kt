@@ -188,7 +188,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     }
 
     // on some sites we might go to another URL
-    val secretURL = "http://ex-hentaidono.me"
+    val secretURL = "http://exhentai-dono.me"
 
     // Function to get array of pages in specific manga, specific chapter by their ids(names)
     // MAY THROW MangaJetException
