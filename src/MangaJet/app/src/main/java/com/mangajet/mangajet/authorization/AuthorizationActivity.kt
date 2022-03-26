@@ -17,12 +17,10 @@ import com.mangajet.mangajet.mangareader.AuthorizationViewModel
 class AuthorizationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val sp = getDefaultSharedPreferences(this)
-        val theme = sp.getInt("THEME", R.style.Theme_MangaJet)
-        setTheme(theme)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization_second)
+
+        setTitle(R.string.title_authorization)
 
         // Call viewmodel to init all elements
         val authorizationViewmodel = ViewModelProvider(this)[AuthorizationViewModel::class.java]

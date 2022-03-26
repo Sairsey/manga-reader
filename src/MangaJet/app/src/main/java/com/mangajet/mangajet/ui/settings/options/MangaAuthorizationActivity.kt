@@ -13,6 +13,7 @@ class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manga_authorization)
+        setTitle(R.string.title_authorization)
 
         val mangasLibraries = arrayListOf<String>()
         Librarian.LibraryName.values().forEach { mangasLibraries.add(it.toString()) }
