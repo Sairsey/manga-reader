@@ -25,7 +25,7 @@ class AboutMangaActivity : AppCompatActivity() {
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]      // Kavo????
         aboutMangaViewmodel.initMangaData(intent)
-        setTitle(aboutMangaViewmodel.origTitle)
+        setTitle(aboutMangaViewmodel.manga.originalName)
         findViewById<TextView>(R.id.fullDescriptionText).movementMethod = ScrollingMovementMethod()
     }
 
@@ -33,13 +33,13 @@ class AboutMangaActivity : AppCompatActivity() {
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
 
-        val cover = MangaPage(aboutMangaViewmodel.cover)
+        val cover = MangaPage(aboutMangaViewmodel.manga.cover)
         cover.upload()
 
-        findViewById<TextView>(R.id.titleText).setText( aboutMangaViewmodel.origTitle + " (" +
-                                                        aboutMangaViewmodel.rusTitle + ")")
-        findViewById<TextView>(R.id.authorText).setText(aboutMangaViewmodel.author)
-        findViewById<TextView>(R.id.fullDescriptionText).setText(aboutMangaViewmodel.descr)
+        findViewById<TextView>(R.id.titleText).setText( aboutMangaViewmodel.manga.originalName + " (" +
+                                                        aboutMangaViewmodel.manga.russianName + ")")
+        findViewById<TextView>(R.id.authorText).setText(aboutMangaViewmodel.manga.author)
+        findViewById<TextView>(R.id.fullDescriptionText).setText(aboutMangaViewmodel.manga.description)
 
         val imageFile = cover.getFile()
 

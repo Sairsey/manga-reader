@@ -1,37 +1,45 @@
 package com.mangajet.mangajet.ui.search
 
-import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
     var isInited = 0
-    val mangasNames = listOf("Гуль", "Гуль", "Гуль")
+    val mangasNames = ArrayList<String>()
     var mangas : ArrayList<Manga> = arrayListOf()
+    var job : Job? = null
+    var adapter : ArrayAdapter<String>? = null
 
-    fun initMangas() {
-        if (isInited == 0) {
-            isInited = 1
-            val mangasTmp =
-                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasNames[0])
-            mangas.add(mangasTmp[0])
-            mangas.add(mangasTmp[1])
-            mangas.add(mangasTmp[2])
+    suspend fun addElementsToMangas() {
+        val mangasSearchWord = "Гуль"
+        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasSearchWord)
+        for (i in libsMangas.indices) {
+            mangas.add(libsMangas[i])
+            mangas[i].updateInfo()
+            mangas[i].updateChapters()
+            mangasNames.add(mangas[i].originalName)
+            withContext (Dispatchers.Main) {
+                adapter?.notifyDataSetChanged()
+            }
         }
     }
 
-    fun packageMangaToIntent(id : Int, intent : Intent) {
-        mangas[id].updateInfo()
-        mangas[id].updateChapters()
-        intent.putExtra("Manga original title", mangas[id].originalName)
-        intent.putExtra("Manga rus title", mangas[id].russianName)
-        intent.putExtra("Manga author", mangas[id].author)
-        intent.putExtra("Manga cover", mangas[id].cover)
-        intent.putExtra("Manga description", mangas[id].description)
+    fun initMangas(adapterNew: ArrayAdapter<String>) {
+        if (isInited == 0) {
+            isInited = 1
+            adapter = adapterNew
+            job = GlobalScope.launch(Dispatchers.IO) {
+                addElementsToMangas()
+            }
+        }
     }
 
     override fun onCleared() {
