@@ -9,10 +9,15 @@ import okio.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 // Singleton which will work with okHTTP to provide access to web resources
 object WebAccessor {
     private val client = OkHttpClient()
+        .newBuilder()
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(1, TimeUnit.MINUTES)
+        .build()
     const val NOT_FOUND = 404
 
     const val NO_ERROR = 0
@@ -22,7 +27,7 @@ object WebAccessor {
 
     // Function to aquire things asyncroniously
     private fun getAsync(url: String, callback: Callback,
-                     headers: Map<String, String> = mapOf()) : Call {
+                         headers: Map<String, String> = mapOf()) : Call {
 
         var preRequest = Request.Builder()
             .url(url)

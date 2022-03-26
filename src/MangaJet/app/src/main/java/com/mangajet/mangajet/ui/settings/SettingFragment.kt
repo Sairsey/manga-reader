@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.FragmentManager
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.authorization.AuthorizationActivity
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import com.mangajet.mangajet.ui.search.SearchViewModel
