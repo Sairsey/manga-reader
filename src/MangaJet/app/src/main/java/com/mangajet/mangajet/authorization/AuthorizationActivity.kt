@@ -1,16 +1,15 @@
 package com.mangajet.mangajet.authorization
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.CookieManager
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
-import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.mangareader.AuthorizationViewModel
-import com.mangajet.mangajet.mangareader.MangaReaderActivity
+
 
 // Class which represents Authorization Activity
 class AuthorizationActivity : AppCompatActivity() {
@@ -25,6 +24,11 @@ class AuthorizationActivity : AppCompatActivity() {
 
         // start webView
         val webViewElement = findViewById<WebView>(R.id.AuthWebView)
+        webViewElement.setWebViewClient(object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                return false
+            }
+        })
         webViewElement.settings.javaScriptEnabled = true
         webViewElement.loadUrl(authorizationViewmodel.url)
         CookieManager.getInstance().setAcceptThirdPartyCookies(webViewElement, true)
