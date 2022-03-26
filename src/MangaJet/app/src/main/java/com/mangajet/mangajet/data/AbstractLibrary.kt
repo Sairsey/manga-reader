@@ -12,6 +12,9 @@ abstract class AbstractLibrary(uniqueID: String) {
     // Function to get Manga class by its id(name)
     abstract fun createMangaById(id: String) : Manga
 
+    // Function to set cookies after authentication
+    abstract fun setCookies(cookies: String)
+
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
     // MAY THROW MangaJetException

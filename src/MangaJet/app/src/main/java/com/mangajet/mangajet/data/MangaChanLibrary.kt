@@ -6,7 +6,7 @@ import org.json.JSONObject
 // Class that represents Manga-Chan.me library
 class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
-    val headers = mapOf(
+    val headers = mutableMapOf(
         "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
             "Chrome/41.0.2228.0 Safari/537.36",
         "accept" to "*/*")
@@ -14,6 +14,10 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
         return Manga(this, id)
+    }
+
+    override fun setCookies(cookies: String) {
+        headers["Cookie"] = cookies
     }
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
