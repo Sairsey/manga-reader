@@ -9,6 +9,7 @@ import com.mangajet.mangajet.R
 import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.data.Librarian
 
+// Authorization in different manga libraries Activity class
 class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

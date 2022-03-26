@@ -24,7 +24,7 @@ class MangaChapter {
         }
     }
 
-    // Constructor for Libraries
+    // Constructor for JSON
     constructor(manga: Manga, id: String, urls : ArrayList<String>) {
         this.manga = manga
         this.id = id

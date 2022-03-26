@@ -6,8 +6,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import android.preference.PreferenceManager
-import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.AuthorizationViewModel

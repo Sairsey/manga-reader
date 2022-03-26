@@ -72,7 +72,7 @@ object StorageManager {
         return File(storageDirectory + "/" + path)
     }
 
-    // Function which will give File handler for specific path
+    // Function which will find folder size recursively
     private fun dirSize(dir: File): Long {
         if (dir.exists()) {
             var result: Long = 0
@@ -89,7 +89,7 @@ object StorageManager {
         return 0
     }
 
-    // Function which will give File handler for specific path
+    // Function which will return folder size
     fun usedStorageSizeInBytes(): Long {
         val dir = File(storageDirectory)
         if (dir.exists()) {
@@ -107,7 +107,7 @@ object StorageManager {
         return 0
     }
 
-    // Function which will give File handler for specific path
+    // Function which remove files from directory recursively
     fun removeDirectory(path: String = ""): Boolean {
         val f = File(storageDirectory + "/" + path)
         return f.deleteRecursively()

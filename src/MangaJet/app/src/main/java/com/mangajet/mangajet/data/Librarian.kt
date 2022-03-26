@@ -34,7 +34,7 @@ object Librarian {
         return map[name]
     }
 
-    // Function to set JSON with each abstract library cookies
+    // Function to set cookies for each Library from JSON
     fun setLibrariesJSON(jsonDataStr : String) {
         val jsonData = JSONObject(jsonDataStr)
 

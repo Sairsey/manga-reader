@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ALL PALLETES WAS TAKEN FROM https://material.io/resources/color/#!/?view.left=1&view.right=0&secondary.color=FF9800&primary.color=F06292 -->
 <resources>
-    <!-- First theme (original - cyan) -->
     <color name="primary">#ff1e88e5</color>
     <color name="primary_dark">#ff005cb2</color>
     <color name="primary_light">#ff6ab7ff</color>
-
-    <!-- Second theme (orange) -->
-    <color name="orange_primary">#fffb8c00</color>
-    <color name="orange_primary_dark">#C25E00</color>
-    <color name="orange_primary_light">#ffffbd45</color>
-
-    <!-- third theme (pink) -->
-    <color name="pink_primary">#f06292</color>
-    <color name="pink_primary_dark">#ff94c2</color>
-    <color name="pink_primary_light">#ba2d65</color>
-
-    <!-- fourth theme (green) -->
-    <color name="green_primary">#43a047</color>
-    <color name="green_primary_dark">#76d275</color>
-    <color name="green_primary_light">#00701a</color>
 
     <color name="true_black">#FF000000</color>
     <color name="black">#FF2a2d34</color>

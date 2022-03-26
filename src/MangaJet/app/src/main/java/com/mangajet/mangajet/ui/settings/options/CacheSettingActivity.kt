@@ -17,7 +17,7 @@ import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
 
-
+// Clear cache dialog class
 class ClearCacheDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -37,13 +37,18 @@ class ClearCacheDialog : DialogFragment() {
     }
 }
 
+// Cache management Activity
 class CacheSettingActivity : AppCompatActivity() {
+    companion object {
+        const val KILO = 1024.0
+    }
+
     private fun getStringSize(size: Long): String {
         if (size <= 0)
             return "0MB"
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
-        val digitGroups = (Math.log10(size.toDouble()) / log10(Companion.sizeDescr)).toInt()
-        return DecimalFormat("#,##0.#").format(size / Companion.sizeDescr.pow(digitGroups.toDouble())) +
+        val digitGroups = (Math.log10(size.toDouble()) / log10(KILO)).toInt()
+        return DecimalFormat("#,##0.#").format(size / KILO.pow(digitGroups.toDouble())) +
                              " " + units[digitGroups]
     }
 
@@ -73,9 +78,5 @@ class CacheSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheListAdapter()
-    }
-
-    companion object {
-        const val sizeDescr = 1024.0
     }
 }

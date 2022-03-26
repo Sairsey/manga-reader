@@ -21,18 +21,17 @@ import com.mangajet.mangajet.ui.settings.options.StoragePathDialog
 class SettingFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     companion object {
-        fun newInstance() = SettingFragment()
-
-        const val AUTHORIZATION_ID = 0
-        const val THEME_PICKER_ID = 1
-        const val CACHE_ID = 2
-        const val BACKUP_ID = 3
-        const val STORAGE_PATH_ID = 4
-        const val ABOUTAPP_ID = 5
+        const val AUTHORIZATION_ID = 0  // Authorization submenu id
+        const val THEME_PICKER_ID = 1   // Theme picker dialog id
+        const val CACHE_ID = 2          // Cache submenu id
+        const val BACKUP_ID = 3         // Backup submenu id
+        const val STORAGE_PATH_ID = 4   // Storage path dialog id
+        const val ABOUTAPP_ID = 5       // About app submenu id
     }
 
-    private lateinit var viewModel: SettingViewModel
+    // Binding tool to get layout elements
     private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,34 +53,34 @@ class SettingFragment : Fragment() {
             dataSettingsList.adapter = adapter
             dataSettingsList.setOnItemClickListener{ parent, view, position, id ->
                 when (id.toInt()) {
-                    Companion.AUTHORIZATION_ID -> {
-                        var intent : Intent = Intent(it, MangaAuthorizationActivity::class.java)
+                    AUTHORIZATION_ID -> {
+                        var intent = Intent(it, MangaAuthorizationActivity::class.java)
                         startActivity(intent)
                     }
-                    Companion.THEME_PICKER_ID -> {
+                    THEME_PICKER_ID -> {
                         val myDialogFragment = ThemePickerDialog()
                         val manager = fragmentManager
                         if (manager != null) {
                             myDialogFragment.show(manager, "Theme picker dialog")
                         }
                     }
-                    Companion.CACHE_ID -> {
-                        var intent : Intent = Intent(it, CacheSettingActivity::class.java)
+                    CACHE_ID -> {
+                        var intent = Intent(it, CacheSettingActivity::class.java)
                         startActivity(intent)
                     }
-                    Companion.BACKUP_ID -> {
-                        var intent : Intent = Intent(it, CacheSettingActivity::class.java)
+                    BACKUP_ID -> {
+                        var intent = Intent(it, CacheSettingActivity::class.java)
                         startActivity(intent)
                     }
-                    Companion.STORAGE_PATH_ID -> {
+                    STORAGE_PATH_ID -> {
                         val myDialogFragment = StoragePathDialog()
                         val manager = fragmentManager
                         if (manager != null) {
                             myDialogFragment.show(manager, "Storage path dialog")
                         }
                     }
-                    Companion.ABOUTAPP_ID -> {
-                        var intent : Intent = Intent(it, AboutAppActivity::class.java)
+                    ABOUTAPP_ID -> {
+                        var intent = Intent(it, AboutAppActivity::class.java)
                         startActivity(intent)
                     }
                 }
@@ -89,11 +88,5 @@ class SettingFragment : Fragment() {
         }
 
         return root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SettingViewModel::class.java)
-        // TODO Use the ViewModel
     }
 }
