@@ -2,6 +2,7 @@ package com.mangajet.mangajet.ui.updates
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View

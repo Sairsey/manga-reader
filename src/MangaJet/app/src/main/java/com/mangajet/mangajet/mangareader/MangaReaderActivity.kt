@@ -2,6 +2,8 @@ package com.mangajet.mangajet.mangareader
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import com.mangajet.mangajet.R
 
 // Class which represents "Manga Reader" Activity

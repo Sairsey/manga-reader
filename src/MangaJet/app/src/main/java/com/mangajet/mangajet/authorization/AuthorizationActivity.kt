@@ -6,7 +6,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import android.preference.PreferenceManager
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.AuthorizationViewModel
 
@@ -15,6 +16,10 @@ import com.mangajet.mangajet.mangareader.AuthorizationViewModel
 class AuthorizationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val sp = getDefaultSharedPreferences(this)
+        val theme = sp.getInt("THEME", R.style.Theme_MangaJet)
+        setTheme(theme)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization_second)
 
