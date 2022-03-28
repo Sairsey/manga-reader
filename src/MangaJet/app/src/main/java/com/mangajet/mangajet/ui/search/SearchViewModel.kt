@@ -12,12 +12,13 @@ import kotlinx.coroutines.launch
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
-    var isInited = 0
-    val mangasNames = ArrayList<String>()
-    var mangas : ArrayList<Manga> = arrayListOf()
-    var job : Job? = null
-    var adapter : ArrayAdapter<String>? = null
+    var isInited = false                            // is init boolean flag
+    val mangasNames = ArrayList<String>()           // mangas names for list
+    var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
+    var job : Job? = null                           // Async job for searching and uploading
+    var adapter : ArrayAdapter<String>? = null      // adapter for list
 
+    // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
         val mangasSearchWord = "Учитель"
         val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasSearchWord)
@@ -31,9 +32,10 @@ class SearchViewModel : ViewModel() {
         }
     }
 
+    // Function which will async load mangas info
     fun initMangas(adapterNew: ArrayAdapter<String>) {
-        if (isInited == 0) {
-            isInited = 1
+        if (!isInited) {
+            isInited = true
             adapter = adapterNew
             job = GlobalScope.launch(Dispatchers.IO) {
                 addElementsToMangas()
@@ -43,7 +45,7 @@ class SearchViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        isInited = 0
+        isInited = false
         mangas.clear()
     }
 }

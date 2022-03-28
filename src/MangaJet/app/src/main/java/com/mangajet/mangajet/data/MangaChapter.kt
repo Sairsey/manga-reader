@@ -17,11 +17,6 @@ class MangaChapter {
     constructor(manga: Manga, id: String) {
         this.manga = manga
         this.id = id
-        try {
-            updateInfo()
-        } catch (ex : MangaJetException) {
-            Log.v(Log.DEBUG.toString(), ex.toString())
-        }
     }
 
     // Constructor for JSON
@@ -42,7 +37,11 @@ class MangaChapter {
 
     // Function to fill all manga info except chapters
     // MAY THROW MangaJetException
-    fun updateInfo(){
+    fun updateInfo(force : Boolean = false){
+        if (!force && pagesURLs.isNotEmpty())
+            return
+
+        pagesURLs.clear()
         val chaptersInfoJSON = JSONArray(manga.library.getChapterInfo(manga.id, id)) // Exception may be thrown here
         for (i in 0 until chaptersInfoJSON.length()) {
             pagesURLs.add(chaptersInfoJSON[i].toString())
@@ -53,6 +52,7 @@ class MangaChapter {
     // Function for safely retrieving amount of pages
     // MAY THROW MangaJetException, ArrayIndexOutOfBoundsException
     public fun getPage(pageNumber : Int) : MangaPage {
+        updateInfo()
         if (pagesNumber == -1)
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)

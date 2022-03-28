@@ -12,34 +12,37 @@ import com.mangajet.mangajet.R
 class AboutMangaActivity : AppCompatActivity() {
     companion object {
         const val PADDING_VERT = 5      // Vert padding tag value
-        const val PADDING_HORZ = 30      // Horz padding tag value
+        const val PADDING_HORZ = 30     // Horz padding tag value
+        const val ABOUT_TAB_ID = 0      // "About" tab button id
+        const val CHAPTERS_TAB_ID = 1   // "Chapters" tab button id
+        const val TOTAL_TABS = 2        // Total tabs count
     }
 
     // In methods 'onCreate' we only init data in viewport. All other actions -> in onStart() or onResume() overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about_manga_second)
+        setContentView(R.layout.about_manga_activity)
 
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
         aboutMangaViewmodel.initMangaData(intent)
         setTitle(aboutMangaViewmodel.manga.originalName)
 
-        val tabLayout = findViewById<TabLayout>(R.id.tabs)
+        val tabLayout = findViewById<TabLayout>(R.id.aboutMangaTabs)
         val viewPager2 = findViewById<ViewPager2>(R.id.fragmentContainerView)
         val adapter = AboutMangaVPAdapter(supportFragmentManager, lifecycle)
 
         viewPager2.adapter = adapter
         TabLayoutMediator(tabLayout, viewPager2) {tab, position ->
             when(position) {
-                0 -> {
+                ABOUT_TAB_ID -> {
                     tab.text = getString(R.string.fragment_title_about)
                 }
-                1 -> {
+                CHAPTERS_TAB_ID -> {
                     tab.text = getString(R.string.fragment_title_chapters)
                 }
                 else -> {
-                tab.text = "PUPAAA!"
+                    tab.text = "None."
                 }
             }
         }.attach()

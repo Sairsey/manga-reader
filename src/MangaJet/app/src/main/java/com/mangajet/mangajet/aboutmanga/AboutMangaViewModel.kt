@@ -7,14 +7,14 @@ import com.mangajet.mangajet.data.Manga
 // Class which represents "About manga" View Model
 class AboutMangaViewModel : ViewModel() {
     // ViewModel initialization flag
-    var isInited = 0
+    var isInited = false
     // Manga, which will be initialised on activity start
     lateinit var manga : Manga
 
     // Function will
     fun initMangaData(intent : Intent) {
-        if (isInited == 0) {
-            isInited = 1
+        if (!isInited) {
+            isInited = true
             manga = Manga(intent.getStringExtra("Manga").toString())
             manga.updateChapters()
         }
@@ -22,6 +22,6 @@ class AboutMangaViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        isInited = 0
+        isInited = false
     }
 }

@@ -17,15 +17,23 @@ import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
+// "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
-
+    // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
                              items: Array<MangaChapter>,
                              private val lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
+        // List context
         private val mContext: Context
 
+        // init block
+        init {
+            mContext = context
+        }
+
+        // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var v: View? = convertView
             if (v == null) {
@@ -39,7 +47,8 @@ class MangaChaptersFragment : Fragment() {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
 
-                chapter?.setText("Chapter " + (position + 1).toString())
+                chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
+                        (position + 1).toString())
                 if (position < lastViewedChapter)
                     icon?.setImageResource(R.drawable.ic_opened_book)
                 else
@@ -47,12 +56,9 @@ class MangaChaptersFragment : Fragment() {
             }
             return v!!
         }
-
-        init {
-            mContext = context
-        }
     }
 
+    // Binding tool for "MangaChapterFragment"
     private var _binding: MangaChaptersFragmentBinding? = null
 
     // This property is only valid between onCreateView and
@@ -72,17 +78,13 @@ class MangaChaptersFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
-        val chaptersString = arrayListOf<String>()
-
-        for (i in 1..aboutMangaViewmodel.manga.chapters.size)
-            chaptersString.add("Chapter $i")
 
         var listView = binding.chaptersList
         activity?.let {
             val adapter = ChapterListAdapter(it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
-                aboutMangaViewmodel.manga.lastViewedChapter + 1 + 1 + 1 + 1 + 1)
+                aboutMangaViewmodel.manga.lastViewedChapter)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->

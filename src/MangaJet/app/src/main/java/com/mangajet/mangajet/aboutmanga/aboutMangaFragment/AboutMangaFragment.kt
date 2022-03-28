@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.aboutmanga.aboutMangaFragment
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,10 +16,17 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
+// "About manga" fragment with main information
 class AboutMangaFragment : Fragment() {
-
+    // Async job for loading bitmap
+    var job : Job? = null
     private var _binding: AboutMangaFragmentBinding? = null
 
     // This property is only valid between onCreateView and
@@ -35,6 +43,12 @@ class AboutMangaFragment : Fragment() {
         return root
     }
 
+    // Function witch will decode bitmap async
+    fun loadBitmap(cover : MangaPage): Bitmap {
+        val imageFile = cover.getFile() // Catch ex here
+        return BitmapFactory.decodeFile(imageFile.absolutePath)
+    }
+
     override fun onStart() {
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
@@ -47,10 +61,12 @@ class AboutMangaFragment : Fragment() {
         binding.authorText.setText(aboutMangaViewmodel.manga.author)
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
 
-        val imageFile = cover.getFile()
-
-        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-        binding.coverManga.setImageBitmap(bitmap)
+        job = GlobalScope.launch(Dispatchers.IO) {
+            val bitmap = loadBitmap(cover)
+                withContext(Dispatchers.Main) {
+                    binding.coverManga.setImageBitmap(bitmap)
+                }
+        }
 
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
