@@ -1,6 +1,3 @@
-# User guide
-Firstly, make sure thar your Android version is 8.0 (Oreo) or higher. Then install .apk from [the latest release](https://github.com/Sairsey/manga-reader/releases).
-
 # Developer guide
 - Install Android Studio from [here](https://developer.android.com/studio)
 - Clone or fork main branch of [our repository](https://github.com/Sairsey/manga-reader)

@@ -10,6 +10,10 @@ List of features:
 + History: User's reading history is saved
 + Downloading: User can download specific chapters of manga to local storage
 + Authorization: User can log in to sites that we parse to get manga, so user gets acces to age-restricted manga 
+
+### User guide
+Firstly, make sure thar your Android version is 8.0 (Oreo) or higher. Then install .apk from [the latest release](https://github.com/Sairsey/manga-reader/releases).
+
 ### Description of advantages over peers
 In comperison with other manga reader applications (for example, mobile version of mangalib, Manga Reader Comic Reader) MangaJet has following advantages:
 + MangaJet supports recommendation system based on tags system that recommends manga not from one source but from all availible. This is our killer feature
@@ -27,4 +31,4 @@ In comperison with other manga reader applications (for example, mobile version 
 + [Code style](docs/code-rules.md)
 + [Commit rules](docs/commit-rules.md)
 + [Workflow rules](docs/workflow-rules.md)
-+ [User and developer guide](docs/user-developer-guide.md)
++ [Developer guide](docs/developer-guide.md)
