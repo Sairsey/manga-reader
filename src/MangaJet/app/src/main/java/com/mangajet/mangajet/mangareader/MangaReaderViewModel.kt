@@ -3,13 +3,17 @@ package com.mangajet.mangajet.mangareader
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
 
-class MangaReaderViewModel : ViewModel() {
-    class Manga(newName: String, newDescr: String) {
-        val name : String = newName
-        val descr : String = newDescr
+// Class which represents "Manga Reader" ViewModel
+class MangaReaderViewModel : ViewModel {
+    val manga: Manga
+
+    constructor() {
+        // or via search
+        manga = Librarian
+            .getLibrary(Librarian.LibraryName.Mangachan)!!
+            .createMangaById("55817-blade-of-demon-destruction.html")
     }
-
-    val manga = Manga("SomeMangaForNotEmptyClassWarningAbuse", "hehe1")
-    val mangasNames = listOf("sample_text", "sample_text2", "sample_text3")
 }

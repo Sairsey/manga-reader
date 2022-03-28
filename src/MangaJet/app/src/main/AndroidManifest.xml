@@ -2,25 +2,47 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mangajet.mangajet">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
+        android:name=".MangaJetApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MangaJet">
+        android:theme="@style/Theme.MangaJet"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.settings.options.MangaAuthorizationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.options.AboutAppWebView"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.options.AboutAppActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.options.CacheSettingActivity"
+            android:exported="false" />
         <activity
             android:name=".authorization.AuthorizationActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".mangareader.MangaReaderActivity"
             android:exported="false" />
         <activity
             android:name=".aboutmanga.AboutMangaActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

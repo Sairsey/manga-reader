@@ -2,4 +2,22 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">40dp</dimen>
     <dimen name="activity_vertical_margin">40dp</dimen>
+
+    <!-- Inner block margins (in About manga activity) -->
+    <dimen name="inner_vertical_margin">16dp</dimen>
+    <dimen name="inner_horizontal_margin">16dp</dimen>
+    <dimen name="half_inner_horizontal_margin">8dp</dimen>
+
+    <!-- Inner block different options list (in settings activity) -->
+    <dimen name="inner_settings_vertical_margin">24dp</dimen>
+    <dimen name="inner_settings_horizontal_margin">16dp</dimen>
+
+    <!-- Chapter list element dimens -->
+    <dimen name="chapter_element_height">40dp</dimen>
+    <dimen name="chapter_pic_size">32dp</dimen>
+    <dimen name="chapter_half_margin">4dp</dimen>   <!-- (40 - 32) / 2 = 4 -->
+
+    <!-- Divider constants -->
+    <dimen name="divider_width">4dp</dimen>
+    <dimen name="divider_height">8dp</dimen>
 </resources>

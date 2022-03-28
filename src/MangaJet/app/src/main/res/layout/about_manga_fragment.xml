@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".aboutmanga.aboutMangaFragment.AboutMangaFragment"
+    android:id="@+id/aboutMangaLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:scrollbars="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:windowBackground"
+        android:elevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainInfoLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/coverManga"
+                android:layout_width="120dp"
+                android:layout_height="170dp"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:layout_marginEnd="@dimen/inner_horizontal_margin"
+                android:text="SampleTitle"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/coverManga"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/authorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:text="Sample Author"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@+id/coverManga"
+                app:layout_constraintTop_toBottomOf="@+id/titleText" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/tagsAndButtonLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainInfoLayout">
+
+            <Button
+                android:id="@+id/readMangaButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:layout_marginEnd="@dimen/inner_horizontal_margin"
+                android:layout_weight="1"
+                android:text="Read manga"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/descriptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tagsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/aboutMangaFragmentTagsText"
+                android:textSize="24sp"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tagsLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginEnd="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+
+                app:alignContent="stretch"
+                app:alignItems="stretch"
+                app:flexWrap="wrap"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagsText"
+
+                app:showDivider="middle"
+                app:dividerDrawable="@drawable/divider">
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:id="@+id/descriptionText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:text="@string/aboutMangaDescriptionText"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagsLayout" />
+
+            <TextView
+                android:id="@+id/fullDescriptionText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/inner_horizontal_margin"
+                android:layout_marginTop="@dimen/inner_vertical_margin"
+                android:layout_marginEnd="@dimen/inner_horizontal_margin"
+                android:text="TextView"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descriptionText" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

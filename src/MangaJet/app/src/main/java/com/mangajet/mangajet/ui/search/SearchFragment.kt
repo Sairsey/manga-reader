@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.SearchFragmentBinding
 
+// Class which represents "Search" fragment of MainActivity
 class SearchFragment : Fragment() {
 
     private var _binding: SearchFragmentBinding? = null
@@ -25,7 +26,7 @@ class SearchFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ) : View {
         val searchViewModel =
             ViewModelProvider(this).get(SearchViewModel::class.java)
 
@@ -39,10 +40,12 @@ class SearchFragment : Fragment() {
                 R.layout.simple_list_item_1,
                 searchViewModel.mangasNames
             )
+            searchViewModel.initMangas(adapter)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                intent.putExtra("Manga", searchViewModel.mangas[id.toInt()].toJSON())
                 startActivity(intent)}
         }
 

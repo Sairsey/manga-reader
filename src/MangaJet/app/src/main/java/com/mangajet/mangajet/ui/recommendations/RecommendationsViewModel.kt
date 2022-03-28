@@ -1,15 +1,53 @@
 package com.mangajet.mangajet.ui.recommendations
 
+import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
+
+// Class which represents "Recommendations" ViewModel
 class RecommendationsViewModel : ViewModel() {
-    class Manga(newName: String, newDescr: String) {
-        val name : String = newName
-        val descr : String = newDescr
+    var isInited = false                            // is init boolean flag
+    val mangasNames = ArrayList<String>()           // mangas names for list
+    var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
+    var job : Job? = null                           // Async job for searching and uploading
+    var adapter : ArrayAdapter<String>? = null      // adapter for list
+
+    // Function which will load info about each manga from "manga names"
+    suspend fun addElementsToMangas() {
+        val mangasSearchWords = listOf("Naruto", "Берсерк", "Onepunchman")
+        for (name in mangasSearchWords) {
+            mangas.add(
+                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
+            )
+            mangas[mangas.size - 1].updateInfo()
+            mangasNames.add(mangas[mangas.size - 1].originalName)
+            withContext (Dispatchers.Main) {
+                adapter?.notifyDataSetChanged()
+            }
+        }
     }
 
-    val mangas = listOf(Manga("RecommendedManga1", "descr1"),
-        Manga("RecommendedManga2", "descr2"),
-        Manga("RecommendedManga3", "descr3"))
-    val mangasNames = listOf("RecommendedManga1", "RecommendedManga2", "RecommendedManga3")
+    // Function which will async load mangas info
+    fun initMangas(adapterNew: ArrayAdapter<String>) {
+        if (!isInited) {
+            isInited = true
+            adapter = adapterNew
+            job = GlobalScope.launch(Dispatchers.IO) {
+                addElementsToMangas()
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        isInited = false
+        mangas.clear()
+    }
 }

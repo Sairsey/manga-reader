@@ -1,21 +1,17 @@
 package com.mangajet.mangajet.ui.history
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 
+// Class which represents "History" fragment of MainActivity
 class HistoryFragment : Fragment() {
 
     private var _binding: HistoryFragmentBinding? = null
@@ -28,7 +24,7 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ) : View {
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 
@@ -43,10 +39,11 @@ class HistoryFragment : Fragment() {
                 historyViewModel.mangasNames
             )
 
+            historyViewModel.initMangas(adapter)
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
-                //val element = parent.getItemAtPosition(position) // The item that was clicked
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                intent.putExtra("Manga", historyViewModel.mangas[id.toInt()].toJSON())
                 startActivity(intent)}
         }
 
