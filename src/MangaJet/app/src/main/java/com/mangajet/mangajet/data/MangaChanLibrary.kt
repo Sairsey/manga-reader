@@ -6,7 +6,7 @@ import org.json.JSONObject
 // Class that represents Manga-Chan.me library
 class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
-    val headers = mapOf(
+    val headers = mutableMapOf(
         "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
             "Chrome/41.0.2228.0 Safari/537.36",
         "accept" to "*/*")
@@ -14,6 +14,16 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
         return Manga(this, id)
+    }
+
+    // Function to set cookies after authentication
+    override fun setCookies(cookies: String) {
+        headers["Cookie"] = cookies
+    }
+
+    // Function to get cookies after authentication
+    override fun getCookies(): String {
+        return headers.getOrDefault("Cookie", "")
     }
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
@@ -28,13 +38,19 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         val res = ArrayList<Manga>()
 
+        var index = 0
         while (f != -1) {
             f = text.indexOf("h2", f)
             f = text.indexOf("<a", f)
             f = text.indexOf("manga/", f) + "manga".length + 1
             val s = text.indexOf("\"", f)
-            res.add(Manga(this, text.subSequence(f, s).toString()))
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
             f = text.indexOf("class=\"content_row\"", f)
+            index++
         }
 
 
@@ -57,14 +73,22 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var f = text.indexOf("name_row")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
+            val sLast = text.indexOf("</a>", f) - 1
             val s = text.indexOf("(", f) - 1
+            if (s == -1 || s > sLast)
+                return text.subSequence(f, sLast).toString()
             return text.subSequence(f, s).toString()
         }
 
         // Retrieve russian name of manga
         fun getRusName(text : String) : String {
             var f = text.indexOf("name_row")
+            f = text.indexOf("<a", f)
+            f = text.indexOf(">", f) + 1
+            val sLast = text.indexOf("</a>", f) - 1;
             f = text.indexOf("(", f) + 1
+            if (f == -1 || f > sLast)
+                return ""
             val s = text.indexOf(")", f)
             return text.subSequence(f, s).toString()
         }
@@ -72,6 +96,8 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         // Retrieve description
         fun getDescr(text : String) : String {
             var f = text.indexOf("<div id=\"description\"")
+            if (f == -1)
+                return ""
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
             return text.subSequence(f, s).toString()
@@ -79,8 +105,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve author
         fun getAuthor(text : String) : String {
-            var f = text.indexOf("mangatitle")
-            f = text.indexOf("Автор", f)
+            var f = text.indexOf(">Автор")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
@@ -89,12 +114,14 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve tags
         fun getTags(text : String) : Array<String> {
+            val res = ArrayList<String>()
             var f = text.indexOf("mangatitle")
+            if (f == -1)
+                return res.toTypedArray()
             f = text.indexOf("Тэги", f)
             var s = text.indexOf("</span", f)
             val subtext = text.subSequence(f, s)
 
-            val res = ArrayList<String>()
 
             f = subtext.indexOf("<a")
             while (f != -1) {
@@ -155,37 +182,33 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             }
         }
         chapters.reverse()
+        if (chapters.size == 0)
+            chapters.add(MangaChapter(manga, manga.id))
         return chapters.toTypedArray()
     }
 
-    // Function to get number of pages in specific manga and specific chapter by their ids(names)
+    // on some sites we might go to another URL
+    val secretURL = "http://exhentai-dono.me"
+
+    // Function to get array of pages in specific manga, specific chapter by their ids(names)
     // MAY THROW MangaJetException
-    override fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int {
-        val url = getURL() + "/online/" + chapterID
+    override fun getChapterInfo(mangaID: String, chapterID: String) : String {
+        var url = "/online/" + chapterID
+        if (getURL()[getURL().length - 2] == 'v')
+            url = secretURL + url + "?development_access=true"
+        else
+            url = getURL() + url
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("fullimg")
         f = text.indexOf("[", f)
-        val s = text.indexOf("]", f) - 1
+        val s = text.indexOf("]", f)
         var subtext = text.subSequence(f, s).toString() + "]"
+        if (subtext[subtext.length - 2] == ',')
+            subtext = subtext.dropLast(2) + "]"
 
         val json = JSONArray(subtext)
 
-        return json.length()
-    }
-
-    // Function to get Manga Page class by its number, manga id and chapter id
-    // MAY THROW MangaJetException
-    override fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage {
-        val url = getURL() + "/online/" + chapterID
-        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
-
-        var f = text.indexOf("fullimg")
-        f = text.indexOf("[", f)
-        val s = text.indexOf("]", f) - 1
-        var subtext = text.subSequence(f, s).toString() + "]"
-
-        val json = JSONArray(subtext)
-        return MangaPage(json[pageNumber].toString())
+        return json.toString()
     }
 }

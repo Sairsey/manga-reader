@@ -12,6 +12,12 @@ abstract class AbstractLibrary(uniqueID: String) {
     // Function to get Manga class by its id(name)
     abstract fun createMangaById(id: String) : Manga
 
+    // Function to set cookies after authentication
+    abstract fun setCookies(cookies: String)
+
+    // Function to get cookies after authentication
+    abstract fun getCookies() : String
+
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
     // MAY THROW MangaJetException
@@ -25,11 +31,7 @@ abstract class AbstractLibrary(uniqueID: String) {
     // MAY THROW MangaJetException
     abstract fun getMangaChapters(manga: Manga) : Array<MangaChapter>
 
-    // Function to get number of pages in specific manga and specific chapter by their ids(names)
+    // Function to get array of pages in specific manga, specific chapter by their ids(names)
     // MAY THROW MangaJetException
-    abstract fun getChaptersNumOfPages(mangaID: String, chapterID: String) : Int
-
-    // Function to get Manga Page class by its number, manga id and chapter id
-    // MAY THROW MangaJetException
-    abstract fun getChapterPage(mangaID: String, chapterID: String, pageNumber: Int) : MangaPage
+    abstract fun getChapterInfo(mangaID: String, chapterID: String) : String
 }

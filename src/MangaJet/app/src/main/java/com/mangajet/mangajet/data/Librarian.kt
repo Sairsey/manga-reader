@@ -1,5 +1,8 @@
 package com.mangajet.mangajet.data
 
+import org.json.JSONArray
+import org.json.JSONObject
+
 // Singleton class that stores all libraries with manga and provides access to them
 object Librarian {
 
@@ -31,4 +34,23 @@ object Librarian {
         return map[name]
     }
 
+    // Function to set cookies for each Library from JSON
+    fun setLibrariesJSON(jsonDataStr : String) {
+        val jsonData = JSONObject(jsonDataStr)
+
+        map.forEach { libraryName, abstractLibrary ->
+            abstractLibrary?.setCookies(jsonData[libraryName.resource].toString())
+        }
+    }
+
+    // Function to get JSON with each abstract library cookies
+    fun getLibrariesJSON() : String {
+        val jsonData = JSONObject()
+
+        map.forEach { libraryName, abstractLibrary ->
+            jsonData.put(libraryName.resource, abstractLibrary?.getCookies() ?: "")
+        }
+
+        return jsonData.toString()
+    }
 }

@@ -2,6 +2,8 @@ package com.mangajet.mangajet
 
 import android.app.Application
 import android.content.Context
+import android.preference.PreferenceManager.getDefaultSharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.data.WebAccessor
@@ -14,6 +16,11 @@ class MangaJetApp : Application() {
     }
 
     override fun onCreate() {
+        val sp = getDefaultSharedPreferences(this)
+        AppCompatDelegate.setDefaultNightMode(sp.getInt("THEME",
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        ))
+
         super.onCreate()
         // We need to use WebAccessor, Librarian and StorageManager here,
         // so they will be initialized at known time
