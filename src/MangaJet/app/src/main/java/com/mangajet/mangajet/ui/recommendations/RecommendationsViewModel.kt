@@ -27,7 +27,6 @@ class RecommendationsViewModel : ViewModel() {
                 Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
             )
             mangas[mangas.size - 1].updateInfo()
-            mangas[mangas.size - 1].updateChapters()
             mangasNames.add(mangas[mangas.size - 1].originalName)
             withContext (Dispatchers.Main) {
                 adapter?.notifyDataSetChanged()

@@ -19,12 +19,11 @@ class SearchViewModel : ViewModel() {
     var adapter : ArrayAdapter<String>? = null
 
     suspend fun addElementsToMangas() {
-        val mangasSearchWord = "Гуль"
+        val mangasSearchWord = "Учитель"
         val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasSearchWord)
         for (i in libsMangas.indices) {
             mangas.add(libsMangas[i])
             mangas[i].updateInfo()
-            mangas[i].updateChapters()
             mangasNames.add(mangas[i].originalName)
             withContext (Dispatchers.Main) {
                 adapter?.notifyDataSetChanged()

@@ -1,31 +1,95 @@
 package com.mangajet.mangajet.aboutmanga.mangaChaptersFragment
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.TextView
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.MangaChapter
+import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
+import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
 class MangaChaptersFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MangaChaptersFragment()
+    class ChapterListAdapter(context: Context,
+                             private val resourceLayout: Int,
+                             items: Array<MangaChapter>,
+                             private val lastViewedChapter : Int) :
+        ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
+        private val mContext: Context
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            var v: View? = convertView
+            if (v == null) {
+                val vi: LayoutInflater
+                vi = LayoutInflater.from(mContext)
+                v = vi.inflate(resourceLayout, null)
+            }
+
+            val p = getItem(position)
+            if (p != null) {
+                val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
+                val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
+
+                chapter?.setText("Chapter " + (position + 1).toString())
+                if (position < lastViewedChapter)
+                    icon?.setImageResource(R.drawable.ic_opened_book)
+                else
+                    icon?.setImageResource(R.drawable.ic_closed_book)
+            }
+            return v!!
+        }
+
+        init {
+            mContext = context
+        }
     }
 
-    private lateinit var viewModel: MangaChaptersViewModel
+    private var _binding: MangaChaptersFragmentBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.manga_chapters_fragment, container, false)
+    ): View {
+        _binding = MangaChaptersFragmentBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        return root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MangaChaptersViewModel::class.java)
-    }
+    override fun onStart() {
+        super.onStart()
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        val chaptersString = arrayListOf<String>()
 
+        for (i in 1..aboutMangaViewmodel.manga.chapters.size)
+            chaptersString.add("Chapter $i")
+
+        var listView = binding.chaptersList
+        activity?.let {
+            val adapter = ChapterListAdapter(it,
+                R.layout.chapter_list_element,
+                aboutMangaViewmodel.manga.chapters,
+                aboutMangaViewmodel.manga.lastViewedChapter + 1 + 1 + 1 + 1 + 1)
+
+            listView.adapter = adapter
+            listView.setOnItemClickListener{ parent, view, position, id ->
+                val intent = Intent(it, MangaReaderActivity::class.java)
+                intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
+                intent.putExtra("Chapter", id.toInt())
+                startActivity(intent)}
+        }
+    }
 }

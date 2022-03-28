@@ -1,30 +1,76 @@
 package com.mangajet.mangajet.aboutmanga.aboutMangaFragment
 
-import androidx.lifecycle.ViewModelProvider
+import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
+import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
+import com.mangajet.mangajet.mangareader.MangaReaderActivity
+
 
 class AboutMangaFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = AboutMangaFragment()
-    }
+    private var _binding: AboutMangaFragmentBinding? = null
 
-    private lateinit var viewModel: AboutMangaViewModel
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.about_manga_fragment, container, false)
+    ): View {
+        _binding = AboutMangaFragmentBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        return root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AboutMangaViewModel::class.java)
+    override fun onStart() {
+        super.onStart()
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+
+        val cover = MangaPage(aboutMangaViewmodel.manga.cover)
+        cover.upload()
+
+        binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
+                aboutMangaViewmodel.manga.russianName + ")")
+        binding.authorText.setText(aboutMangaViewmodel.manga.author)
+        binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
+
+        val imageFile = cover.getFile()
+
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        binding.coverManga.setImageBitmap(bitmap)
+
+        val buttonToRead = binding.readMangaButton
+        buttonToRead.setOnClickListener{
+            val intent = Intent(activity, MangaReaderActivity::class.java)
+            startActivity(intent)}
+
+        // Tags TextView generator
+        val tagsLayout = binding.tagsLayout
+        aboutMangaViewmodel.manga.tags.forEach {
+            val newTextView = TextView(activity)
+            newTextView.setText(it)
+            newTextView.setPadding(
+                AboutMangaActivity.PADDING_HORZ,
+                AboutMangaActivity.PADDING_VERT,
+                AboutMangaActivity.PADDING_HORZ,
+                AboutMangaActivity.PADDING_VERT
+            )
+            newTextView.setTextColor(resources.getColor(R.color.primary))
+            newTextView.setBackgroundResource(R.drawable.tag_border)
+            tagsLayout.addView(newTextView)
+        }
     }
 }

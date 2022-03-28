@@ -93,7 +93,10 @@ class Manga {
         if (this.lastViewedChapter < 0 || this.lastViewedChapter >= this.chapters.size)
             this.lastViewedChapter = 0
         json.put("lastViewedChapter", this.lastViewedChapter)
-        json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        if (this.chapters.isNotEmpty())
+            json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        else
+            json.put("lastViewedPage", 0)
         return json.toString()
     }
 }
