@@ -30,16 +30,19 @@
             android:exported="false" />
         <activity
             android:name=".authorization.AuthorizationActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".mangareader.MangaReaderActivity"
             android:exported="false" />
         <activity
             android:name=".aboutmanga.AboutMangaActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

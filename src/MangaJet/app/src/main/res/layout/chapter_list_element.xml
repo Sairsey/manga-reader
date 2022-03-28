@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_width="fill_parent">
+
+    <TableRow android:layout_width="fill_parent"
+        android:id="@+id/listElementRow"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/viewedIcon"
+            android:layout_width="wrap_content"
+            android:layout_marginVertical="@dimen/chapter_half_margin"
+            android:layout_marginHorizontal="@dimen/chapter_half_margin"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_closed_book"
+            app:tint="@color/primary" />
+
+        <TextView
+            android:id="@+id/chapterTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:height="@dimen/chapter_element_height"
+            android:layout_marginVertical="@dimen/chapter_half_margin"
+            android:gravity="left"
+            android:text="CHAPTER TITLE"
+            android:typeface="monospace" />
+    </TableRow>
+
+</TableLayout>

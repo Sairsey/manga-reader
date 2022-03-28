@@ -40,11 +40,12 @@ class RecommendationsFragment : Fragment() {
                 R.layout.simple_list_item_1,
                 recommendedViewModel.mangasNames
             )
+            recommendedViewModel.initMangas(adapter)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
-                //val element = parent.getItemAtPosition(position) // The item that was clicked
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                intent.putExtra("Manga", recommendedViewModel.mangas[id.toInt()].toJSON())
                 startActivity(intent)}
         }
         return root

@@ -16,7 +16,7 @@ class AuthorizationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_authorization_second)
+        setContentView(R.layout.authorization_activity)
 
         setTitle(R.string.title_authorization)
 

@@ -1,20 +1,53 @@
 package com.mangajet.mangajet.ui.history
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.content.Intent
+import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // Class which represents "History" View Model
 class HistoryViewModel : ViewModel() {
-    // dummy class
-    class Manga(newName: String, newDescr: String) {
-        val name: String = newName
-        val descr: String = newDescr
+    var isInited = false                            // is init boolean flag
+    val mangasNames = ArrayList<String>()           // mangas names for list
+    var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
+    var job : Job? = null                           // Async job for searching and uploading
+    var adapter : ArrayAdapter<String>? = null      // adapter for list
+
+    // Function which will load info about each manga from "manga names"
+    suspend fun addElementsToMangas() {
+        val mangasSearchWords = listOf("Клинок", "Dorohedoro", "chainsaw")
+        for (name in mangasSearchWords) {
+            mangas.add(
+                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
+            )
+            mangas[mangas.size - 1].updateInfo()
+            mangasNames.add(mangas[mangas.size - 1].originalName)
+            withContext (Dispatchers.Main) {
+                adapter?.notifyDataSetChanged()
+            }
+        }
     }
 
-    // dummy data
-    val mangas = listOf(Manga("manga1", "descr1"),
-                        Manga("manga2", "descr2"),
-                        Manga("manga3", "descr3"))
-    val mangasNames = listOf("manga1", "manga2", "manga3")
+    // Function which will async load mangas info
+    fun initMangas(adapterNew: ArrayAdapter<String>) {
+        if (!isInited) {
+            isInited = true
+            adapter = adapterNew
+            job = GlobalScope.launch(Dispatchers.IO) {
+                addElementsToMangas()
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        isInited = false
+        mangas.clear()
+    }
 }

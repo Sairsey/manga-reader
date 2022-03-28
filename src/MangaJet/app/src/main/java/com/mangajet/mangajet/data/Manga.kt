@@ -71,7 +71,8 @@ class Manga {
             listTmp.add(MangaChapter(this, chapterId, pagesArray))
         }
         this.chapters = listTmp.toTypedArray()
-        this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
+        if (this.chapters.isNotEmpty())
+            this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
     }
 
     // Function to fill all manga info except chapters
@@ -87,7 +88,7 @@ class Manga {
     }
 
     // Function dump information about manga as JSON string
-    fun toJSON() : String {
+    fun toJSON(full : Boolean = false) : String {
         val json = JSONObject()
         json.put("id", this.id)
         json.put("library", this.library.getURL())
@@ -104,8 +105,15 @@ class Manga {
         if (this.lastViewedChapter < 0 || this.lastViewedChapter >= this.chapters.size)
             this.lastViewedChapter = 0
         json.put("lastViewedChapter", this.lastViewedChapter)
-        json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        if (this.chapters.isNotEmpty())
+            json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        else
+            json.put("lastViewedPage", 0)
         val jsonChapters = JSONObject()
+
+        if (full)
+            chapters.forEach{it.updateInfo()}
+
         chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
         json.put("chapters", jsonChapters)
         return json.toString()

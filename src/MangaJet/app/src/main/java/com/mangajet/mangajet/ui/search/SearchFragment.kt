@@ -40,10 +40,12 @@ class SearchFragment : Fragment() {
                 R.layout.simple_list_item_1,
                 searchViewModel.mangasNames
             )
+            searchViewModel.initMangas(adapter)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
+                intent.putExtra("Manga", searchViewModel.mangas[id.toInt()].toJSON())
                 startActivity(intent)}
         }
 
