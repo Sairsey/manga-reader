@@ -3,9 +3,6 @@
     <color name="primary">#ff1e88e5</color>
     <color name="primary_dark">#ff005cb2</color>
     <color name="primary_light">#ff6ab7ff</color>
-    <color name="secondary">#ffec407a</color>
-    <color name="secondary_dark">#ffb4004e</color>
-    <color name="secondary_light">#ffff77a9</color>
 
     <color name="true_black">#FF000000</color>
     <color name="black">#FF2a2d34</color>

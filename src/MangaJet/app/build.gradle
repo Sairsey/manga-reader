@@ -81,6 +81,7 @@ preBuild.dependsOn detektAll
 dependencies {
     implementation platform('com.squareup.okhttp3:okhttp-bom:4.9.3')
     implementation 'com.squareup.okhttp3:okhttp'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1'

@@ -3,16 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".aboutmanga.AboutMangaActivity"
+    tools:context=".aboutmanga.aboutMangaFragment.AboutMangaFragment"
     android:id="@+id/aboutMangaLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:scrollbars="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?attr/android:windowBackground"
-        android:elevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -83,25 +82,29 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/descriptionLayout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/descriptionLayout"
-            android:layout_width="match_parent"
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/tagsLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -110,58 +113,52 @@
                 android:id="@+id/tagsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tags"
-                android:textSize="24sp"
-                android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
-                android:layout_marginTop="@dimen/inner_about_manga_vertical_margin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/tagsLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
-                android:layout_marginEnd="@dimen/inner_about_manga_horizontal_margin"
-                android:layout_marginTop="@dimen/half_inner_about_manga_horizontal_margin"
-
-                app:alignContent="stretch"
-                app:alignItems="stretch"
-                app:flexWrap="wrap"
-
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tagsText"
-
-                app:showDivider="middle"
-                app:dividerDrawable="@drawable/divider">
-            </com.google.android.flexbox.FlexboxLayout>
+                android:text="Tags: "
+                android:textSize="24sp"/>
 
             <TextView
-                android:id="@+id/descriptionText"
-                android:layout_width="0dp"
+                android:id="@+id/textview1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
-                android:layout_marginTop="@dimen/inner_about_manga_vertical_margin"
-                android:text="Description"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tagsLayout" />
+                android:text="tag0" />
 
             <TextView
-                android:id="@+id/fullDescriptionText"
-                android:layout_width="0dp"
+                android:id="@+id/textview2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
-                android:layout_marginTop="@dimen/inner_about_manga_vertical_margin"
-                android:layout_marginEnd="@dimen/inner_about_manga_horizontal_margin"
-                android:text="TextView"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/descriptionText" />
+                android:text="tag1" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+            <TextView
+                android:id="@+id/textview3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="tag2" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <TextView
+            android:id="@+id/descriptionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
+            android:layout_marginTop="@dimen/inner_about_manga_vertical_margin"
+            android:text="Description"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tagsLayout" />
+
+        <TextView
+            android:id="@+id/fullDescriptionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/inner_about_manga_horizontal_margin"
+            android:layout_marginTop="@dimen/inner_about_manga_vertical_margin"
+            android:layout_marginEnd="@dimen/inner_about_manga_horizontal_margin"
+            android:text="TextView"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/descriptionText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

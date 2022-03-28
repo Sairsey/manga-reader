@@ -6,6 +6,7 @@
     <!-- Inner block margins (in About manga activity) -->
     <dimen name="inner_about_manga_vertical_margin">16dp</dimen>
     <dimen name="inner_about_manga_horizontal_margin">16dp</dimen>
+    <dimen name="half_inner_about_manga_horizontal_margin">8dp</dimen>
 
     <!-- Inner block different options list (in settings activity) -->
     <dimen name="inner_settings_vertical_margin">24dp</dimen>
