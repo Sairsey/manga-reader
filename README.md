@@ -27,4 +27,4 @@ In comperison with other manga reader applications (for example, mobile version 
 + [Code style](docs/code-rules.md)
 + [Commit rules](docs/commit-rules.md)
 + [Workflow rules](docs/workflow-rules.md)
-+ [User and developer guide](docs/workflow-rules.md)
++ [User and developer guide](docs/user-developer-guide.md)
