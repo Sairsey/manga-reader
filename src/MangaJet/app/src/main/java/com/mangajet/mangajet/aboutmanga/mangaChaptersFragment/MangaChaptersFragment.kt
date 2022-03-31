@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +17,13 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlin.jvm.JvmName as JvmName1
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
+    // scroll position variable
+    lateinit var scrollPosiition : Parcelable
+
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
@@ -93,5 +98,20 @@ class MangaChaptersFragment : Fragment() {
                 intent.putExtra("Chapter", id.toInt())
                 startActivity(intent)}
         }
+
+        scrollPosiition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will restore scroll position
+    override fun onResume() {
+        super.onResume()
+        binding.chaptersList.onRestoreInstanceState(scrollPosiition)
+    }
+
+    // Overridden func which will save scroll position
+    override fun onPause() {
+        super.onPause()
+        var listView = binding.chaptersList
+        scrollPosiition = listView.onSaveInstanceState()!!
     }
 }
