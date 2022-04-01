@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
@@ -94,8 +95,7 @@ class MangaChaptersFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
-                intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
-                intent.putExtra("Chapter", id.toInt())
+                MangaJetApp.currentManga = aboutMangaViewmodel.manga
                 startActivity(intent)}
         }
 

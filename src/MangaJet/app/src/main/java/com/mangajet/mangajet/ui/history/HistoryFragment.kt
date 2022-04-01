@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 
@@ -43,7 +44,7 @@ class HistoryFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
-                intent.putExtra("Manga", historyViewModel.mangas[id.toInt()].toJSON())
+                MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
                 startActivity(intent)}
         }
 
