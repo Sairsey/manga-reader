@@ -1,5 +1,7 @@
 package com.mangajet.mangajet.data
 
+import android.os.Build
+import android.text.Html
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -100,7 +102,11 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 return ""
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
-            return text.subSequence(f, s).toString()
+            val description = text.subSequence(f, s).toString()
+            return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                Html.fromHtml(description, Html.FROM_HTML_MODE_LEGACY).toString()
+            else
+                Html.fromHtml(description).toString()
         }
 
         // Retrieve author
