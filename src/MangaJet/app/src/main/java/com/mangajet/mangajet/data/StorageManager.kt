@@ -2,6 +2,9 @@ package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.MangaJetApp
 import java.io.File
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
 
 // Singleton which will do everything about memory management
 // it also will map files from Android filesystem to ours filesystem
@@ -197,22 +200,33 @@ object StorageManager {
         return f.readText()
     }
 
-    // Function which will return all existed paths for specific file type
+    // Function which will return paths for all elements of specific file type in order of modification date
     fun getAllPathsForType(type: FileType) : Array<String> {
         if (type == FileType.Auto)
             throw MangaJetException("Request is too strange")
         val f = File(storageDirectory + type.subdirectoryPath)
-        var array = ArrayList<String>()
 
+        var files = ArrayList<File>()
+
+        // get all files
         f.walkTopDown().forEach {
             if (it.path.contains(".json") ||
                 it.path.contains(".png") ||
                 it.path.contains(".jpg")) {
-                array.add(it.path.substring((storageDirectory + type.subdirectoryPath + 1).length))
+                    files.add(it)
             }
         }
+        val filesArray = files.toTypedArray()
 
+        // sort them by modification date
+        Arrays.sort(filesArray, Comparator.comparingLong(File::lastModified).reversed());
 
-        return array.toTypedArray()
+        // make paths
+        val pathArray = ArrayList<String>()
+        filesArray.forEach {
+            pathArray.add(it.path.substring((storageDirectory + type.subdirectoryPath + 1).length))
+        }
+
+        return pathArray.toTypedArray()
     }
 }
