@@ -30,8 +30,8 @@ class SearchViewModel : ViewModel() {
         for (i in libsMangas.indices) {
             mangas.add(libsMangas[i])
             mangas[i].updateInfo()
-            mangasNames.add(mangas[i].originalName)
             withContext (Dispatchers.Main) {
+                mangasNames.add(mangas[i].originalName)
                 adapter?.notifyDataSetChanged()
             }
         }
