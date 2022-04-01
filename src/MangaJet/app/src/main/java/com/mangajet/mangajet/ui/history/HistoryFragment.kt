@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
+import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 
 // Class which represents "History" fragment of MainActivity
@@ -38,7 +39,7 @@ class HistoryFragment : Fragment() {
                 android.R.layout.simple_list_item_1,
                 historyViewModel.mangasNames
             )
-
+            StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
             historyViewModel.initMangas(adapter)
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->

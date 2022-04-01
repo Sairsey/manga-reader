@@ -116,6 +116,8 @@ class Manga {
 
         chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
         json.put("chapters", jsonChapters)
-        return json.toString()
+        var q = json.toString()
+        StorageManager.saveString(id.replace(".", "_") + ".json", q)
+        return q
     }
 }
