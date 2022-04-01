@@ -177,10 +177,10 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
-                var nameStart = table.indexOf(">", s) + 1
+                var nameStart = table.indexOf("&nbsp;&nbsp;", s) + "&nbsp;&nbsp;".length + 1
+                nameStart = table.indexOf("&nbsp;&nbsp;", nameStart) + "&nbsp;&nbsp;".length
                 var nameFinish = table.indexOf("<", nameStart)
-                chapters.add(MangaChapter(manga, table.substring(f, s), table.substring(nameStart, nameFinish)
-                                                                             .replace("&nbsp;&nbsp;", " ")))
+                chapters.add(MangaChapter(manga, table.substring(f, s), table.substring(nameStart, nameFinish)))
                 f = table.indexOf("zaliv", f)
             }
         }
