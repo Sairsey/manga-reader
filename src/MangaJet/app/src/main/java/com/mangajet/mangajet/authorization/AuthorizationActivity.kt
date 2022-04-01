@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.authorization
 
-import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.os.Build
 import android.os.Bundle
