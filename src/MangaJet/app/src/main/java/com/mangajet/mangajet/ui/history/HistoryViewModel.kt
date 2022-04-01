@@ -30,22 +30,23 @@ class HistoryViewModel : ViewModel() {
                 mangas.add(
                     Manga(StorageManager.loadString(path))
                 )
-                mangasNames.add(mangas[mangas.size - 1].originalName)
-
+                withContext(Dispatchers.Main) {
+                    mangasNames.add(mangas[mangas.size - 1].originalName)
+                    adapter?.notifyDataSetChanged()
+                }
             } catch (ex: MangaJetException) {
                 println(ex.message)
             }
-            withContext(Dispatchers.Main) {
-                adapter?.notifyDataSetChanged()
-            }
+
         }
     }
 
     // Function which will async load mangas info
     fun initMangas(adapterNew: ArrayAdapter<String>) {
         if (!isInited) {
-            isInited = true
             adapter = adapterNew
+            mangasNames.clear()
+            mangas.clear()
             job = GlobalScope.launch(Dispatchers.IO) {
                 addElementsToMangas()
             }

@@ -21,6 +21,16 @@ class HistoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private var adapter: ArrayAdapter<String>? = null
+
+    override fun onResume() {
+        super.onResume()
+
+        val historyViewModel =
+            ViewModelProvider(this).get(HistoryViewModel::class.java)
+        historyViewModel.initMangas(adapter!!)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,13 +44,13 @@ class HistoryFragment : Fragment() {
 
         var listView = binding.historyListview
         activity?.let {
-            val adapter = ArrayAdapter<String>(
+            adapter = ArrayAdapter<String>(
                 it,
                 android.R.layout.simple_list_item_1,
                 historyViewModel.mangasNames
             )
             StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
-            historyViewModel.initMangas(adapter)
+            //historyViewModel.initMangas(adapter!!)
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
