@@ -5,14 +5,11 @@ import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
-import com.mangajet.mangajet.data.MangaJetException
-import com.mangajet.mangajet.data.StorageManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 
 // Class which represents "History" View Model
 class HistoryViewModel : ViewModel() {
@@ -24,20 +21,16 @@ class HistoryViewModel : ViewModel() {
 
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
-        val mangasPaths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
-        for (path in mangasPaths) {
-            try {
-                mangas.add(
-                    Manga(StorageManager.loadString(path))
-                )
-                withContext(Dispatchers.Main) {
-                    mangasNames.add(mangas[mangas.size - 1].originalName)
-                    adapter?.notifyDataSetChanged()
-                }
-            } catch (ex: MangaJetException) {
-                println(ex.message)
+        val mangasSearchWords = listOf("Клинок", "Dorohedoro", "chainsaw")
+        for (name in mangasSearchWords) {
+            mangas.add(
+                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
+            )
+            mangas[mangas.size - 1].updateInfo()
+            mangasNames.add(mangas[mangas.size - 1].originalName)
+            withContext (Dispatchers.Main) {
+                adapter?.notifyDataSetChanged()
             }
-
         }
     }
 

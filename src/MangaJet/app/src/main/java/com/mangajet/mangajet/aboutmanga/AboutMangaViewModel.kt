@@ -16,10 +16,7 @@ class AboutMangaViewModel : ViewModel() {
         if (!isInited) {
             isInited = true
             manga = Manga(intent.getStringExtra("Manga").toString())
-            if (manga.chapters.size == 0) {
-                manga.updateChapters()
-            }
-            manga.toJSON()
+            manga.updateChapters()
         }
     }
 
