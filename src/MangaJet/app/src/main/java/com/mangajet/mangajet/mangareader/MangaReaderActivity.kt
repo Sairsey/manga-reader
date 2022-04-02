@@ -14,7 +14,7 @@ class MangaReaderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val mangaReaderViewmodel = ViewModelProvider(this).get(MangaReaderViewModel::class.java)
 
-        mangaReaderViewmodel.initMangaData(intent)
+        mangaReaderViewmodel.initMangaData()
         setContentView(R.layout.manga_reader_activity)
 
         val text = findViewById<TextView>(R.id.sample_texr)

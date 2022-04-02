@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 
@@ -19,12 +20,12 @@ class MangaReaderViewModel : ViewModel() {
     }
 
     // Function will
-    fun initMangaData(intent : Intent) {
+    fun initMangaData() {
         if (!isInited) {
             isInited = true
+
             // Load manga
-            manga = Manga(intent.getStringExtra("Manga").toString())
-            manga.lastViewedChapter = intent.getIntExtra("Chapter", manga.lastViewedChapter)
+            manga = MangaJetApp.currentManga!!
 
             // And save its state to File
             saveMangaState()

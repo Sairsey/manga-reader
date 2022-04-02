@@ -98,29 +98,27 @@ class MangaChaptersFragment : Fragment() {
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
                 MangaJetApp.currentManga = aboutMangaViewmodel.manga
+                MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
                 startActivity(intent)}
         }
 
-        scrollPosiition = listView.onSaveInstanceState()!!
+        scrollPosition = listView.onSaveInstanceState()!!
     }
 
-    // Overridden func which will restore scroll position
-    override fun onResume() {
-        super.onResume()
-        binding.chaptersList.onRestoreInstanceState(scrollPosiition)
-    }
 
     // Overridden func which will save scroll position
     override fun onPause() {
         super.onPause()
         var listView = binding.chaptersList
-        scrollPosiition = listView.onSaveInstanceState()!!
+        scrollPosition = listView.onSaveInstanceState()!!
     }
 
+    // Overridden func which will restore scroll position
     override fun onResume() {
         super.onResume()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
+        binding.chaptersList.onRestoreInstanceState(scrollPosition)
         adapter.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
         adapter.notifyDataSetChanged()
     }
