@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit
 object WebAccessor {
     private val client = OkHttpClient()
         .newBuilder()
-        .connectTimeout(1, TimeUnit.MINUTES)
-        .readTimeout(1, TimeUnit.MINUTES)
         .build()
     const val NOT_FOUND = 404
 
