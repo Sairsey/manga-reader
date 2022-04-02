@@ -2,7 +2,7 @@ package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.MangaJetApp
 import java.io.File
-import java.util.*
+import java.util.Arrays
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 

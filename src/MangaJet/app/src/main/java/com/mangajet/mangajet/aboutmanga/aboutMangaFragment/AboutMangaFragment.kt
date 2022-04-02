@@ -78,7 +78,6 @@ class AboutMangaFragment : Fragment() {
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
             val intent = Intent(activity, MangaReaderActivity::class.java)
-            intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
             startActivity(intent)}
 
         // Tags TextView generator

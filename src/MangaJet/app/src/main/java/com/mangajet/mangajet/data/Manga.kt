@@ -5,8 +5,8 @@ import org.json.JSONObject
 
 // Class that represents one specific manga, stores info about it(name, author, genre...) and chapters of this manga
 class Manga {
-    val id: String               // This manga unique identifier
-    val library: AbstractLibrary // Library which this manga belongs
+    lateinit var id: String               // This manga unique identifier
+    lateinit var library: AbstractLibrary // Library which this manga belongs
 
     //manga info
     var originalName: String = ""                    // Manga's original name
@@ -23,6 +23,22 @@ class Manga {
     constructor(library: AbstractLibrary, id: String) {
         this.library = library
         this.id = id
+
+        // check if we already have this manga in local storage
+        val path = id.replace(".", "_") + ".json"
+        var isExist = false
+        try {
+            isExist = StorageManager.isExist(path, StorageManager.FileType.MangaInfo)
+        }
+        catch (ex : MangaJetException) {
+            // user didn`t gave permission to us. Very bad.
+        }
+
+        // if file Exist, better to load from json
+        if (isExist){
+            val json = JSONObject(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
+            fromJSON(json)
+        }
     }
 
     // Utility function to fill data fields of manga class from json file
@@ -46,13 +62,12 @@ class Manga {
         this.tags = list.toTypedArray()
     }
 
-    // Constructor from JSON string
+    // Fill data from JSONObject
     // MAY THROW MangaJetException
-    constructor(jsonStr: String){
-        val json = JSONObject(jsonStr)
-        this.id = json.optString("id")
+    private fun fromJSON(json: JSONObject) {
+        id = json.optString("id")
         try {
-            this.library = Librarian.getLibrary(
+            library = Librarian.getLibrary(
                 Librarian.LibraryName.from(json.optString("library"))
             )!!
         }
@@ -76,6 +91,13 @@ class Manga {
         this.chapters = listTmp.toTypedArray()
         if (this.chapters.isNotEmpty())
             this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
+    }
+
+    // Constructor from JSON string
+    // MAY THROW MangaJetException
+    constructor(jsonStr: String){
+        val json = JSONObject(jsonStr)
+        fromJSON(json)
     }
 
     // Function to fill all manga info except chapters

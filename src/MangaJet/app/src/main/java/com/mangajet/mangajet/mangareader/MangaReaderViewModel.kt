@@ -1,11 +1,7 @@
 package com.mangajet.mangajet.mangareader
 
-import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
-import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 
 // Class which represents "Manga Reader" ViewModel
