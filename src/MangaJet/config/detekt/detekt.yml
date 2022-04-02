@@ -666,7 +666,7 @@ style:
     active: true
     excludes: ['**']
   LoopWithTooManyJumpStatements:
-    active: true
+    active: false
     maxJumpCount: 1
   MagicNumber:
     active: true
@@ -740,7 +740,7 @@ style:
   SpacingBetweenPackageAndImports:
     active: false
   ThrowsCount:
-    active: true
+    active: false
     max: 2
     excludeGuardClauses: false
   TrailingWhitespace:
