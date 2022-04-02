@@ -20,6 +20,14 @@ class HistoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    override fun onResume() {
+        super.onResume()
+        val historyViewModel =
+            ViewModelProvider(this).get(HistoryViewModel::class.java)
+
+        historyViewModel.makeListFromStorage()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,7 +47,7 @@ class HistoryFragment : Fragment() {
                 historyViewModel.mangasNames
             )
 
-            historyViewModel.initMangas(adapter)
+            historyViewModel.init(adapter)
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
