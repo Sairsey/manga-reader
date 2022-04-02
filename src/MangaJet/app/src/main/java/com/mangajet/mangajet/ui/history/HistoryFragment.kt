@@ -29,6 +29,16 @@ class HistoryFragment : Fragment() {
         historyViewModel.makeListFromStorage()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            val historyViewModel =
+                ViewModelProvider(this).get(HistoryViewModel::class.java)
+
+            historyViewModel.makeListFromStorage()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,7 +68,7 @@ class HistoryFragment : Fragment() {
 
         return root
     }
-
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
