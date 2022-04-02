@@ -18,6 +18,9 @@ abstract class AbstractLibrary(uniqueID: String) {
     // Function to get cookies after authentication
     abstract fun getCookies() : String
 
+    // Function to get headers if we need
+    abstract fun getHeadersForDownload() : Map<String, String>
+
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
     // MAY THROW MangaJetException

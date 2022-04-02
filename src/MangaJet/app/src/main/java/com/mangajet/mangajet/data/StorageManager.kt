@@ -48,7 +48,11 @@ object StorageManager {
 
     // Function which asynchronously start download from Internet to file
     // MAY THROW MangaJetException
-    fun download(url: String, path: String, type: FileType = FileType.CachedPages) {
+    fun download(
+        url: String,
+        path: String,
+        type: FileType = FileType.CachedPages,
+        headers: Map<String, String> = mapOf()) {
         if (!writePermission)
             throw MangaJetException("Write permission not granted")
 
@@ -78,7 +82,7 @@ object StorageManager {
                 "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
 
         // Build a promise and start downloading
-        loadPromises.put(new_path, WebAccessor.writeBytesStream(url, file.outputStream()))
+        loadPromises.put(new_path, WebAccessor.writeBytesStream(url, file.outputStream(), headers))
     }
 
     // Function which will wait for specific file to load

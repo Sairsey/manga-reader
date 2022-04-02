@@ -57,7 +57,7 @@ class MangaChapter {
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)
             throw ArrayIndexOutOfBoundsException("Bad page index") // Exception may be thrown here
-        return MangaPage(pagesURLs[pageNumber])
+        return MangaPage(pagesURLs[pageNumber], manga.library.getHeadersForDownload())
     }
 
     // Function for safely retrieving JSON of pages
