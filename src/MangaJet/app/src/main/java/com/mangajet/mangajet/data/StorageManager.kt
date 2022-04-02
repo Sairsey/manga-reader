@@ -167,6 +167,9 @@ object StorageManager {
     // Function which will safe String to file
     // MAY THROW MangaJetException
     fun saveString(path: String, data: String, type: FileType=FileType.MangaInfo) {
+        if (!writePermission)
+            throw MangaJetException("Write permission not granted")
+
         val new_path = type.subdirectoryPath + "/" + path
 
         if (type == FileType.Auto)
@@ -198,6 +201,9 @@ object StorageManager {
     // Function which will load String to file
     // MAY THROW MangaJetException
     fun loadString(path: String, type: FileType=FileType.Auto) : String {
+        if (!readPermission)
+            throw MangaJetException("Read permission not granted")
+
         val f = getFile(path, type)
         if (!f.exists())
             throw MangaJetException("Cannot find file " + path)
@@ -206,6 +212,9 @@ object StorageManager {
 
     // Function which will return paths for all elements of specific file type in order of modification date
     fun getAllPathsForType(type: FileType) : Array<String> {
+        if (!readPermission)
+            throw MangaJetException("Read permission not granted")
+
         if (type == FileType.Auto)
             throw MangaJetException("Request is too strange")
         val f = File(storageDirectory + type.subdirectoryPath)
