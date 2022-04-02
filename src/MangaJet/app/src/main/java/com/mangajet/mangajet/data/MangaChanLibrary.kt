@@ -26,6 +26,11 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return headers.getOrDefault("Cookie", "")
     }
 
+    // Function to get headers if we need
+    override fun getHeadersForDownload(): Map<String, String> {
+        return headers.toMap()
+    }
+
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
     // MAY THROW MangaJetException

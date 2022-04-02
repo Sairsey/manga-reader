@@ -61,11 +61,14 @@ class Manga {
         }
         this.lastViewedChapter = json.optInt("lastViewedChapter", 0)
         fillMangaFromJSON(json)
+        val chaptersJson = json.getJSONObject("chapters")
         val listTmp = arrayListOf<MangaChapter>()
-        for (i in 0 until json.getJSONObject("chapters").length()) {
-            val chapterId = json.getJSONObject("chapters").names().getString(i)
-            val pagesJSON = json.getJSONObject("chapters").getJSONArray(chapterId)
+        listTmp.ensureCapacity(chaptersJson.length())
+        for (i in 0 until chaptersJson.length()) {
+            val chapterId = chaptersJson.names().getString(i)
+            val pagesJSON = chaptersJson.getJSONArray(chapterId)
             val pagesArray = arrayListOf<String>()
+            pagesArray.ensureCapacity(pagesJSON.length())
             for (j in 0 until pagesJSON.length())
                 pagesArray.add(pagesJSON[j].toString())
             listTmp.add(MangaChapter(this, chapterId, pagesArray))
@@ -117,5 +120,13 @@ class Manga {
         chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
         json.put("chapters", jsonChapters)
         return json.toString()
+    }
+
+    // function for saving Manga to file
+    // MAY THROW MangaJetException
+    fun saveToFile(full: Boolean = false) {
+        var string = toJSON(full)
+        var path = id.replace(".", "_") + ".json"
+        StorageManager.saveString(path, string, StorageManager.FileType.MangaInfo)
     }
 }

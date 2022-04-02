@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
@@ -44,9 +45,14 @@ class AboutMangaFragment : Fragment() {
     }
 
     // Function witch will decode bitmap async
-    fun loadBitmap(cover : MangaPage): Bitmap {
-        val imageFile = cover.getFile() // Catch ex here
-        return BitmapFactory.decodeFile(imageFile.absolutePath)
+    fun loadBitmap(cover : MangaPage): Bitmap? {
+        try {
+            val imageFile = cover.getFile() // Catch ex here
+            return BitmapFactory.decodeFile(imageFile.absolutePath)
+        }
+        catch (ex: MangaJetException) {
+            return null
+        }
     }
 
     override fun onStart() {
@@ -64,13 +70,15 @@ class AboutMangaFragment : Fragment() {
         job = GlobalScope.launch(Dispatchers.IO) {
             val bitmap = loadBitmap(cover)
                 withContext(Dispatchers.Main) {
-                    binding.coverManga.setImageBitmap(bitmap)
+                    if (bitmap != null)
+                        binding.coverManga.setImageBitmap(bitmap)
                 }
         }
 
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
             val intent = Intent(activity, MangaReaderActivity::class.java)
+            intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
             startActivity(intent)}
 
         // Tags TextView generator

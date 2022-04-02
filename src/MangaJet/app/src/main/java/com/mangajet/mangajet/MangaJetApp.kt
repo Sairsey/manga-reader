@@ -5,7 +5,7 @@ import android.content.Context
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.mangajet.mangajet.data.Librarian
-import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.data.WebAccessor
 
@@ -30,5 +30,14 @@ class MangaJetApp : Application() {
         WebAccessor.hashCode()
         Librarian.hashCode()
         StorageManager.hashCode()
+
+        // on start it is good idea to load all cookies and Authentication from Librarian
+        try {
+            Librarian.setLibrariesJSON(
+                StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
+        }
+        catch (ex: MangaJetException) {
+            // in this case we can just skip, because if file not found it isnt a big deal.
+        }
     }
 }

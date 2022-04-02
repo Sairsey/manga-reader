@@ -26,7 +26,7 @@ class ClearCacheDialog : DialogFragment() {
                 .setMessage("Are you sure about deleting cache?")
                 .setCancelable(true)
                 .setPositiveButton("Delete") { dialog, id ->
-                    StorageManager.removeDirectory()
+                    StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
                     (activity as CacheSettingActivity?)?.fillCacheListAdapter()
                 }
                 .setNegativeButton("Cancel",

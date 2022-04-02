@@ -23,13 +23,13 @@ import kotlin.jvm.JvmName as JvmName1
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
     // scroll position variable
-    lateinit var scrollPosiition : Parcelable
+    lateinit var scrollPosition : Parcelable
 
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
                              items: Array<MangaChapter>,
-                             private val lastViewedChapter : Int) :
+                             public var lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
         private val mContext: Context
@@ -71,6 +71,8 @@ class MangaChaptersFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private lateinit var adapter: ChapterListAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -87,7 +89,7 @@ class MangaChaptersFragment : Fragment() {
 
         var listView = binding.chaptersList
         activity?.let {
-            val adapter = ChapterListAdapter(it,
+            adapter = ChapterListAdapter(it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
                 aboutMangaViewmodel.manga.lastViewedChapter)
@@ -113,5 +115,13 @@ class MangaChaptersFragment : Fragment() {
         super.onPause()
         var listView = binding.chaptersList
         scrollPosiition = listView.onSaveInstanceState()!!
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+
+        adapter.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
+        adapter.notifyDataSetChanged()
     }
 }
