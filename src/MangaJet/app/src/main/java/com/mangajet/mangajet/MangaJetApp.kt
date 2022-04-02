@@ -14,6 +14,7 @@ class MangaJetApp : Application() {
     companion object
     {
         var context: Context? = null
+        var currentManga : Manga? = null // used for fast sending data between activities without json
     }
 
     override fun onCreate() {

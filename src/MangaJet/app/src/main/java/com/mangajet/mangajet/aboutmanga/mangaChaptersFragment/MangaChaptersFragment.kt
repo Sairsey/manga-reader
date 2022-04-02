@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +12,18 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlin.jvm.JvmName as JvmName1
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
+    // scroll position variable
+    lateinit var scrollPosition : Parcelable
 
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
@@ -92,10 +97,24 @@ class MangaChaptersFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
-                intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
-                intent.putExtra("Chapter", id.toInt())
+                MangaJetApp.currentManga = aboutMangaViewmodel.manga
                 startActivity(intent)}
         }
+
+        scrollPosiition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will restore scroll position
+    override fun onResume() {
+        super.onResume()
+        binding.chaptersList.onRestoreInstanceState(scrollPosiition)
+    }
+
+    // Overridden func which will save scroll position
+    override fun onPause() {
+        super.onPause()
+        var listView = binding.chaptersList
+        scrollPosiition = listView.onSaveInstanceState()!!
     }
 
     override fun onResume() {

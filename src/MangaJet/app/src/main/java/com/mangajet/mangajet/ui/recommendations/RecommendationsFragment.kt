@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.RecommendationsFragmentBinding
 
@@ -45,7 +46,7 @@ class RecommendationsFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
-                intent.putExtra("Manga", recommendedViewModel.mangas[id.toInt()].toJSON())
+                MangaJetApp.currentManga = recommendedViewModel.mangas[id.toInt()]
                 startActivity(intent)}
         }
         return root
