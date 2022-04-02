@@ -20,16 +20,6 @@ class HistoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private var adapter: ArrayAdapter<String>? = null
-
-    override fun onResume() {
-        super.onResume()
-
-        val historyViewModel =
-            ViewModelProvider(this).get(HistoryViewModel::class.java)
-        historyViewModel.initMangas(adapter!!)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,7 +33,7 @@ class HistoryFragment : Fragment() {
 
         var listView = binding.historyListview
         activity?.let {
-            adapter = ArrayAdapter<String>(
+            val adapter = ArrayAdapter<String>(
                 it,
                 android.R.layout.simple_list_item_1,
                 historyViewModel.mangasNames

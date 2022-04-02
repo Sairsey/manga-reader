@@ -37,9 +37,8 @@ class HistoryViewModel : ViewModel() {
     // Function which will async load mangas info
     fun initMangas(adapterNew: ArrayAdapter<String>) {
         if (!isInited) {
+            isInited = true
             adapter = adapterNew
-            mangasNames.clear()
-            mangas.clear()
             job = GlobalScope.launch(Dispatchers.IO) {
                 addElementsToMangas()
             }
