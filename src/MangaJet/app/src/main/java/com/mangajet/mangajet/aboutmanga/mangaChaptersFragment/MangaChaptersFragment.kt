@@ -47,8 +47,13 @@ class MangaChaptersFragment : Fragment() {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
 
-                chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                        (position + 1).toString())
+                if (p.name.isNotEmpty())
+                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
+                            (position + 1).toString() + ": " + p.name)
+                else
+                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
+                            (position + 1).toString())
+
                 if (position < lastViewedChapter)
                     icon?.setImageResource(R.drawable.ic_opened_book)
                 else

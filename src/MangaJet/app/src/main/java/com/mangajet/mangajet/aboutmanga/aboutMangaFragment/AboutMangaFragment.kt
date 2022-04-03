@@ -62,6 +62,8 @@ class AboutMangaFragment : Fragment() {
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
 
         job = GlobalScope.launch(Dispatchers.IO) {
+            // POTENTIAL EXCEPTION and ERROR
+            // Cover isn't downloaded but we try to draw it => terminate
             val bitmap = loadBitmap(cover)
                 withContext(Dispatchers.Main) {
                     binding.coverManga.setImageBitmap(bitmap)

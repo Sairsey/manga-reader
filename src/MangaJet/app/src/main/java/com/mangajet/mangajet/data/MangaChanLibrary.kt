@@ -1,5 +1,7 @@
 package com.mangajet.mangajet.data
 
+import android.os.Build
+import android.text.Html
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -100,7 +102,11 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 return ""
             f = text.indexOf(">", f) + 1
             val s = text.indexOf("<", f)
-            return text.subSequence(f, s).toString()
+            val description = text.subSequence(f, s).toString()
+            return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                Html.fromHtml(description, Html.FROM_HTML_MODE_LEGACY).toString()
+            else
+                Html.fromHtml(description).toString()
         }
 
         // Retrieve author
@@ -177,8 +183,15 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
-                chapters.add(MangaChapter(manga, table.substring(f, s)))
-                f = table.indexOf("zaliv", f)
+                var nameStart = table.indexOf("&nbsp;&nbsp;", s) + "&nbsp;&nbsp;".length + 1
+                nameStart = table.indexOf("&nbsp;&nbsp;", nameStart) + "&nbsp;&nbsp;".length
+                if(nameStart == "&nbsp;&nbsp;".length - 1)
+                    chapters.add(MangaChapter(manga, table.substring(f, s)))
+                else{
+                    var nameFinish = table.indexOf("<", nameStart)
+                    chapters.add(MangaChapter(manga, table.substring(f, s), table.substring(nameStart, nameFinish)))
+                    f = table.indexOf("zaliv", f)
+                }
             }
         }
         chapters.reverse()
