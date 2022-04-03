@@ -59,6 +59,8 @@ class HistoryFragment : Fragment() {
             )
 
             historyViewModel.init(adapter)
+            historyViewModel.makeListFromStorage()
+
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)

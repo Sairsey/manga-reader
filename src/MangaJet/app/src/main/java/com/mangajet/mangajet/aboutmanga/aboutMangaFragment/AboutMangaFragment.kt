@@ -82,6 +82,7 @@ class AboutMangaFragment : Fragment() {
 
         // Tags TextView generator
         val tagsLayout = binding.tagsLayout
+        tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
             val newTextView = TextView(activity)
             newTextView.setText(it)
