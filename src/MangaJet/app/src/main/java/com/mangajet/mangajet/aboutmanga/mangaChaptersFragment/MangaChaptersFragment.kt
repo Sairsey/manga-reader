@@ -18,12 +18,11 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
-import kotlin.jvm.JvmName as JvmName1
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
     // scroll position variable
-    lateinit var scrollPosiition : Parcelable
+    lateinit var scrollPosition : Parcelable
 
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
@@ -32,12 +31,7 @@ class MangaChaptersFragment : Fragment() {
                              private val lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
-        private val mContext: Context
-
-        // init block
-        init {
-            mContext = context
-        }
+        private val mContext: Context = context
 
         // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -99,19 +93,18 @@ class MangaChaptersFragment : Fragment() {
                 startActivity(intent)}
         }
 
-        scrollPosiition = listView.onSaveInstanceState()!!
+        scrollPosition = listView.onSaveInstanceState()!!
     }
 
     // Overridden func which will restore scroll position
     override fun onResume() {
         super.onResume()
-        binding.chaptersList.onRestoreInstanceState(scrollPosiition)
+        binding.chaptersList.onRestoreInstanceState(scrollPosition)
     }
 
     // Overridden func which will save scroll position
     override fun onPause() {
         super.onPause()
-        var listView = binding.chaptersList
-        scrollPosiition = listView.onSaveInstanceState()!!
+        scrollPosition = binding.chaptersList.onSaveInstanceState()!!
     }
 }
