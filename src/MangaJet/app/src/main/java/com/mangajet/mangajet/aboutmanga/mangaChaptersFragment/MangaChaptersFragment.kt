@@ -28,7 +28,7 @@ class MangaChaptersFragment : Fragment() {
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
                              items: Array<MangaChapter>,
-                             private val lastViewedChapter : Int) :
+                             public var lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
         private val mContext: Context = context
@@ -70,6 +70,9 @@ class MangaChaptersFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // Adapter on ChapterList for custom ListView
+    private lateinit var adapter: ChapterListAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -86,7 +89,7 @@ class MangaChaptersFragment : Fragment() {
 
         var listView = binding.chaptersList
         activity?.let {
-            val adapter = ChapterListAdapter(it,
+            adapter = ChapterListAdapter(it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
                 aboutMangaViewmodel.manga.lastViewedChapter)
@@ -95,21 +98,27 @@ class MangaChaptersFragment : Fragment() {
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
                 MangaJetApp.currentManga = aboutMangaViewmodel.manga
+                MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
                 startActivity(intent)}
         }
 
         scrollPosition = listView.onSaveInstanceState()!!
     }
 
-    // Overridden func which will restore scroll position
-    override fun onResume() {
-        super.onResume()
-        binding.chaptersList.onRestoreInstanceState(scrollPosition)
-    }
-
     // Overridden func which will save scroll position
     override fun onPause() {
         super.onPause()
-        scrollPosition = binding.chaptersList.onSaveInstanceState()!!
+        var listView = binding.chaptersList
+        scrollPosition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will restore scroll position
+    override fun onResume() {
+        super.onResume()
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+
+        binding.chaptersList.onRestoreInstanceState(scrollPosition)
+        adapter.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
+        adapter.notifyDataSetChanged()
     }
 }
