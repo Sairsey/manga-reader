@@ -1,11 +1,12 @@
 package com.mangajet.mangajet.ui.history
 
-import android.content.Intent
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
-import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.data.StorageManager
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -21,33 +22,53 @@ class HistoryViewModel : ViewModel() {
 
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
-        val mangasSearchWords = listOf("Клинок", "Dorohedoro", "chainsaw")
-        for (name in mangasSearchWords) {
-            mangas.add(
-                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
-            )
-            mangas[mangas.size - 1].updateInfo()
-            mangasNames.add(mangas[mangas.size - 1].originalName)
+        var mangasPaths = arrayOf<String>()
+        try {
+            mangasPaths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
+        }
+        catch (ex: MangaJetException) {
+            // we do not have permission to read.
+            // not a big problem, just not showing anything
+        }
+        for (path in mangasPaths) {
+            job?.ensureActive()
+            try {
+                mangas.add(
+                    Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
+                )
+            }
+            catch (ex: MangaJetException) {
+                // nothing too tragic, we just haven`t permission to read or file invalid
+                // but we should continue
+                continue
+            }
+
+            job?.ensureActive()
             withContext (Dispatchers.Main) {
+                mangasNames.add(mangas[mangas.size - 1].originalName)
                 adapter?.notifyDataSetChanged()
             }
         }
     }
 
-    // Function which will async load mangas info
-    fun initMangas(adapterNew: ArrayAdapter<String>) {
-        if (!isInited) {
-            isInited = true
-            adapter = adapterNew
-            job = GlobalScope.launch(Dispatchers.IO) {
-                addElementsToMangas()
-            }
+    // Function which update mangas info from storage
+    fun makeListFromStorage(adapterNew: ArrayAdapter<String>) {
+        // cancel job if we need
+        adapter = adapterNew
+        job?.cancel()
+        mangas.clear()
+        mangasNames.clear()
+
+        job = GlobalScope.launch(Dispatchers.Default) {
+            addElementsToMangas()
         }
     }
 
+
     override fun onCleared() {
         super.onCleared()
-        isInited = false
+        job?.cancel()
         mangas.clear()
+        mangasNames.clear()
     }
 }

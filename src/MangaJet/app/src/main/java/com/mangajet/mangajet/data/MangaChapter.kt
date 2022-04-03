@@ -9,20 +9,23 @@ import javax.net.ssl.ManagerFactoryParameters
 class MangaChapter {
     public var manga: Manga      // Manga from which this chapter created
     public var id: String        // Id of this Chapter
+    public var name: String    // Chapter name (can be zero-size string)
     public var lastViewedPage = 0 // Number of last viewed page
     private var pagesNumber = -1  // Number of pages in this chapter
     private var pagesURLs = arrayListOf<String>()
 
     // Constructor for Libraries
-    constructor(manga: Manga, id: String) {
+    constructor(manga: Manga, id: String, name: String = "") {
         this.manga = manga
         this.id = id
+        this.name = name
     }
 
     // Constructor for JSON
-    constructor(manga: Manga, id: String, urls : ArrayList<String>) {
+    constructor(manga: Manga, id: String, urls : ArrayList<String>, name: String = "") {
         this.manga = manga
         this.id = id
+        this.name = name
         this.pagesURLs = urls
         this.pagesNumber = urls.size
     }
@@ -57,7 +60,7 @@ class MangaChapter {
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)
             throw ArrayIndexOutOfBoundsException("Bad page index") // Exception may be thrown here
-        return MangaPage(pagesURLs[pageNumber])
+        return MangaPage(pagesURLs[pageNumber], manga.library.getHeadersForDownload())
     }
 
     // Function for safely retrieving JSON of pages

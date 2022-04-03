@@ -21,6 +21,9 @@ object Librarian {
     // Map for storing libraries names as keys and abstract libraries as value
     private val map = hashMapOf<LibraryName, AbstractLibrary?>()
 
+    // Filename for StorageManager
+    public const val path = "libraries.json"
+
     // Initializer block
     init {
         map[LibraryName.Readmanga] = null

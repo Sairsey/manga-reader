@@ -25,7 +25,7 @@ class AboutMangaActivity : AppCompatActivity() {
 
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
-        aboutMangaViewmodel.initMangaData(intent)
+        aboutMangaViewmodel.initMangaData()
         setTitle(aboutMangaViewmodel.manga.originalName)
 
         val tabLayout = findViewById<TabLayout>(R.id.aboutMangaTabs)
