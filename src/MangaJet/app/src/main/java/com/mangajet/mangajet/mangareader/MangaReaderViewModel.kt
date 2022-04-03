@@ -11,11 +11,12 @@ class MangaReaderViewModel : ViewModel() {
     // Manga we are reading right now
     lateinit var manga: Manga
 
-    fun saveMangaState() {
+    // Function will save current manga state to file
+    private fun saveMangaState() {
         manga.saveToFile()
     }
 
-    // Function will
+    // Function will init all data about manga
     fun initMangaData() {
         if (!isInited) {
             isInited = true

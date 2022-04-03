@@ -39,6 +39,8 @@ class HistoryViewModel : ViewModel() {
             }
             catch (ex: MangaJetException) {
                 // nothing too tragic, we just haven`t permission to read or file invalid
+                // but we should continue
+                continue
             }
 
             job?.ensureActive()

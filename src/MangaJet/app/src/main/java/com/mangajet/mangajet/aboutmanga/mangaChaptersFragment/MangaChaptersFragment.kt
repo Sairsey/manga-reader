@@ -65,6 +65,7 @@ class MangaChaptersFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // Adapter on ChapterList for custom ListView
     private lateinit var adapter: ChapterListAdapter
 
     override fun onCreateView(
