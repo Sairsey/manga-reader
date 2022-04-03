@@ -18,7 +18,6 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
-import kotlin.jvm.JvmName as JvmName1
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
@@ -32,12 +31,7 @@ class MangaChaptersFragment : Fragment() {
                              public var lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
-        private val mContext: Context
-
-        // init block
-        init {
-            mContext = context
-        }
+        private val mContext: Context = context
 
         // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -104,7 +98,6 @@ class MangaChaptersFragment : Fragment() {
 
         scrollPosition = listView.onSaveInstanceState()!!
     }
-
 
     // Overridden func which will save scroll position
     override fun onPause() {
