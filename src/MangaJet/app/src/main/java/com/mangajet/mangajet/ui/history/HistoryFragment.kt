@@ -21,12 +21,15 @@ class HistoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // Adapter for ListView
+    private lateinit var adapter: ArrayAdapter<String>
+
     override fun onResume() {
         super.onResume()
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 
-        historyViewModel.makeListFromStorage()
+        historyViewModel.makeListFromStorage(adapter)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -35,7 +38,7 @@ class HistoryFragment : Fragment() {
             val historyViewModel =
                 ViewModelProvider(this).get(HistoryViewModel::class.java)
 
-            historyViewModel.makeListFromStorage()
+            historyViewModel.makeListFromStorage(adapter)
         }
     }
 
@@ -51,22 +54,19 @@ class HistoryFragment : Fragment() {
         val root: View = binding.root
 
         var listView = binding.historyListview
-        activity?.let {
-            val adapter = ArrayAdapter<String>(
-                it,
-                android.R.layout.simple_list_item_1,
-                historyViewModel.mangasNames
-            )
+        adapter = ArrayAdapter<String>(
+            requireActivity(),
+            android.R.layout.simple_list_item_1,
+            historyViewModel.mangasNames
+        )
 
-            historyViewModel.init(adapter)
-            historyViewModel.makeListFromStorage()
+        historyViewModel.makeListFromStorage(adapter)
 
-            listView.adapter = adapter
-            listView.setOnItemClickListener{ parent, view, position, id ->
-                val intent = Intent(it, AboutMangaActivity::class.java)
-                MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
-                startActivity(intent)}
-        }
+        listView.adapter = adapter
+        listView.setOnItemClickListener{ parent, view, position, id ->
+            val intent = Intent(requireActivity(), AboutMangaActivity::class.java)
+            MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
+            startActivity(intent)}
 
         return root
     }

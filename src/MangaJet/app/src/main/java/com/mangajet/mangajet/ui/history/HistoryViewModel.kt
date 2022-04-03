@@ -52,8 +52,9 @@ class HistoryViewModel : ViewModel() {
     }
 
     // Function which update mangas info from storage
-    fun makeListFromStorage() {
+    fun makeListFromStorage(adapterNew: ArrayAdapter<String>) {
         // cancel job if we need
+        adapter = adapterNew
         job?.cancel()
         mangas.clear()
         mangasNames.clear()
@@ -63,19 +64,11 @@ class HistoryViewModel : ViewModel() {
         }
     }
 
-    // Function which set adapter async load mangas info
-    fun init(adapterNew: ArrayAdapter<String>) {
-        if (!isInited) {
-            isInited = true
-            adapter = adapterNew
-        }
-    }
 
     override fun onCleared() {
         super.onCleared()
         job?.cancel()
         mangas.clear()
         mangasNames.clear()
-        isInited = false
     }
 }
