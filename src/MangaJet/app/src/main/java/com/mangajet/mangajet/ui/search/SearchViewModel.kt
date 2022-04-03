@@ -12,6 +12,10 @@ import kotlinx.coroutines.launch
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
+    companion object {
+        const val SEARCH_AMOUNT = 20        // Amount of searchable mangas
+    }
+
     var isInited = false                            // is init boolean flag
     val mangasNames = ArrayList<String>()           // mangas names for list
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
@@ -21,12 +25,13 @@ class SearchViewModel : ViewModel() {
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
         val mangasSearchWord = "Учитель"
-        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(mangasSearchWord)
+        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.
+                                searchManga(mangasSearchWord, SEARCH_AMOUNT, 0)
         for (i in libsMangas.indices) {
             mangas.add(libsMangas[i])
             mangas[i].updateInfo()
-            mangasNames.add(mangas[i].originalName)
             withContext (Dispatchers.Main) {
+                mangasNames.add(mangas[i].originalName)
                 adapter?.notifyDataSetChanged()
             }
         }

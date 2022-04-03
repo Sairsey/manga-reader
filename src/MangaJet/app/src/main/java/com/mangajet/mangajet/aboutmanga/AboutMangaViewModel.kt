@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.aboutmanga
 import android.content.Intent
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 
@@ -12,10 +13,10 @@ class AboutMangaViewModel : ViewModel() {
     lateinit var manga : Manga
 
     // Function will
-    fun initMangaData(intent : Intent) {
+    fun initMangaData() {
         if (!isInited) {
             isInited = true
-            manga = Manga(intent.getStringExtra("Manga").toString())
+            manga = MangaJetApp.currentManga!!
             manga.updateChapters()
         }
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
@@ -19,6 +21,9 @@ import com.mangajet.mangajet.mangareader.MangaReaderActivity
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
+    // scroll position variable
+    lateinit var scrollPosition : Parcelable
+
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
@@ -26,12 +31,7 @@ class MangaChaptersFragment : Fragment() {
                              private val lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
-        private val mContext: Context
-
-        // init block
-        init {
-            mContext = context
-        }
+        private val mContext: Context = context
 
         // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -89,9 +89,22 @@ class MangaChaptersFragment : Fragment() {
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
-                intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
-                intent.putExtra("Chapter", id.toInt())
+                MangaJetApp.currentManga = aboutMangaViewmodel.manga
                 startActivity(intent)}
         }
+
+        scrollPosition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will restore scroll position
+    override fun onResume() {
+        super.onResume()
+        binding.chaptersList.onRestoreInstanceState(scrollPosition)
+    }
+
+    // Overridden func which will save scroll position
+    override fun onPause() {
+        super.onPause()
+        scrollPosition = binding.chaptersList.onSaveInstanceState()!!
     }
 }
