@@ -69,10 +69,10 @@ class AboutMangaFragment : Fragment() {
 
         job = GlobalScope.launch(Dispatchers.IO) {
             val bitmap = loadBitmap(cover)
-                withContext(Dispatchers.Main) {
-                    if (bitmap != null)
-                        binding.coverManga.setImageBitmap(bitmap)
-                }
+            withContext(Dispatchers.Main) {
+                if (bitmap != null)
+                    binding.coverManga.setImageBitmap(bitmap)
+            }
         }
 
         val buttonToRead = binding.readMangaButton

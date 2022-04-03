@@ -56,6 +56,9 @@ object StorageManager {
         if (!writePermission)
             throw MangaJetException("Write permission not granted")
 
+        if (type == FileType.Auto)
+            throw MangaJetException("Request is too strange")
+
         var new_path = type.subdirectoryPath + "/" + path
 
         // If we already loaded this file - do not do anything
@@ -90,6 +93,9 @@ object StorageManager {
     fun await(path: String, type: FileType = FileType.CachedPages){
 
         var new_path = type.subdirectoryPath + "/" + path
+
+        if (type == FileType.Auto)
+            throw MangaJetException("Request is too strange")
 
         // If we already loaded this file - do not do anything
         if (!loadPromises.containsKey(new_path))
