@@ -1,4 +1,7 @@
-package com.mangajet.mangajet.data
+package com.mangajet.mangajet.data.libraries
+
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaChapter
 
 // Abstract class that represents one site from which we parse manga
 abstract class AbstractLibrary(uniqueID: String) {
