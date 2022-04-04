@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.data.libraries.AbstractLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
 import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import org.json.JSONObject

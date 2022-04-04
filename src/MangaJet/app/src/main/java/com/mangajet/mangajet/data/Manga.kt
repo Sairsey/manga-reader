@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.data.libraries.AbstractLibrary
 import org.json.JSONArray
 import org.json.JSONObject
 

@@ -2,7 +2,6 @@ package com.mangajet.mangajet.data.libraries
 
 import android.os.Build
 import android.text.Html
-import com.mangajet.mangajet.data.AbstractLibrary
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.WebAccessor
