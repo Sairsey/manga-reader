@@ -12,8 +12,7 @@ import org.json.JSONObject
 class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
     val headers = mutableMapOf(
-        "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
-                "Chrome/41.0.2228.0 Safari/537.36",
+        "User-Agent" to "readmangafun",
         "accept" to "*/*")
 
     // Function to get Manga class by its id(name)
@@ -43,24 +42,22 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val url = getURL() + "/search/suggestion?query=" + id
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
-        var f = text.indexOf("\"link\":\"") + "\"link\":\"".length
+        val json = JSONObject(text)
+        val query = json.getJSONArray("suggestions")
 
         val res = ArrayList<Manga>()
 
         var index = 0
-        while (f - "\"link\":\"".length != - 1) {
-            if(text.indexOf("list", f) != -1) {
-                f = text.indexOf("\"link\":\"", f) + "\"link\":\"".length
-                continue
-            }
+        for (i in 0 until query.length())
+        {
+            var link = query.getJSONObject(i).getString("link")
 
-            val s = text.indexOf("\"", f)
+            if (link.contains("/person/") || link.contains("/tag/") )
+                continue
             if (index >= offset + amount)
                 break
-
             if (index >= offset)
-                res.add(Manga(this, text.subSequence(f, s).toString()))
-            f = text.indexOf("\"link\":\"", f) + "\"link\":\"".length
+                res.add(Manga(this, link))
             index++
         }
 
@@ -200,7 +197,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // Function to get array of pages in specific manga, specific chapter by their ids(names)
     // MAY THROW MangaJetException
     override fun getChapterInfo(mangaID: String, chapterID: String) : String {
-        val url = getURL() + "/" + chapterID
+        val url = getURL() + "/" + chapterID + "?mtr=1"
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
         val res = ArrayList<String>()
 
