@@ -1,6 +1,8 @@
 package com.mangajet.mangajet.data
 
-import org.json.JSONArray
+import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.data.libraries.MangaChanLibrary
+import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import org.json.JSONObject
 
 // Singleton class that stores all libraries with manga and provides access to them
@@ -26,7 +28,7 @@ object Librarian {
 
     // Initializer block
     init {
-        map[LibraryName.Readmanga] = null
+        map[LibraryName.Readmanga] = ReadMangaLibrary(LibraryName.Readmanga.resource)
         map[LibraryName.Mangalib] = null
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = null
