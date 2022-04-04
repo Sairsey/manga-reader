@@ -1,25 +1,48 @@
 package com.mangajet.mangajet.mangareader
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.mangajet.mangajet.R
-import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+
 
 // Class which represents "Manga Reader" Activity
 class MangaReaderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.manga_reader_activity)
+
         val mangaReaderViewmodel = ViewModelProvider(this).get(MangaReaderViewModel::class.java)
 
         mangaReaderViewmodel.initMangaData()
-        setContentView(R.layout.manga_reader_activity)
 
-        val text = findViewById<TextView>(R.id.sample_texr)
+        var detektFuckUper = ""
+        val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewmodel)
+        val viewPager = findViewById<ViewPager>(R.id.mangaViewPager)
+        viewPager.adapter = pagerAdapter
+        viewPager.currentItem = mangaReaderViewmodel.getStartedPosition()
 
-        text.text = "Chapter " + (mangaReaderViewmodel.manga.lastViewedChapter + 1)
+        viewPager.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                if (position > mangaReaderViewmodel.maxPos) {
+                    mangaReaderViewmodel.saveLastViewedData()
+                    mangaReaderViewmodel.maxPos = position
+                }
+            }
 
+            override fun onPageSelected(position: Int) {
+                detektFuckUper += ""
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                detektFuckUper += ""
+            }
+        })
     }
 }
