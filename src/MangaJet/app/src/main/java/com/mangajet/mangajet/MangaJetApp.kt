@@ -31,14 +31,5 @@ class MangaJetApp : Application() {
         WebAccessor.hashCode()
         Librarian.hashCode()
         StorageManager.hashCode()
-
-        // on start it is good idea to load all cookies and Authentication from Librarian
-        try {
-            Librarian.setLibrariesJSON(
-                StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
-        }
-        catch (ex: MangaJetException) {
-            // in this case we can just skip, because if file not found it isnt a big deal.
-        }
     }
 }
