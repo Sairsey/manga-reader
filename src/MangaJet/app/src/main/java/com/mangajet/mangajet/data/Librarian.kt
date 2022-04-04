@@ -26,7 +26,7 @@ object Librarian {
 
     // Initializer block
     init {
-        map[LibraryName.Readmanga] = null
+        map[LibraryName.Readmanga] = ReadMangaLibrary(LibraryName.Readmanga.resource)
         map[LibraryName.Mangalib] = null
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = null

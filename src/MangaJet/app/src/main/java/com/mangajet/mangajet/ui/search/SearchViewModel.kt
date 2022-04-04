@@ -25,7 +25,7 @@ class SearchViewModel : ViewModel() {
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
         val mangasSearchWord = "Учитель"
-        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.
+        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Readmanga)!!.
                                 searchManga(mangasSearchWord, SEARCH_AMOUNT, 0)
         for (i in libsMangas.indices) {
             mangas.add(libsMangas[i])
