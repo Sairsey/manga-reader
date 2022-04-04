@@ -1,8 +1,12 @@
-package com.mangajet.mangajet.data
+package com.mangajet.mangajet.data.libraries
 
 import android.os.Build
 import android.text.Html
 import androidx.core.text.isDigitsOnly
+import com.mangajet.mangajet.data.AbstractLibrary
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaChapter
+import com.mangajet.mangajet.data.WebAccessor
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -64,6 +68,14 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return res.toTypedArray()
     }
 
+    // Helper function to delete weird Html symbols
+    private fun transformFromHtml(text : String) : String{
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
+        else
+            Html.fromHtml(text).toString()
+    }
+
     // Helper class for some functions
     private class ReadMangaLibraryHelper {
         // Retrieve title image URL
@@ -102,11 +114,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var f = text.indexOf("itemprop=\"description\"")
             f = text.indexOf("content=", f) + "content=".length + 1
             val s = text.indexOf("\"", f + 1)
-            val description = text.subSequence(f, s).toString()
-            return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                Html.fromHtml(description, Html.FROM_HTML_MODE_LEGACY).toString()
-            else
-                Html.fromHtml(description).toString()
+            return text.subSequence(f, s).toString()
         }
 
         // Retrieve author
@@ -138,12 +146,12 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val json = JSONObject()
-        json.put("name", ReadMangaLibraryHelper().getName(text))
-        json.put("cover", ReadMangaLibraryHelper().getTitleImageURL(text))
-        json.put("rus_name", ReadMangaLibraryHelper().getRusName(text))
-        json.put("rating", ReadMangaLibraryHelper().getRating(text))
-        json.put("author", ReadMangaLibraryHelper().getAuthor(text))
-        json.put("description", ReadMangaLibraryHelper().getDescr(text))
+        json.put("name", transformFromHtml(ReadMangaLibraryHelper().getName(text)))
+        json.put("cover", transformFromHtml(ReadMangaLibraryHelper().getTitleImageURL(text)))
+        json.put("rus_name", transformFromHtml(ReadMangaLibraryHelper().getRusName(text)))
+        json.put("rating", transformFromHtml(ReadMangaLibraryHelper().getRating(text)))
+        json.put("author", transformFromHtml(ReadMangaLibraryHelper().getAuthor(text)))
+        json.put("description", transformFromHtml(ReadMangaLibraryHelper().getDescr(text)))
         val tagArray = JSONArray(ReadMangaLibraryHelper().getTags(text))
         json.put("tags", tagArray)
         return json.toString()
@@ -181,11 +189,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                     res += nameSplit[i] + " "
                 name = res
             }
-            name = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                Html.fromHtml(name, Html.FROM_HTML_MODE_LEGACY).toString()
-            else
-                Html.fromHtml(name).toString()
-            chapters.add(MangaChapter(manga, id, name))
+            chapters.add(MangaChapter(manga, id, transformFromHtml(name)))
             f = text.indexOf("item-title", f)
         }
         chapters.reverse()

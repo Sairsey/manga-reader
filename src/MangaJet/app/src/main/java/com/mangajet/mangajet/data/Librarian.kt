@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.data
 
-import org.json.JSONArray
+import com.mangajet.mangajet.data.libraries.MangaChanLibrary
+import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import org.json.JSONObject
 
 // Singleton class that stores all libraries with manga and provides access to them
