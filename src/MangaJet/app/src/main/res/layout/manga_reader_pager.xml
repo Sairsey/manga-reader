@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <ImageView
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/mangaPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

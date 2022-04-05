@@ -1,18 +1,15 @@
 package com.mangajet.mangajet.mangareader
 
-import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaPage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     RecyclerView.Adapter<MangaReaderVPAdapter.MangaReaderPageHolder>() {
@@ -20,21 +17,23 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     var currentViewModelWithData = viewModel
 
     inner class MangaReaderPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imagePage = itemView.findViewById<ImageView>(R.id.mangaPage)
-        private val pageAndChapterNumberView = itemView.findViewById<TextView>(R.id.pageAndChapterNumber)
+        private val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
+        private val pageAndChapterNumberView =
+            itemView.findViewById<TextView>(R.id.pageAndChapterNumber)
 
         fun bind(mangaPage : MangaPage, position : Int, chapter : Int) {
             pageAndChapterNumberView.text = "$chapter/$position"
 
-            currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
-                // POTENTIAL EXCEPTION and ERROR
-                // Cover isn't downloaded but we try to draw it => terminate
-                val bitmap = currentViewModelWithData.loadBitmap(mangaPage)
-                withContext(Dispatchers.Main) {
-                    if (bitmap != null)
-                        imagePage.setImageBitmap(bitmap)
-                }
+            if (mangaPage.localPath == "") {
+                val img = ImageSource.uri(mangaPage.localPath)
+                imagePage.setImage(img)
             }
+            else {
+                val pageFile = mangaPage.getFile()
+                val bitmapa = BitmapFactory.decodeFile(pageFile.absolutePath)
+                imagePage.setImage(ImageSource.bitmap(bitmapa))
+            }
+            //imagePage.setImage(ImageSource.uri())
         }
     }
 
@@ -47,18 +46,74 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     }
 
     override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
-        if (position == 0 || position == itemCount - 1)
+        // SPECIAL CASES:
+        var pageIndex : Int = 0
+        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
+
+        // only one chapter
+        if (currentViewModelWithData.manga.chapters.size == 1)
+            pageIndex = position
+
+        // First chapter
+        else if (currentViewModelWithData.manga.lastViewedChapter == 0) {
+            if (position == itemCount - 1) {
+                pageIndex = 0
+                chapterIndex++
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+            }
+            else
+                pageIndex = position
+        }
+        // Last chapter
+        else if (currentViewModelWithData.manga.lastViewedChapter == currentViewModelWithData.manga.chapters.size - 1) {
+            if (position == 0) {
+                chapterIndex--
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+                pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+            }
+            else
+                pageIndex = position - 1
+        }
+        // Other cases
+        else {
+            if (position == 0) {
+                chapterIndex--
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+                pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+            }
+            else if (position == itemCount - 1) {
+                pageIndex = 0
+                chapterIndex++
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+            }
+            else
+                pageIndex = position - 1
+        }
+
+        if (pageIndex == -1)
             return
 
         val mangaPage = currentViewModelWithData.manga
-            .chapters[currentViewModelWithData.manga.lastViewedChapter]
-            .getPage(position - 1)
+            .chapters[chapterIndex]
+            .getPage(pageIndex)
 
-        holder.bind(mangaPage, position - 1,
-            currentViewModelWithData.manga.lastViewedChapter)
+        holder.bind(mangaPage, position,
+            chapterIndex)
     }
 
     override fun getItemCount(): Int {
+        // Only one chapter
+        if (currentViewModelWithData.manga.chapters.size == 1)
+            return currentViewModelWithData.manga
+                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+
+        // First or last chapter
+        if (currentViewModelWithData.manga.lastViewedChapter == 0
+            || currentViewModelWithData.manga.lastViewedChapter == currentViewModelWithData.manga.chapters.size - 1)
+            return currentViewModelWithData.manga
+                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum() + 1
+
+        // All chapters
         return currentViewModelWithData.manga
             .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum() + 2
     }

@@ -28,67 +28,112 @@ class MangaReaderActivity : AppCompatActivity() {
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewmodel)
         viewPager.adapter = pagerAdapter
+
+        var delta = 1
+        if (mangaReaderViewmodel.manga.lastViewedChapter == 0)
+            delta = 0
+
         viewPager.setCurrentItem(mangaReaderViewmodel.manga
-                 .chapters[mangaReaderViewmodel.manga.lastViewedChapter]
-                 .lastViewedPage + 1, false)
+            .chapters[mangaReaderViewmodel.manga.lastViewedChapter]
+            .lastViewedPage + delta, false)
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
+            private fun doToPrevChapter() {
+                // update chapter
+                mangaReaderViewmodel.manga.lastViewedChapter--;
+
+                // update pages count (and load chapter)
+                mangaReaderViewmodel.pagesCount =
+                    mangaReaderViewmodel.manga
+                        .chapters[mangaReaderViewmodel.manga.lastViewedChapter].getPagesNum()
+
+                // set correct page
+                mangaReaderViewmodel.manga
+                    .chapters[mangaReaderViewmodel.manga.lastViewedChapter]
+                    .lastViewedPage = mangaReaderViewmodel.pagesCount - 1
+
+                // save manga state
+                mangaReaderViewmodel.manga.saveToFile()
+
+                // start loading all pages
+                mangaReaderViewmodel.uploadPages()
+
+                // update adapter
+                viewPager.adapter = null
+                pagerAdapter.notifyDataSetChanged()
+                viewPager.adapter = pagerAdapter
+
+                // determine delta
+                var delta = 0
+                if (mangaReaderViewmodel.manga.lastViewedChapter == 0)
+                    delta = -1
+
+                // go to right page without animation
+                viewPager.setCurrentItem(mangaReaderViewmodel.pagesCount + delta, false)
+            }
+
+            private fun doToNextChapter() {
+                // update chapter
+                mangaReaderViewmodel.manga.lastViewedChapter++;
+
+                // update pages count (and load chapter)
+                mangaReaderViewmodel.pagesCount =
+                    mangaReaderViewmodel.manga
+                        .chapters[mangaReaderViewmodel.manga.lastViewedChapter].getPagesNum()
+
+                // set correct page
+                mangaReaderViewmodel.manga
+                    .chapters[mangaReaderViewmodel.manga.lastViewedChapter]
+                    .lastViewedPage = 0
+
+                // save manga state
+                mangaReaderViewmodel.manga.saveToFile()
+
+                // start loading all pages
+                mangaReaderViewmodel.uploadPages()
+
+                // update adapter
+                viewPager.adapter = null
+                pagerAdapter.notifyDataSetChanged()
+                viewPager.adapter = pagerAdapter
+
+                // go to right page without animation
+                viewPager.setCurrentItem(1, false)
+            }
+
+
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 mangaReaderViewmodel.manga
                     .chapters[mangaReaderViewmodel.manga.lastViewedChapter]
                     .lastViewedPage = position
-                Toast.makeText(context, "onPageSelected", Toast.LENGTH_SHORT).show()
-            }
 
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                // prev chapter
-                if (position == 0
-                    && positionOffset > SWAP_RIGHT_BORDER
-                    && mangaReaderViewmodel.manga.lastViewedChapter > 0)
-                {
-                    mangaReaderViewmodel.manga.lastViewedChapter--;
+                //Toast.makeText(context, "onPageSelected", Toast.LENGTH_SHORT).show()
 
-                    mangaReaderViewmodel.pagesCount =
-                        mangaReaderViewmodel.manga
-                            .chapters[mangaReaderViewmodel.manga.lastViewedChapter].getPagesNum()
+                // SPECIAL CASES
+                // only one chapter
+                if (mangaReaderViewmodel.manga.chapters.size == 1)
+                    return // do nothing
 
-                    mangaReaderViewmodel.manga
-                        .chapters[mangaReaderViewmodel.manga.lastViewedChapter].lastViewedPage =
-                        mangaReaderViewmodel.pagesCount - 1
-
-                    mangaReaderViewmodel.uploadPages()
-                    pagerAdapter.notifyDataSetChanged()
-                    viewPager.setCurrentItem(mangaReaderViewmodel.pagesCount + 1, false)
-
+                // First chapter
+                else if (mangaReaderViewmodel.manga.lastViewedChapter == 0) {
+                    if (position == pagerAdapter.itemCount - 1) {
+                        doToNextChapter()
+                    }
                 }
-
-                // next chapter
-                if (position == mangaReaderViewmodel.pagesCount
-                    && positionOffset < SWAP_LEFT_BORDER
-                    && mangaReaderViewmodel.manga.lastViewedChapter <
-                       mangaReaderViewmodel.manga.chapters.size - 1)
-                {
-                    mangaReaderViewmodel.manga.lastViewedChapter++
-
-                    mangaReaderViewmodel.pagesCount =
-                        mangaReaderViewmodel.manga
-                            .chapters[mangaReaderViewmodel.manga.lastViewedChapter].getPagesNum()
-
-                    mangaReaderViewmodel.manga
-                        .chapters[mangaReaderViewmodel.manga.lastViewedChapter].lastViewedPage = 0
-
-                    mangaReaderViewmodel.uploadPages()
-                    pagerAdapter.notifyDataSetChanged()
-                    viewPager.setCurrentItem(1, false)
+                // Last chapter
+                else if (mangaReaderViewmodel.manga.lastViewedChapter == mangaReaderViewmodel.manga.chapters.size - 1) {
+                    if (position == 0)
+                        doToPrevChapter()
                 }
-
-                // if we go to end or begin -> block scroll
+                // Other cases
+                else {
+                    if (position == 0)
+                        doToPrevChapter()
+                    else if (position == pagerAdapter.itemCount - 1)
+                        doToNextChapter()
+                }
             }
         })
     }

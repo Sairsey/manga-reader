@@ -2,6 +2,8 @@ package com.mangajet.mangajet.mangareader
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.PointF
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
@@ -12,6 +14,7 @@ import com.mangajet.mangajet.data.MangaPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
+
 
 // Class which represents "Manga Reader" ViewModel
 class MangaReaderViewModel : ViewModel() {
@@ -25,14 +28,6 @@ class MangaReaderViewModel : ViewModel() {
 
     var pagesCount = 0                  // pages amount in current viewed chapter
 
-    // async pages loadings
-    var jobs : Array<Job?> = arrayOf()
-
-    // Function which will save current manga state to file
-    private fun saveMangaState() {
-        manga.saveToFile()
-    }
-
     // Function which will init all data about manga
     fun initMangaData() {
         if (!isInited) {
@@ -45,16 +40,11 @@ class MangaReaderViewModel : ViewModel() {
             uploadPages()
 
             // And save its state to File
-            saveMangaState()
+            manga.saveToFile()
         }
     }
 
     fun uploadPages() {
-        for (job in jobs)
-            job?.cancel()
-
-        jobs = arrayOfNulls<Job?>(pagesCount)
-
         for (i in 0 until pagesCount)
             manga.chapters[manga.lastViewedChapter].getPage(i).upload()
     }
@@ -86,7 +76,7 @@ class MangaReaderViewModel : ViewModel() {
         super.onCleared()
         if (isInited) {
             isInited = false
-            saveMangaState()
+            manga.saveToFile()
         }
     }
 }
