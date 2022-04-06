@@ -29,13 +29,9 @@ class SearchViewModel : ViewModel() {
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : ArrayAdapter<String>? = null      // adapter for list
 
-    // Function which will load info about each manga from "manga names"
-    suspend fun addElementsToMangas() {
-        val mangasSearchWord = "Учитель"
-        val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Readmanga)!!.
-                                searchManga(mangasSearchWord, SEARCH_AMOUNT, 0)
-        for (i in libsMangas.indices) {
-            mangas.add(libsMangas[i])
+    // Function which will upload manga into mangas array and catch exceptions
+    private suspend fun uploadMangaIntoArray(i : Int) {
+        try {
             mangas[i].updateInfo()
             withContext(Dispatchers.Main) {
                 mangasNames.add(mangas[i].originalName)
