@@ -1,4 +1,7 @@
-package com.mangajet.mangajet.data
+package com.mangajet.mangajet.data.libraries
+
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaChapter
 
 // Abstract class that represents one site from which we parse manga
 abstract class AbstractLibrary(uniqueID: String) {
@@ -17,6 +20,9 @@ abstract class AbstractLibrary(uniqueID: String) {
 
     // Function to get cookies after authentication
     abstract fun getCookies() : String
+
+    // Function to get headers if we need
+    abstract fun getHeadersForDownload() : Map<String, String>
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)

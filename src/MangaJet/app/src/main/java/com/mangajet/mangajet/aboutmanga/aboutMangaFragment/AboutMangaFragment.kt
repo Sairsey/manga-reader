@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
@@ -44,9 +45,14 @@ class AboutMangaFragment : Fragment() {
     }
 
     // Function witch will decode bitmap async
-    fun loadBitmap(cover : MangaPage): Bitmap {
-        val imageFile = cover.getFile() // Catch ex here
-        return BitmapFactory.decodeFile(imageFile.absolutePath)
+    fun loadBitmap(cover : MangaPage): Bitmap? {
+        try {
+            val imageFile = cover.getFile() // Catch ex here
+            return BitmapFactory.decodeFile(imageFile.absolutePath)
+        }
+        catch (ex: MangaJetException) {
+            return null
+        }
     }
 
     override fun onStart() {
@@ -62,19 +68,24 @@ class AboutMangaFragment : Fragment() {
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
 
         job = GlobalScope.launch(Dispatchers.IO) {
+            // POTENTIAL EXCEPTION and ERROR
+            // Cover isn't downloaded but we try to draw it => terminate
             val bitmap = loadBitmap(cover)
-                withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
+                if (bitmap != null)
                     binding.coverManga.setImageBitmap(bitmap)
-                }
+            }
         }
 
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
+            if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
             val intent = Intent(activity, MangaReaderActivity::class.java)
-            startActivity(intent)}
+            startActivity(intent)}}
 
         // Tags TextView generator
         val tagsLayout = binding.tagsLayout
+        tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
             val newTextView = TextView(activity)
             newTextView.setText(it)

@@ -43,9 +43,9 @@ class SearchViewModel : ViewModel() {
     }
 
     // Function which will load info about each manga from "manga names"
-    suspend fun addElementsToMangas(binding : SearchFragmentBinding, queryString : String) {
+    private suspend fun addElementsToMangas(binding : SearchFragmentBinding, queryString : String) {
         try {
-            val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!
+            val libsMangas = Librarian.getLibrary(Librarian.LibraryName.Readmanga)!!
                 .searchManga(queryString, SEARCH_AMOUNT, 0)
 
             if (libsMangas.isEmpty()) {

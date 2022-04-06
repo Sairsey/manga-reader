@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MainActivity
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.StorageManager
@@ -26,7 +27,7 @@ class ClearCacheDialog : DialogFragment() {
                 .setMessage("Are you sure about deleting cache?")
                 .setCancelable(true)
                 .setPositiveButton("Delete") { dialog, id ->
-                    StorageManager.removeDirectory()
+                    StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
                     (activity as CacheSettingActivity?)?.fillCacheListAdapter()
                 }
                 .setNegativeButton("Cancel",
@@ -76,7 +77,7 @@ class CacheSettingActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTitle(R.string.setting_cache)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheListAdapter()

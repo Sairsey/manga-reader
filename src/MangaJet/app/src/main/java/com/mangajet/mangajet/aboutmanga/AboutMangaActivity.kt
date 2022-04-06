@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mangajet.mangajet.R
@@ -23,10 +24,12 @@ class AboutMangaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.about_manga_activity)
 
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutMangaToolbar))
+
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
         aboutMangaViewmodel.initMangaData()
-        setTitle(aboutMangaViewmodel.manga.originalName)
+        supportActionBar?.title = aboutMangaViewmodel.manga.originalName
 
         val tabLayout = findViewById<TabLayout>(R.id.aboutMangaTabs)
         val viewPager2 = findViewById<ViewPager2>(R.id.fragmentContainerView)

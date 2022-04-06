@@ -21,10 +21,10 @@ class RecommendationsViewModel : ViewModel() {
 
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
-        val mangasSearchWords = listOf("Naruto", "Берсерк", "Onepunchman")
+        val mangasSearchWords = listOf("гуль", "Берсерк", "Onepunchman")
         for (name in mangasSearchWords) {
             mangas.add(
-                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[0]
+                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
             )
             mangas[mangas.size - 1].updateInfo()
             withContext (Dispatchers.Main) {

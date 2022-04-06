@@ -6,14 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".mangareader.MangaReaderActivity">
 
-    <TextView
-        android:id="@+id/sample_texr"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="YA SOSU HUUUI"
+        android:id="@+id/mangaReaderToolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MANGA READER"
-        android:textSize="24sp"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints"
+        app:menu="@menu/manga_reader_menu"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/mangaViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/mangaReaderToolbar" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+

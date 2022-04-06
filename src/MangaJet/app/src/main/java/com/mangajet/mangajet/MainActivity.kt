@@ -12,6 +12,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.MaterialToolbar
+import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
 
@@ -61,8 +64,19 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
 
+        // on start it is good idea to load all cookies and Authentication from Librarian
+        try {
+            Librarian.setLibrariesJSON(
+                StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
+        }
+        catch (ex: MangaJetException) {
+            // in this case we can just skip, because if file not found it isnt a big deal.
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setSupportActionBar(binding.mainToolbar)
 
         val navView: BottomNavigationView = binding.navView
 

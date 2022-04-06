@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
 
 // Class which represents "About manga" View Model
 class AboutMangaViewModel : ViewModel() {
@@ -17,7 +18,12 @@ class AboutMangaViewModel : ViewModel() {
         if (!isInited) {
             isInited = true
             manga = MangaJetApp.currentManga!!
-            manga.updateChapters()
+            try {
+                manga.updateChapters()
+            }
+            catch (ex: MangaJetException) {
+                // chapters from json or no chapters at all.
+            }
         }
     }
 

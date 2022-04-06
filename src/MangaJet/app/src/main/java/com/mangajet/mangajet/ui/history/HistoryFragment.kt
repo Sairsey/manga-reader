@@ -21,6 +21,27 @@ class HistoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // Adapter for ListView
+    private lateinit var adapter: ArrayAdapter<String>
+
+    override fun onResume() {
+        super.onResume()
+        val historyViewModel =
+            ViewModelProvider(this).get(HistoryViewModel::class.java)
+
+        historyViewModel.makeListFromStorage(adapter)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            val historyViewModel =
+                ViewModelProvider(this).get(HistoryViewModel::class.java)
+
+            historyViewModel.makeListFromStorage(adapter)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,20 +54,19 @@ class HistoryFragment : Fragment() {
         val root: View = binding.root
 
         var listView = binding.historyListview
-        activity?.let {
-            val adapter = ArrayAdapter<String>(
-                it,
-                android.R.layout.simple_list_item_1,
-                historyViewModel.mangasNames
-            )
+        adapter = ArrayAdapter<String>(
+            requireActivity(),
+            android.R.layout.simple_list_item_1,
+            historyViewModel.mangasNames
+        )
 
-            historyViewModel.initMangas(adapter)
-            listView.adapter = adapter
-            listView.setOnItemClickListener{ parent, view, position, id ->
-                val intent = Intent(it, AboutMangaActivity::class.java)
-                MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
-                startActivity(intent)}
-        }
+        historyViewModel.makeListFromStorage(adapter)
+
+        listView.adapter = adapter
+        listView.setOnItemClickListener{ parent, view, position, id ->
+            val intent = Intent(requireActivity(), AboutMangaActivity::class.java)
+            MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
+            startActivity(intent)}
 
         return root
     }
