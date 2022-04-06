@@ -26,10 +26,9 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         private val pageAndChapterNumberView =
             itemView.findViewById<TextView>(R.id.pageAndChapterNumber)
 
-        fun bind(mangaPage : MangaPage, position : Int, chapter : Int) {
+        fun bind(mangaPage : MangaPage, chapter : Int, page : Int) {
             val chapterOutput = chapter + 1
-            val pageOutput = currentViewModelWithData.manga
-                .chapters[currentViewModelWithData.manga.lastViewedChapter].lastViewedPage
+            val pageOutput = page + 1
 
             //pageAndChapterNumberView.text = "Chap: $chapterOutput / Page: $pageOutput"
             pageAndChapterNumberView.text = "$chapterOutput / $pageOutput"
@@ -101,7 +100,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
 
         // bind holder
         val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
-        holder.bind(mangaPage, position, chapterIndex)
+        holder.bind(mangaPage, chapterIndex, pageIndex)
     }
 
     override fun getItemCount(): Int {
