@@ -28,8 +28,6 @@ class AuthorizationActivity : AppCompatActivity() {
         setContentView(R.layout.authorization_activity)
 
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationWVToolbar))
-
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.mangaReaderToolbar))
         setTitle(R.string.title_authorization)
 
         // Call viewmodel to init all elements
