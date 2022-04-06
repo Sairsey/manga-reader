@@ -99,6 +99,9 @@ class MangaChaptersFragment : Fragment() {
                 val intent = Intent(it, MangaReaderActivity::class.java)
                 MangaJetApp.currentManga = aboutMangaViewmodel.manga
                 MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
+                MangaJetApp.currentManga!!
+                    .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
+                    .lastViewedPage = 0
                 startActivity(intent)}
         }
 

@@ -110,13 +110,10 @@ class Manga {
     // Function to fill chapters array of manga
     // MAY THROW MangaJetException
     fun updateChapters(){
-        if (chapters.size > lastViewedChapter) {
-            var tmp = chapters[lastViewedChapter].lastViewedPage
-            chapters = library.getMangaChapters(this) // Exception may be thrown here
-            chapters[lastViewedChapter].lastViewedPage = tmp
-        }
-        else {
-            chapters = library.getMangaChapters(this) // Exception may be thrown here
+        var tmp = chapters
+        chapters = library.getMangaChapters(this)
+        for (i in tmp.indices) {
+            chapters[i] = tmp[i]
         }
     }
 

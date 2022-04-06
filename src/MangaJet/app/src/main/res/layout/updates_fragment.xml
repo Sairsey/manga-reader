@@ -5,7 +5,9 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.updates.UpdatesFragment">
+    tools:context=".ui.updates.UpdatesFragment"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingBottom="?attr/actionBarSize">
 
     <TextView
         android:id="@+id/textView3"

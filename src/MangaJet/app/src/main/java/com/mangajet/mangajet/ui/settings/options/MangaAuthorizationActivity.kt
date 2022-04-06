@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.data.Librarian
@@ -14,6 +15,7 @@ class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manga_authorization)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationToolbar))
         setTitle(R.string.title_authorization)
 
         val mangasLibraries = arrayListOf<String>()

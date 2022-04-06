@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.mangareader
 
+import android.app.ActionBar
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import kotlinx.coroutines.Job
 
 
 // Class which represents "Manga Reader" ViewModel
@@ -19,6 +21,8 @@ class MangaReaderViewModel : ViewModel() {
     var isInited = false                // ViewModel initialization flag
     lateinit var manga: Manga           // Manga we are reading right now
     var pagesCount = 0                  // pages amount in current viewed chapter
+
+    var jobs = arrayOf<Job?>()
 
 
     /**
@@ -44,12 +48,6 @@ class MangaReaderViewModel : ViewModel() {
         return isOnFirstChapter() || isOnLastChapter()
     }
 
-    // Function which check if we are in middle chapter
-    fun isOnMiddleChapter() : Boolean {
-        return !(manga.lastViewedChapter == manga.chapters.size - 1
-                || manga.lastViewedChapter == 0)
-    }
-
     /**
      * Other functions
      */
@@ -71,13 +69,14 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will upload pages
     fun uploadPages() {
+        for (job in jobs)
+            if (job != null && job.isActive)
+                job.cancel()
+
+        jobs = arrayOfNulls(pagesCount + 2)
+
         for (i in 0 until pagesCount)
             manga.chapters[manga.lastViewedChapter].getPage(i).upload()
-    }
-
-    // Function which will brutforced reload page
-    fun uploadCurrentPage(page : MangaPage) {
-        page.upload(true)
     }
 
     // Function which will decode bitmap async

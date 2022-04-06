@@ -190,8 +190,6 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             f = text.indexOf("item-title", f)
         }
         chapters.reverse()
-        if (chapters.size == 0)
-            chapters.add(MangaChapter(manga, manga.id))
         return chapters.toTypedArray()
     }
 

@@ -11,6 +11,7 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
@@ -26,6 +27,9 @@ class AuthorizationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.authorization_activity)
 
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationWVToolbar))
+
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.mangaReaderToolbar))
         setTitle(R.string.title_authorization)
 
         // Call viewmodel to init all elements
