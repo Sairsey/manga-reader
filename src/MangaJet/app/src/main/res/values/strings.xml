@@ -20,4 +20,6 @@
 
     <string name="aboutMangaFragmentTagsText">Tags</string>
     <string name="aboutMangaDescriptionText">Description</string>
+    <string name="search_fragment_no_result_text">No result</string>
+    <string name="search_hint">Write query</string>
 </resources>
