@@ -79,8 +79,9 @@ class AboutMangaFragment : Fragment() {
 
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
+            if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
             val intent = Intent(activity, MangaReaderActivity::class.java)
-            startActivity(intent)}
+            startActivity(intent)}}
 
         // Tags TextView generator
         val tagsLayout = binding.tagsLayout
