@@ -2,18 +2,11 @@ package com.mangajet.mangajet.mangareader
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.PointF
-import android.view.MotionEvent
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
-import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
 
 
 // Class which represents "Manga Reader" ViewModel
@@ -25,9 +18,41 @@ class MangaReaderViewModel : ViewModel() {
     // Initialize data to work
     var isInited = false                // ViewModel initialization flag
     lateinit var manga: Manga           // Manga we are reading right now
-
     var pagesCount = 0                  // pages amount in current viewed chapter
 
+
+    /**
+     * Case-check functions block
+     */
+    // Function which check if manga contains only one chapter
+    fun isSingleChapterManga() : Boolean {
+        return manga.chapters.size == 1
+    }
+
+    // Function which check if we reached first chapter
+    fun isOnFirstChapter() : Boolean {
+        return manga.lastViewedChapter == 0
+    }
+
+    // Function which check if we reached last chapter
+    fun isOnLastChapter() : Boolean {
+        return manga.lastViewedChapter == manga.chapters.size - 1
+    }
+
+    // Function which check if we reached last or first chapter
+    fun isOnSideChapter() : Boolean {
+        return isOnFirstChapter() || isOnLastChapter()
+    }
+
+    // Function which check if we are in middle chapter
+    fun isOnMiddleChapter() : Boolean {
+        return !(manga.lastViewedChapter == manga.chapters.size - 1
+                || manga.lastViewedChapter == 0)
+    }
+
+    /**
+     * Other functions
+     */
     // Function which will init all data about manga
     fun initMangaData() {
         if (!isInited) {
@@ -44,30 +69,30 @@ class MangaReaderViewModel : ViewModel() {
         }
     }
 
+    // Function which will upload pages
     fun uploadPages() {
         for (i in 0 until pagesCount)
             manga.chapters[manga.lastViewedChapter].getPage(i).upload()
     }
 
-    // Function witch will decode bitmap async
-    suspend fun loadBitmap(page : MangaPage): Bitmap? {
+    // Function which will brutforced reload page
+    fun uploadCurrentPage(page : MangaPage) {
+        page.upload(true)
+    }
+
+    // Function which will decode bitmap async
+    fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
             i.hashCode()
             try {
                 page.upload(i > 0)
                 val imageFile = page.getFile() // Catch ex here
-                val res = BitmapFactory.decodeFile(imageFile.absolutePath)
-                if (res == null)
-                    continue
-                return res
+                return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
-                }
                 continue
             }
         }
-        // TODO Make sneakbar to ask user for reload
+        // maybe throw exception or reload?
         return null
     }
 

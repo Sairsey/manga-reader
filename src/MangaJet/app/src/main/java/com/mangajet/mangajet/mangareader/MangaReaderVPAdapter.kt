@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.mangareader
 
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,12 @@ import com.mangajet.mangajet.data.MangaPage
 
 class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     RecyclerView.Adapter<MangaReaderVPAdapter.MangaReaderPageHolder>() {
+    companion object {
+        const val SINGLE_CHAPTER_REVERSED_LIST = 0
+        const val SIDE_CHAPTER_REVERSED_LIST   = 1
+        const val MIDDLE_CHAPTER_REVERSED_LIST = 2
+    }
+
     // viewModel, which contains our interesting data
     var currentViewModelWithData = viewModel
 
@@ -22,18 +27,16 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             itemView.findViewById<TextView>(R.id.pageAndChapterNumber)
 
         fun bind(mangaPage : MangaPage, position : Int, chapter : Int) {
-            pageAndChapterNumberView.text = "$chapter/$position"
+            val chapterOutput = chapter + 1
+            val pageOutput = currentViewModelWithData.manga
+                .chapters[currentViewModelWithData.manga.lastViewedChapter].lastViewedPage
 
-            if (mangaPage.localPath == "") {
-                val img = ImageSource.uri(mangaPage.localPath)
-                imagePage.setImage(img)
-            }
-            else {
-                val pageFile = mangaPage.getFile()
-                val bitmapa = BitmapFactory.decodeFile(pageFile.absolutePath)
-                imagePage.setImage(ImageSource.bitmap(bitmapa))
-            }
-            //imagePage.setImage(ImageSource.uri())
+            //pageAndChapterNumberView.text = "Chap: $chapterOutput / Page: $pageOutput"
+            pageAndChapterNumberView.text = "$chapterOutput / $pageOutput"
+
+            val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+            if (pageFile != null)
+                imagePage.setImage(ImageSource.bitmap(pageFile))
         }
     }
 
@@ -46,16 +49,16 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     }
 
     override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
-        // SPECIAL CASES:
-        var pageIndex : Int = 0
+        var pageIndex = 0
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
+        // SPECIAL CASES:
         // only one chapter
-        if (currentViewModelWithData.manga.chapters.size == 1)
+        if (currentViewModelWithData.isSingleChapterManga())
             pageIndex = position
 
         // First chapter
-        else if (currentViewModelWithData.manga.lastViewedChapter == 0) {
+        else if (currentViewModelWithData.isOnFirstChapter()) {
             if (position == itemCount - 1) {
                 pageIndex = 0
                 chapterIndex++
@@ -64,8 +67,9 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             else
                 pageIndex = position
         }
+
         // Last chapter
-        else if (currentViewModelWithData.manga.lastViewedChapter == currentViewModelWithData.manga.chapters.size - 1) {
+        else if (currentViewModelWithData.isOnLastChapter()) {
             if (position == 0) {
                 chapterIndex--
                 currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
@@ -74,6 +78,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             else
                 pageIndex = position - 1
         }
+
         // Other cases
         else {
             if (position == 0) {
@@ -90,31 +95,29 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 pageIndex = position - 1
         }
 
+        // leave if bad page index
         if (pageIndex == -1)
             return
 
-        val mangaPage = currentViewModelWithData.manga
-            .chapters[chapterIndex]
-            .getPage(pageIndex)
-
-        holder.bind(mangaPage, position,
-            chapterIndex)
+        // bind holder
+        val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
+        holder.bind(mangaPage, position, chapterIndex)
     }
 
     override fun getItemCount(): Int {
+        val count = currentViewModelWithData.manga
+            .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+
         // Only one chapter
-        if (currentViewModelWithData.manga.chapters.size == 1)
-            return currentViewModelWithData.manga
-                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+        if (currentViewModelWithData.isSingleChapterManga())
+            return count + SINGLE_CHAPTER_REVERSED_LIST
 
         // First or last chapter
-        if (currentViewModelWithData.manga.lastViewedChapter == 0
-            || currentViewModelWithData.manga.lastViewedChapter == currentViewModelWithData.manga.chapters.size - 1)
-            return currentViewModelWithData.manga
-                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum() + 1
+        else if (currentViewModelWithData.isOnSideChapter())
+            return count + SIDE_CHAPTER_REVERSED_LIST
 
-        // All chapters
-        return currentViewModelWithData.manga
-            .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum() + 2
+        // Middle chapter
+        else
+            return count + MIDDLE_CHAPTER_REVERSED_LIST
     }
 }

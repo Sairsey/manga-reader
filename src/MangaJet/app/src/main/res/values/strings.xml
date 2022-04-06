@@ -20,4 +20,9 @@
 
     <string name="aboutMangaFragmentTagsText">Tags</string>
     <string name="aboutMangaDescriptionText">Description</string>
+
+    <!-- Strings, using in "Manga reader" activity -->
+    <string name="manga_reader_bad_page">Ca</string>
+    <string name="setting_cache">Cache options</string>
+    <string name="setting_aboutapp">About app</string>
 </resources>
