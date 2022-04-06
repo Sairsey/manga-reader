@@ -38,7 +38,9 @@ class SearchViewModel : ViewModel() {
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
-            Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
