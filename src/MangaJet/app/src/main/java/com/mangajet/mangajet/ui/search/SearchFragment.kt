@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.SearchFragmentBinding
 
@@ -31,10 +31,10 @@ class SearchFragment : Fragment() {
         override fun onQueryTextSubmit(p0: String?): Boolean {
             binding.noResultLayout.visibility = View.INVISIBLE
 
-            val adapter = ArrayAdapter<String>(
+            val adapter = MangaListAdapter(
                 frag,
-                R.layout.simple_list_item_1,
-                searchViewModel.mangasNames
+                com.mangajet.mangajet.R.layout.manga_list_element,
+                searchViewModel.mangas
             )
 
             if (p0 != null) {

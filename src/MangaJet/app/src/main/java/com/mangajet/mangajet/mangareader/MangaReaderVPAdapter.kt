@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaPage
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 withContext(Dispatchers.Main) {
                     if (pageFile != null)
                         imagePage.setImage(ImageSource.bitmap(pageFile))
+                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
             }
         }

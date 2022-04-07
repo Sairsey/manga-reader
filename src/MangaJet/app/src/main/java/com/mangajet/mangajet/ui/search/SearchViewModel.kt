@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp.Companion.context
+import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import kotlinx.coroutines.Job
@@ -27,7 +28,7 @@ class SearchViewModel : ViewModel() {
     val mangasNames = ArrayList<String>()           // mangas names for list
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
-    var adapter : ArrayAdapter<String>? = null      // adapter for list
+    var adapter : MangaListAdapter? = null          // adapter for list
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(i : Int) {
@@ -86,7 +87,7 @@ class SearchViewModel : ViewModel() {
     }
 
     // Function which will async load mangas info
-    fun initMangas(adapterNew: ArrayAdapter<String>, binding : SearchFragmentBinding, queryString : String) {
+    fun initMangas(adapterNew: MangaListAdapter, binding : SearchFragmentBinding, queryString : String) {
         binding.progressBar.show()
         adapter = adapterNew
 
