@@ -1,46 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <TableRow android:layout_width="fill_parent"
-        android:id="@+id/listElementRow"
-        android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/coverManga"
+        android:layout_width="60dp"
+        android:layout_height="85dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:layout_marginHorizontal="@dimen/chapter_half_margin"
+        tools:srcCompat="@tools:sample/avatars"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-        <ImageView
-            android:id="@+id/coverManga"
-            android:layout_width="60dp"
-            android:layout_height="85dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:layout_marginVertical="@dimen/chapter_half_margin"
-            android:layout_marginHorizontal="@dimen/chapter_half_margin"
-            tools:srcCompat="@tools:sample/avatars"/>
+    <TextView
+        android:id="@+id/mangaTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
+        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:textSize="18sp"
+        android:text="TITLE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/coverManga"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/mangaTitle"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal ="@dimen/chapter_half_margin"
-                android:layout_marginVertical="@dimen/chapter_half_margin"
-                android:textSize="18sp"
-                android:text="MANGA TITLE"/>
-            <TextView
-                android:id="@+id/authorTitle"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal ="@dimen/chapter_half_margin"
-                android:layout_marginVertical="@dimen/chapter_half_margin"
-                android:textSize="14sp"
-                android:text="source title"/>
-        </LinearLayout>
-    </TableRow>
-</TableLayout>
+    <TextView
+        android:id="@+id/authorTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
+        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/mangaTitle"
+        app:layout_constraintStart_toEndOf="@id/coverManga"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="author"/>
+
+    <TextView
+        android:id="@+id/sourceLib"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
+        android:layout_marginVertical="@dimen/chapter_half_margin"
+        app:layout_constraintTop_toBottomOf="@id/authorTitle"
+        app:layout_constraintStart_toEndOf="@id/coverManga"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/chapter_half_margin"
+        android:textSize="14sp"
+        android:text="source"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

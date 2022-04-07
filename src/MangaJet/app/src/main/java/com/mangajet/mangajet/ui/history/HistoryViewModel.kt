@@ -2,7 +2,6 @@ package com.mangajet.mangajet.ui.history
 
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
-import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
@@ -19,7 +18,7 @@ class HistoryViewModel : ViewModel() {
     val mangasNames = ArrayList<String>()           // mangas names for list
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
-    var adapter : MangaListAdapter? = null      // adapter for list
+    var adapter : ArrayAdapter<String>? = null      // adapter for list
 
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
@@ -53,7 +52,7 @@ class HistoryViewModel : ViewModel() {
     }
 
     // Function which update mangas info from storage
-    fun makeListFromStorage(adapterNew: MangaListAdapter) {
+    fun makeListFromStorage(adapterNew: ArrayAdapter<String>) {
         // cancel job if we need
         adapter = adapterNew
         job?.cancel()

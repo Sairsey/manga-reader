@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.MangaJetApp
-import com.mangajet.mangajet.MangaListAdapter
-import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 
@@ -24,7 +22,7 @@ class HistoryFragment : Fragment() {
     private val binding get() = _binding!!
 
     // Adapter for ListView
-    private lateinit var adapter: MangaListAdapter
+    private lateinit var adapter: ArrayAdapter<String>
 
     override fun onResume() {
         super.onResume()
@@ -56,10 +54,10 @@ class HistoryFragment : Fragment() {
         val root: View = binding.root
 
         var listView = binding.historyListview
-        adapter = MangaListAdapter(
+        adapter = ArrayAdapter<String>(
             requireActivity(),
-            R.layout.manga_list_element,
-            historyViewModel.mangas
+            android.R.layout.simple_list_item_1,
+            historyViewModel.mangasNames
         )
 
         historyViewModel.makeListFromStorage(adapter)

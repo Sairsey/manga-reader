@@ -19,6 +19,9 @@ class AboutMangaActivity : AppCompatActivity() {
         const val TOTAL_TABS = 2        // Total tabs count
     }
 
+    // about manga view model
+    lateinit var aboutMangaViewmodel : AboutMangaViewModel
+
     // In methods 'onCreate' we only init data in viewport. All other actions -> in onStart() or onResume() overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +30,7 @@ class AboutMangaActivity : AppCompatActivity() {
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutMangaToolbar))
 
         // Call viewport to manage low speed downloading data in dat class
-        val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
+        aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
         aboutMangaViewmodel.initMangaData()
         supportActionBar?.title = aboutMangaViewmodel.manga.originalName
 

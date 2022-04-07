@@ -28,4 +28,5 @@
     <!-- Strings, using in Search -->
     <string name="search_fragment_no_result_text">No result</string>
     <string name="search_hint">Write query</string>
+    <string name="search_set_sources">Set sources</string>
 </resources>

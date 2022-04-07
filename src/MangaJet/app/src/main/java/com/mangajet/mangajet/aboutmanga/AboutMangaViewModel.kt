@@ -16,7 +16,6 @@ class AboutMangaViewModel : ViewModel() {
     // Function will
     fun initMangaData() {
         if (!isInited) {
-            isInited = true
             manga = MangaJetApp.currentManga!!
             try {
                 manga.updateChapters()
@@ -24,6 +23,7 @@ class AboutMangaViewModel : ViewModel() {
             catch (ex: MangaJetException) {
                 // chapters from json or no chapters at all.
             }
+            isInited = true
         }
     }
 

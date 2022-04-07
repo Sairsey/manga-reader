@@ -1,0 +1,46 @@
+package com.mangajet.mangajet.ui.search
+
+import android.app.Dialog
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+
+class SearchSetSourcesDialog(sourcesNames : Array<String>, checkedItems : BooleanArray) : DialogFragment() {
+    private val mSourcesNames = sourcesNames
+    val mCheckedItems = checkedItems
+
+    var wasSelected = false
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        wasSelected = false
+
+        return activity?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.setTitle("Choose resources")
+                .setMultiChoiceItems(mSourcesNames, mCheckedItems) {
+                        dialog, which, isChecked ->
+                    mCheckedItems[which] = isChecked
+                    val name = mSourcesNames[which] // Get the clicked item
+                    Toast.makeText(activity, name, Toast.LENGTH_LONG).show()
+                }
+                .setPositiveButton("Set sources"
+                ) {
+                        dialog, id ->
+                    wasSelected = true
+                    // User clicked OK, so save the selectedItems results somewhere
+                    for (i in mSourcesNames.indices) {
+                        val checked = mCheckedItems[i]
+                        if (checked) {
+                            Log.i("Dialog", mSourcesNames[i])
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel") {
+                        dialog, _ ->  dialog.cancel()
+                }
+            builder.create()
+        } ?: throw IllegalStateException("Activity cannot be null")
+    }
+}

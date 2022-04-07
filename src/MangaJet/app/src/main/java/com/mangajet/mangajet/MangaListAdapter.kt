@@ -34,7 +34,7 @@ class MangaListAdapter(
 
 
     // Function which will decode bitmap async
-    private fun loadBitmap(page : MangaPage): Bitmap? {
+    /* private fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
             i.hashCode()
             try {
@@ -47,7 +47,7 @@ class MangaListAdapter(
         }
         // maybe throw exception or reload?
         return null
-    }
+    } */
 
     // Function which will fill every list element
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -65,19 +65,20 @@ class MangaListAdapter(
                 val coverSrc = MangaPage(p.cover)
                 coverSrc.upload()
                 /* val job = */
-                GlobalScope.launch(Dispatchers.IO) {
+                //GlobalScope.launch(Dispatchers.IO) {
                     // POTENTIAL EXCEPTION and ERROR
                     // Cover isn't downloaded but we try to draw it => terminate
-                    val bitmap = loadBitmap(coverSrc)
-                    withContext(Dispatchers.Main) {
-                        if (bitmap != null)
-                            cover?.setImageBitmap(bitmap)
-                    }
-                }
+                //    val bitmap = loadBitmap(coverSrc)
+                //    withContext(Dispatchers.Main) {
+                //        if (bitmap != null)
+                //            cover?.setImageBitmap(bitmap)
+                //    }
+                //}
             }
 
             val title = v?.findViewById<TextView>(R.id.mangaTitle)
             val author = v?.findViewById<TextView>(R.id.authorTitle)
+            val source = v?.findViewById<TextView>(R.id.sourceLib)
 
             if (p.originalName.isNotEmpty())
                 title?.text = p.originalName
@@ -90,6 +91,8 @@ class MangaListAdapter(
                 author?.text = "Author: " + p.author
             else
                 author?.text = "Creative work from Web"
+
+            source?.text = "Source: " + p.library.getURL()
         }
         return v!!
     }
