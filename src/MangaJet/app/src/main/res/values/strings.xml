@@ -22,4 +22,5 @@
     <string name="aboutMangaDescriptionText">Description</string>
     <string name="search_fragment_no_result_text">No result</string>
     <string name="search_hint">Write query</string>
+    <string name="clear_cache">Clear Cache</string>
 </resources>
