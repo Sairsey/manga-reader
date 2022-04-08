@@ -18,11 +18,20 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
     // scroll position variable
     lateinit var scrollPosition : Parcelable
+
+    var job : Job? = null
+    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
@@ -70,9 +79,6 @@ class MangaChaptersFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    // Adapter on ChapterList for custom ListView
-    private lateinit var adapter: ChapterListAdapter
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,29 +89,52 @@ class MangaChaptersFragment : Fragment() {
         return root
     }
 
+    private suspend fun createChaptersList() {
+        aboutMangaViewmodel.job?.join()
+
+        withContext(Dispatchers.Main) {
+            aboutMangaViewmodel.adapter?.notifyDataSetChanged()
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
-
+        aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
         var listView = binding.chaptersList
+
+        binding.loadIndicator.hide()
+
+        // Start async waiting of chapters loading job
+        if (aboutMangaViewmodel.job?.isCompleted == false) {
+            binding.chaptersList.visibility = View.INVISIBLE
+            binding.loadIndicator.show()
+            job = GlobalScope.launch(Dispatchers.Default) {
+                createChaptersList()
+            }
+        }
+
+        scrollPosition = listView.onSaveInstanceState()!!
         activity?.let {
-            adapter = ChapterListAdapter(it,
+            aboutMangaViewmodel.adapter = ChapterListAdapter(
+                it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
                 aboutMangaViewmodel.manga.lastViewedChapter)
 
-            listView.adapter = adapter
-            listView.setOnItemClickListener{ parent, view, position, id ->
+            binding.chaptersList.adapter = aboutMangaViewmodel.adapter
+
+            binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
                 val intent = Intent(it, MangaReaderActivity::class.java)
                 MangaJetApp.currentManga = aboutMangaViewmodel.manga
                 MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
                 MangaJetApp.currentManga!!
                     .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
                     .lastViewedPage = 0
-                startActivity(intent)}
+                startActivity(intent)
+            }
         }
-
-        scrollPosition = listView.onSaveInstanceState()!!
     }
 
     // Overridden func which will save scroll position
@@ -120,8 +149,9 @@ class MangaChaptersFragment : Fragment() {
         super.onResume()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
+        binding.chaptersList.invalidateViews()
         binding.chaptersList.onRestoreInstanceState(scrollPosition)
-        adapter.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
-        adapter.notifyDataSetChanged()
+        aboutMangaViewmodel.adapter?.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
+        aboutMangaViewmodel.adapter?.notifyDataSetChanged()
     }
 }
