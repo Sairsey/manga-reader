@@ -3,6 +3,7 @@ package com.mangajet.mangajet.data.libraries
 import android.os.Build
 import android.text.Html
 import androidx.core.text.isDigitsOnly
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.WebAccessor
@@ -12,19 +13,10 @@ import org.json.JSONObject
 class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
     val headers = mutableMapOf(
-        "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
-                "Chrome/41.0.2228.0 Safari/537.36",
-        "accept" to "*/*")
-
-    val downloadHeaders = mutableMapOf(
-        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" +
-                "Chrome/70.0.3538.77 Safari/537.36",
-        "Referer" to "",
-        "Accept" to "image/webp,image/png;q=0.9,image/jpeg,*/*;q=0.8",
-        "Cache-Control" to "no-store",
-        "Host" to "img3.cdnlibs.org", //HARDCODED
-        "Connection" to "Keep-Alive",
-        "Accept-Encoding" to "gzip")
+        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+        "Accept" to "*/*",
+        "Referer" to getURL() + "/")
 
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
@@ -43,14 +35,14 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
     // Function to get headers if we need
     override fun getHeadersForDownload(): Map<String, String> {
-        return downloadHeaders.toMap()
+        return headers.toMap()
     }
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
     // and offset from start(optional)
     // MAY THROW MangaJetException
     override fun searchManga(id: String, amount: Int, offset: Int): Array<Manga> {
-        val url = getURL() + "/manga-list?name=" + id + "&caution[]=1&caution[]=0" // DELETE LAST PART AFTER 18+ SUPPORT
+        val url = getURL() + "/manga-list?name=" + id
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         var f = text.indexOf("media-card-wrap")
@@ -119,6 +111,8 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         // Retrieve description
         fun getDescr(text : String) : String {
             var f = text.indexOf("itemprop=\"description\"")
+            if(f == -1)
+                return ""
             f = text.indexOf("content=\"", f) + "content=\"".length
             val s = text.indexOf("\"", f)
             return text.subSequence(f, s).toString()
@@ -221,7 +215,8 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val json = JSONObject(subtext)
         json.optJSONObject("")
         val urlEnd = JSONObject(json["img"].toString())["url"].toString()
-        val urlBegin = JSONObject(json["servers"].toString())["main"].toString()
+        val urlBegin = JSONObject(json["servers"].toString())["main"].toString().
+        replace('2', '3') // Ohhh, dunno, but this is for hentai
 
         // Combine
         for(i in 0 until pageData.length())

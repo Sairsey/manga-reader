@@ -30,18 +30,20 @@ class SearchViewModel : ViewModel() {
     var adapter : ArrayAdapter<String>? = null      // adapter for list
 
     // Function which will upload manga into mangas array and catch exceptions
-    private suspend fun uploadMangaIntoArray(i : Int) {
+    private suspend fun uploadMangaIntoArray(manga : Manga) : Boolean {
         try {
-            mangas[i].updateInfo()
+            manga.updateInfo()
             withContext(Dispatchers.Main) {
-                mangasNames.add(mangas[i].originalName)
+                mangasNames.add(manga.originalName)
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
             }
+            return false
         }
+        return true
     }
 
     // Function which will load info about each manga from "manga names"
@@ -57,10 +59,10 @@ class SearchViewModel : ViewModel() {
                 }
                 return
             }
-
             for (i in libsMangas.indices) {
                 mangas.add(libsMangas[i])
-                uploadMangaIntoArray(i)
+                if(!uploadMangaIntoArray(mangas[mangas.size - 1]))
+                    mangas.removeAt(mangas.size - 1)
             }
 
             withContext(Dispatchers.Main) {
