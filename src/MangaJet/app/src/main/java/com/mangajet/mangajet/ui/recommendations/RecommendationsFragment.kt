@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.RecommendationsFragmentBinding
 
@@ -36,10 +37,10 @@ class RecommendationsFragment : Fragment() {
 
         var listView = binding.recommendedListView
         activity?.let {
-            val adapter = ArrayAdapter<String>(
-                it,
-                R.layout.simple_list_item_1,
-                recommendedViewModel.mangasNames
+            val adapter = MangaListAdapter(
+                requireActivity(),
+                com.mangajet.mangajet.R.layout.manga_list_element,
+                recommendedViewModel.mangasInfos
             )
             recommendedViewModel.initMangas(adapter)
 

@@ -7,12 +7,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaPage
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     RecyclerView.Adapter<MangaReaderVPAdapter.MangaReaderPageHolder>() {
@@ -38,9 +41,11 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         fun bind(mangaPage : MangaPage, position : Int) {
             currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
                 val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+                currentViewModelWithData.jobs[position]?.ensureActive()
                 withContext(Dispatchers.Main) {
                     if (pageFile != null)
                         imagePage.setImage(ImageSource.bitmap(pageFile))
+                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
             }
         }

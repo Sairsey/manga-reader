@@ -22,6 +22,6 @@
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:textColorPrimary">@color/true_black</item>
         <item name="android:windowBackground">@color/white</item>
-        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:navigationBarColor">@color/almost_white</item>
     </style>
 </resources>

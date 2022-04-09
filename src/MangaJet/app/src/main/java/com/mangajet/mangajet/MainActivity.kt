@@ -12,7 +12,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager

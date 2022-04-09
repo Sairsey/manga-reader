@@ -7,7 +7,7 @@
     tools:context=".mangareader.MangaReaderActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
-        app:title="YA SOSU HUUUI"
+        app:title="@string/app_name"
         android:id="@+id/mangaReaderToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
