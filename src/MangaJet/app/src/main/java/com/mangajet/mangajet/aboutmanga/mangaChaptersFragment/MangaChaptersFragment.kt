@@ -116,25 +116,6 @@ class MangaChaptersFragment : Fragment() {
         }
 
         scrollPosition = listView.onSaveInstanceState()!!
-        activity?.let {
-            aboutMangaViewmodel.adapter = ChapterListAdapter(
-                it,
-                R.layout.chapter_list_element,
-                aboutMangaViewmodel.manga.chapters,
-                aboutMangaViewmodel.manga.lastViewedChapter)
-
-            binding.chaptersList.adapter = aboutMangaViewmodel.adapter
-
-            binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
-                val intent = Intent(it, MangaReaderActivity::class.java)
-                MangaJetApp.currentManga = aboutMangaViewmodel.manga
-                MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
-                MangaJetApp.currentManga!!
-                    .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
-                    .lastViewedPage = 0
-                startActivity(intent)
-            }
-        }
     }
 
     // Overridden func which will save scroll position
@@ -149,7 +130,30 @@ class MangaChaptersFragment : Fragment() {
         super.onResume()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
-        binding.chaptersList.invalidateViews()
+        if (aboutMangaViewmodel.isInited) {
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+
+            activity?.let {
+                aboutMangaViewmodel.adapter = ChapterListAdapter(
+                    it,
+                    R.layout.chapter_list_element,
+                    aboutMangaViewmodel.manga.chapters,
+                    aboutMangaViewmodel.manga.lastViewedChapter)
+
+                binding.chaptersList.adapter = aboutMangaViewmodel.adapter
+
+                binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
+                    val intent = Intent(it, MangaReaderActivity::class.java)
+                    MangaJetApp.currentManga = aboutMangaViewmodel.manga
+                    MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
+                    MangaJetApp.currentManga!!
+                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
+                        .lastViewedPage = 0
+                    startActivity(intent)
+                }
+            }
+        }
         binding.chaptersList.onRestoreInstanceState(scrollPosition)
         aboutMangaViewmodel.adapter?.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
         aboutMangaViewmodel.adapter?.notifyDataSetChanged()
