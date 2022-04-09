@@ -6,7 +6,7 @@
         android:title="@string/title_updates" />
     <item
         android:id="@+id/navigation_history"
-        android:icon="@drawable/visibility_black_24dp"
+        android:icon="@drawable/history_black_24dp"
         android:title="@string/title_history" />
     <item
         android:id="@+id/navigation_search"
