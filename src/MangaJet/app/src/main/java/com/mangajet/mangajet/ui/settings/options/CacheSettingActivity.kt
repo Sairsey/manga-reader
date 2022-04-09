@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.preference.PreferenceManager.getDefaultSharedPreferences
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
@@ -80,5 +81,12 @@ class CacheSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheListAdapter()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }
+

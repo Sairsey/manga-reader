@@ -3,6 +3,7 @@ package com.mangajet.mangajet.ui.settings.options
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.mangajet.mangajet.R
@@ -14,6 +15,7 @@ class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manga_authorization)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle(R.string.title_authorization)
 
         val mangasLibraries = arrayListOf<String>()
@@ -35,5 +37,10 @@ class MangaAuthorizationActivity : AppCompatActivity() {
             intent.putExtra("URL", mangasLibrariesURL[id.toInt()])
             startActivity(intent)
         }
+
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }

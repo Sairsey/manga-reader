@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
@@ -44,7 +45,7 @@ class AboutAppActivity : AppCompatActivity() {
         setTitle(R.string.setting_aboutapp)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_app)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val aboutAppList = findViewById<ListView>(R.id.aboutAppList)
         val adapter = ArrayAdapter<String> (
             this,
@@ -70,5 +71,9 @@ class AboutAppActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }
