@@ -59,7 +59,8 @@ class AboutMangaFragment : Fragment() {
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
-        val cover = MangaPage(aboutMangaViewmodel.manga.cover)
+        val cover = MangaPage(aboutMangaViewmodel.manga.cover,
+            aboutMangaViewmodel.manga.library.getHeadersForDownload())
         cover.upload()
 
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
