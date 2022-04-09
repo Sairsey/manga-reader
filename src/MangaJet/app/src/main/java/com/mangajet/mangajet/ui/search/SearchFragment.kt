@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.SearchFragmentBinding
 
@@ -37,10 +38,10 @@ class SearchFragment : Fragment() {
         override fun onQueryTextSubmit(p0: String?): Boolean {
             binding.noResultLayout.visibility = View.INVISIBLE
 
-            val adapter = ArrayAdapter<String>(
+            val adapter = MangaListAdapter(
                 frag,
-                android.R.layout.simple_list_item_1,
-                searchViewModel.mangasNames
+                R.layout.manga_list_element,
+                searchViewModel.mangasInfos
             )
 
             if (p0 != null) {

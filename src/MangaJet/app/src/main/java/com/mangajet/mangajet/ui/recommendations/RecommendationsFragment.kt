@@ -40,7 +40,7 @@ class RecommendationsFragment : Fragment() {
             val adapter = MangaListAdapter(
                 requireActivity(),
                 com.mangajet.mangajet.R.layout.manga_list_element,
-                recommendedViewModel.mangas
+                recommendedViewModel.mangasInfos
             )
             recommendedViewModel.initMangas(adapter)
 

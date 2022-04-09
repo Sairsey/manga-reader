@@ -8,23 +8,26 @@
 
     <ImageView
         android:id="@+id/coverManga"
-        android:layout_width="60dp"
-        android:layout_height="85dp"
+        android:layout_width="50dp"
+        android:layout_height="71dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+        android:layout_marginBottom="@dimen/half_inner_horizontal_margin"
+        android:layout_marginStart="@dimen/half_inner_horizontal_margin"
         android:layout_marginHorizontal="@dimen/chapter_half_margin"
         tools:srcCompat="@tools:sample/avatars"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
         android:id="@+id/mangaTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
-        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+         android:layout_marginStart="@dimen/half_inner_horizontal_margin"
         android:textSize="18sp"
         android:text="TITLE"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,8 +39,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
-        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+        android:layout_marginStart="@dimen/half_inner_horizontal_margin"
+
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@id/mangaTitle"
         app:layout_constraintStart_toEndOf="@id/coverManga"
@@ -49,12 +53,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginHorizontal ="@dimen/chapter_half_margin"
-        android:layout_marginVertical="@dimen/chapter_half_margin"
+        android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+        android:layout_marginBottom="@dimen/half_inner_horizontal_margin"
+        android:layout_marginStart="@dimen/half_inner_horizontal_margin"
         app:layout_constraintTop_toBottomOf="@id/authorTitle"
         app:layout_constraintStart_toEndOf="@id/coverManga"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="@dimen/chapter_half_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:textSize="14sp"
         android:text="source"/>
 

@@ -18,13 +18,26 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
+class MangaListElementContainer(
+    newTitle : String,
+    newAuthor : String,
+    newSource : String,
+    newCover : String,
+) {
+    var title : String = newTitle
+    var author : String = newAuthor
+    var source : String = newSource
+    var coverUrl : String = newCover
+}
+
 // List adapter for "manga" list inner class
 class MangaListAdapter(
     context: Context,
     private val resourceLayout: Int,
-    items: ArrayList<Manga>
+    items: ArrayList<MangaListElementContainer>
 ) :
-    ArrayAdapter<Manga>(context, resourceLayout, items) {
+    ArrayAdapter<MangaListElementContainer>(context, resourceLayout, items) {
     companion object {
         const val LOAD_REPEATS = 5      // Load repeat count (if prev load failed -> repeat)
     }
@@ -34,7 +47,7 @@ class MangaListAdapter(
 
 
     // Function which will decode bitmap async
-    /* private fun loadBitmap(page : MangaPage): Bitmap? {
+    private fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
             i.hashCode()
             try {
@@ -47,7 +60,7 @@ class MangaListAdapter(
         }
         // maybe throw exception or reload?
         return null
-    } */
+    }
 
     // Function which will fill every list element
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -61,38 +74,36 @@ class MangaListAdapter(
         val p = getItem(position)
         if (p != null) {
             val cover = v?.findViewById<ImageView>(R.id.coverManga)
-            if (p.cover.isNotEmpty()) {
-                val coverSrc = MangaPage(p.cover)
+            if (p.coverUrl.isNotEmpty()) {
+                val coverSrc = MangaPage(p.coverUrl)
                 coverSrc.upload()
                 /* val job = */
-                //GlobalScope.launch(Dispatchers.IO) {
+                GlobalScope.launch(Dispatchers.Default) {
                     // POTENTIAL EXCEPTION and ERROR
                     // Cover isn't downloaded but we try to draw it => terminate
-                //    val bitmap = loadBitmap(coverSrc)
-                //    withContext(Dispatchers.Main) {
-                //        if (bitmap != null)
-                //            cover?.setImageBitmap(bitmap)
-                //    }
-                //}
+                    val bitmap = loadBitmap(coverSrc)
+                    withContext(Dispatchers.Main) {
+                        if (bitmap != null)
+                            cover?.setImageBitmap(bitmap)
+                    }
+                }
             }
 
             val title = v?.findViewById<TextView>(R.id.mangaTitle)
             val author = v?.findViewById<TextView>(R.id.authorTitle)
             val source = v?.findViewById<TextView>(R.id.sourceLib)
 
-            if (p.originalName.isNotEmpty())
-                title?.text = p.originalName
-            else if (p.russianName.isNotEmpty())
-                title?.text = p.russianName
+            if (p.title.isNotEmpty() && p.title != "")
+                title?.text = p.title
             else
                 title?.text = "Manga #$position"
 
-            if (p.author.isNotEmpty())
+            if (p.author.isNotEmpty() && p.author != "")
                 author?.text = "Author: " + p.author
             else
                 author?.text = "Creative work from Web"
 
-            source?.text = "Source: " + p.library.getURL()
+            source?.text = "Source: " + p.source
         }
         return v!!
     }

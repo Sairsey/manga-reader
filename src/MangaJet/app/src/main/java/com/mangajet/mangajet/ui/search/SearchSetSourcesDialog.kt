@@ -29,13 +29,6 @@ class SearchSetSourcesDialog(sourcesNames : Array<String>, checkedItems : Boolea
                 ) {
                         dialog, id ->
                     wasSelected = true
-                    // User clicked OK, so save the selectedItems results somewhere
-                    for (i in mSourcesNames.indices) {
-                        val checked = mCheckedItems[i]
-                        if (checked) {
-                            Log.i("Dialog", mSourcesNames[i])
-                        }
-                    }
                 }
                 .setNegativeButton("Cancel") {
                         dialog, _ ->  dialog.cancel()

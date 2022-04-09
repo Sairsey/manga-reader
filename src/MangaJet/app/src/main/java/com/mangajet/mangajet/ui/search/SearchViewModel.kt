@@ -1,39 +1,42 @@
 package com.mangajet.mangajet.ui.search
 
-import android.preference.PreferenceManager
 import android.view.View
-import android.webkit.WebView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp.Companion.context
+import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.databinding.SearchFragmentBinding
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import com.mangajet.mangajet.data.MangaJetException
-import com.mangajet.mangajet.databinding.SearchFragmentBinding
+import kotlinx.coroutines.withContext
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
     companion object {
         const val SEARCH_AMOUNT = 20        // Amount of searchable mangas
+        const val WAIT_FOR_BUILD_IN_MS = 75
     }
-    val mangasNames = ArrayList<String>()           // mangas names for list
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
-    var adapter : ArrayAdapter<String>? = null      // adapter for list
+    var adapter : MangaListAdapter? = null          // adapter for list
+
+    // mangas info for list
+    val mangasInfos = ArrayList<MangaListElementContainer>()
 
     // Selected resources
     var allLibraries = arrayOf(
         Librarian.LibraryName.Readmanga,
         Librarian.LibraryName.Mangachan,
-        //Librarian.LibraryName.Mangalib,
+        Librarian.LibraryName.Mangalib,
         Librarian.LibraryName.Acomics
     )
     // flags for each resource
@@ -47,20 +50,26 @@ class SearchViewModel : ViewModel() {
     }
 
     // Function which will upload manga into mangas array and catch exceptions
-    private suspend fun uploadMangaIntoArray(i : Int) {
+    private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
         try {
+            job?.ensureActive()
             mangas[i].updateInfo()
             withContext(Dispatchers.Main) {
-                mangasNames.add(mangas[i].originalName + "("
-                        + mangas[i].library.getURL() + ")"
-                )
+                mangasInfos.add(MangaListElementContainer(
+                    mangas[i].originalName,
+                    mangas[i].author,
+                    mangas[i].library.getURL(),
+                    mangas[i].cover
+                    ))
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
             }
+            return false
         }
+        return true
     }
 
     // Function which will load info about each manga from "manga names"
@@ -78,7 +87,8 @@ class SearchViewModel : ViewModel() {
 
             for (i in libsMangas.indices) {
                 mangas.add(libsMangas[i])
-                uploadMangaIntoArray(mangas.size - 1)
+                if (!uploadMangaIntoArray(mangas.size - 1))
+                    mangas.removeAt(mangas.size - 1)
             }
 
         } catch (ex : MangaJetException) {
@@ -105,11 +115,11 @@ class SearchViewModel : ViewModel() {
         job?.cancel()
         adapter?.clear()
         mangas.clear()
-        mangasNames.clear()
+        mangasInfos.clear()
     }
 
     // Function which will async load mangas info
-    fun initMangas(adapterNew: ArrayAdapter<String>, binding : SearchFragmentBinding, queryString : String) {
+    fun initMangas(adapterNew: MangaListAdapter, binding : SearchFragmentBinding, queryString : String) {
         binding.progressBar.show()
         binding.noResultLayout.visibility = View.INVISIBLE
 
