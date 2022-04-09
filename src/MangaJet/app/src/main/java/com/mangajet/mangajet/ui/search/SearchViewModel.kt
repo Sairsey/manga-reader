@@ -84,7 +84,7 @@ class SearchViewModel : ViewModel() {
             if (libsMangas.isEmpty()) {
                 return
             }
-
+            
             for (i in libsMangas.indices) {
                 mangas.add(libsMangas[i])
                 if (!uploadMangaIntoArray(mangas.size - 1))
