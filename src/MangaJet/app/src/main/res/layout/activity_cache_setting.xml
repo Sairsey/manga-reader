@@ -19,8 +19,8 @@
     </ListView>-->
     <TextView
         android:id="@+id/cacheSize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="312dp"
+        android:layout_height="87dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -36,10 +36,14 @@
         android:layout_marginTop="175dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="508dp"
+        android:background="@android:color/holo_red_dark"
         android:text="@string/clear_cache"
+        android:textColor="#E8F5E9"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-        android:onClick="toastMe"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
