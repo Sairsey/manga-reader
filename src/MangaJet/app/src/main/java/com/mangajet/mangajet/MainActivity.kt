@@ -1,10 +1,12 @@
 package com.mangajet.mangajet
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -16,6 +18,7 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
+import kotlin.system.exitProcess
 
 // Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boolean>> {
@@ -32,6 +35,23 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     override fun onActivityResult(result: Map<String, Boolean>) {
         StorageManager.readPermission = result[Manifest.permission.READ_EXTERNAL_STORAGE] == true
         StorageManager.writePermission = result[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
+
+        if (!StorageManager.readPermission || !StorageManager.writePermission)
+        {
+            val builder = AlertDialog.Builder(this)
+            builder
+                .setTitle("Error")
+                .setMessage("This application cannot work without storage permission." +
+                        "Please open your settings and give this application permission")
+                .setPositiveButton("Exit",
+                    DialogInterface.OnClickListener { dialog, id ->
+                        exitProcess(-1)
+                    })
+            val dialog = builder.create()
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+        }
     }
 
     // Function to check permission.
