@@ -1,29 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/navigation_history"
-        android:icon="@drawable/history_black_24dp"
-        android:title="@string/title_history" />
-
-    <item
-        android:id="@+id/navigation_recommendations"
-        android:icon="@drawable/recommend_black_24dp"
-        android:title="@string/title_recommendations" />
-
-    <item
-        android:id="@+id/navigation_search"
-        android:icon="@drawable/search_black_36dp"
-        android:title="@string/title_search" />
-
     <item
         android:id="@+id/navigation_updates"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/title_updates" />
-
+    <item
+        android:id="@+id/navigation_history"
+        android:icon="@drawable/visibility_black_24dp"
+        android:title="@string/title_history" />
+    <item
+        android:id="@+id/navigation_search"
+        android:icon="@drawable/search_black_36dp"
+        android:title="@string/title_search" />
+    <item
+        android:id="@+id/navigation_recommendations"
+        android:icon="@drawable/recommend_black_24dp"
+        android:title="@string/title_recommendations" />
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/settings_black_24dp"
+        android:icon="@drawable/settings_black_24dp__2_"
         android:title="@string/title_settings" />
 
 </menu>
