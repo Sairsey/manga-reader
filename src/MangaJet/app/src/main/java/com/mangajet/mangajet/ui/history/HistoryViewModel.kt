@@ -17,10 +17,9 @@ import kotlinx.coroutines.launch
 
 // Class which represents "History" View Model
 class HistoryViewModel : ViewModel() {
-
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
-    var adapter : MangaListAdapter? = null      // adapter for list
+    var adapter : MangaListAdapter? = null          // adapter for list
 
     // mangas info for list
     val mangasInfos = ArrayList<MangaListElementContainer>()

@@ -23,7 +23,6 @@ import kotlinx.coroutines.withContext
 class SearchViewModel : ViewModel() {
     companion object {
         const val SEARCH_AMOUNT = 20        // Amount of searchable mangas
-        const val WAIT_FOR_BUILD_IN_MS = 75
     }
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading

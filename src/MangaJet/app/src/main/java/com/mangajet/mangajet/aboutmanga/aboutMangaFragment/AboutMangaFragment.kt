@@ -27,13 +27,14 @@ import kotlinx.coroutines.launch
 
 // "About manga" fragment with main information
 class AboutMangaFragment : Fragment() {
-    // Async job for loading bitmap
-    var job : Job? = null
     private var _binding: AboutMangaFragmentBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    // Async job for loading bitmap
+    var job : Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

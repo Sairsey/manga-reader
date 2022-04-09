@@ -30,8 +30,9 @@ import kotlinx.coroutines.launch
 class MangaChaptersFragment : Fragment() {
     // scroll position variable
     lateinit var scrollPosition : Parcelable
-
+    // job for async waiting of 'initManga()' function
     var job : Job? = null
+    // about manga viewmodel for management UI elements
     private lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     // List adapter for "chapters" list inner class
@@ -89,6 +90,7 @@ class MangaChaptersFragment : Fragment() {
         return root
     }
 
+    // Function which will init list witch chapters adapter
     private fun initChaptersListAdapter() {
         activity?.let {
             aboutMangaViewmodel.adapter = ChapterListAdapter(
@@ -117,6 +119,7 @@ class MangaChaptersFragment : Fragment() {
         }
     }
 
+    // Function which will async wait for 'initManga()' function finish
     private suspend fun createChaptersList() {
         aboutMangaViewmodel.job?.join()
 
