@@ -29,7 +29,7 @@ class HistoryFragment : Fragment() {
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 
-        historyViewModel.makeListFromStorage(adapter)
+        historyViewModel.makeListFromStorage(adapter, binding)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -38,7 +38,7 @@ class HistoryFragment : Fragment() {
             val historyViewModel =
                 ViewModelProvider(this).get(HistoryViewModel::class.java)
 
-            historyViewModel.makeListFromStorage(adapter)
+            historyViewModel.makeListFromStorage(adapter, binding)
         }
     }
 
@@ -60,7 +60,9 @@ class HistoryFragment : Fragment() {
             historyViewModel.mangasInfos
         )
 
-        historyViewModel.makeListFromStorage(adapter)
+        binding.progressBar.show()
+        binding.noResultLayout.visibility = View.INVISIBLE
+        historyViewModel.makeListFromStorage(adapter, binding)
 
         listView.adapter = adapter
         listView.setOnItemClickListener{ parent, view, position, id ->

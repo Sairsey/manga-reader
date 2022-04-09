@@ -3,7 +3,6 @@ package com.mangajet.mangajet
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -13,7 +12,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager

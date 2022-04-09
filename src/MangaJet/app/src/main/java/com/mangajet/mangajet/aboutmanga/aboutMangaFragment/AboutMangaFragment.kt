@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
@@ -45,13 +46,12 @@ class AboutMangaFragment : Fragment() {
     }
 
     // Function witch will decode bitmap async
-    fun loadBitmap(cover : MangaPage): Bitmap? {
-        try {
+    private fun loadBitmap(cover : MangaPage): Bitmap? {
+        return try {
             val imageFile = cover.getFile() // Catch ex here
-            return BitmapFactory.decodeFile(imageFile.absolutePath)
-        }
-        catch (ex: MangaJetException) {
-            return null
+            BitmapFactory.decodeFile(imageFile.absolutePath)
+        } catch (ex: MangaJetException) {
+            null
         }
     }
 
@@ -81,15 +81,21 @@ class AboutMangaFragment : Fragment() {
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
             if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
-            val intent = Intent(activity, MangaReaderActivity::class.java)
-            startActivity(intent)}}
+                val intent = Intent(activity, MangaReaderActivity::class.java)
+                startActivity(intent)
+            }
+            else
+                Toast.makeText(context,
+                    "Can't open manga before all chapters are updated...",
+                    Toast.LENGTH_SHORT).show()
+        }
 
         // Tags TextView generator
         val tagsLayout = binding.tagsLayout
         tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
             val newTextView = TextView(activity)
-            newTextView.setText(it)
+            newTextView.text = it
             newTextView.setPadding(
                 AboutMangaActivity.PADDING_HORZ,
                 AboutMangaActivity.PADDING_VERT,

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mangajet.mangajet.MangaJetApp
@@ -35,6 +36,7 @@ class AboutMangaActivity : AppCompatActivity() {
         aboutMangaViewmodel.manga = MangaJetApp.currentManga!!
         supportActionBar?.title = aboutMangaViewmodel.manga.originalName
 
+        aboutMangaViewmodel.progressIndicator = findViewById(R.id.progressBar)
         aboutMangaViewmodel.initMangaData()
 
         val tabLayout = findViewById<TabLayout>(R.id.aboutMangaTabs)

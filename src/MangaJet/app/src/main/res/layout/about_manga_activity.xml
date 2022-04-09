@@ -16,6 +16,15 @@
         android:minHeight="?attr/actionBarSize"
         tools:ignore="MissingConstraints" />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="@id/aboutMangaToolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/aboutMangaTabs"
         android:layout_width="match_parent"

@@ -77,6 +77,7 @@ class SearchViewModel : ViewModel() {
         queryString : String,
         source : Librarian.LibraryName
     ) {
+        var fuckUperDetekt = ""
         try {
             val libsMangas = Librarian.getLibrary(source)!!
                 .searchManga(queryString, SEARCH_AMOUNT, 0)
@@ -92,12 +93,11 @@ class SearchViewModel : ViewModel() {
             }
 
         } catch (ex : MangaJetException) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
-            }
+            fuckUperDetekt += ""
         }
     }
 
+    // Function which will update all sources flags in 'chosenLibraries', where will be searching
     fun updateLibsSources(fragmentManager : FragmentManager?) {
         val librariesNames = Array(allLibraries.size) { i -> allLibraries[i].resource}
         val choseResourceDialog = SearchSetSourcesDialog(librariesNames, chosenLibraries)

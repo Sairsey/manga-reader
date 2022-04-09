@@ -1,11 +1,13 @@
 package com.mangajet.mangajet.ui.history
 
+import android.view.View
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
+import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -15,9 +17,6 @@ import kotlinx.coroutines.launch
 
 // Class which represents "History" View Model
 class HistoryViewModel : ViewModel() {
-    companion object {
-        const val WAIT_FOR_BUILD_IN_MS = 75
-    }
 
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
@@ -50,7 +49,6 @@ class HistoryViewModel : ViewModel() {
                         mangas[mangas.size - 1].cover,
                     ))
                     adapter?.notifyDataSetChanged()
-                    //Thread.sleep(WAIT_FOR_BUILD_IN_MS.toLong())
                 }
             }
             catch (ex: MangaJetException) {
@@ -62,7 +60,8 @@ class HistoryViewModel : ViewModel() {
     }
 
     // Function which update mangas info from storage
-    fun makeListFromStorage(adapterNew: MangaListAdapter) {
+    fun makeListFromStorage(adapterNew: MangaListAdapter,
+        binding : HistoryFragmentBinding) {
         // cancel job if we need
         adapter = adapterNew
         job?.cancel()
@@ -71,6 +70,12 @@ class HistoryViewModel : ViewModel() {
 
         job = GlobalScope.launch(Dispatchers.Default) {
             addElementsToMangas()
+
+            withContext(Dispatchers.Main) {
+                binding.progressBar.hide()
+                if (mangas.isEmpty())
+                    binding.noResultLayout.visibility = View.VISIBLE
+            }
         }
     }
 

@@ -18,17 +18,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
+// Class for initializing MangaList element
 class MangaListElementContainer(
     newTitle : String,
     newAuthor : String,
     newSource : String,
     newCover : String,
 ) {
-    var title : String = newTitle
-    var author : String = newAuthor
-    var source : String = newSource
-    var coverUrl : String = newCover
+    var title : String = newTitle       // manga title
+    var author : String = newAuthor     // manga author
+    var source : String = newSource     // manga source
+    var coverUrl : String = newCover    // manga cover url
 }
 
 // List adapter for "manga" list inner class
@@ -77,7 +77,6 @@ class MangaListAdapter(
             if (p.coverUrl.isNotEmpty()) {
                 val coverSrc = MangaPage(p.coverUrl)
                 coverSrc.upload()
-                /* val job = */
                 GlobalScope.launch(Dispatchers.Default) {
                     // POTENTIAL EXCEPTION and ERROR
                     // Cover isn't downloaded but we try to draw it => terminate

@@ -22,8 +22,6 @@ class SearchSetSourcesDialog(sourcesNames : Array<String>, checkedItems : Boolea
                 .setMultiChoiceItems(mSourcesNames, mCheckedItems) {
                         dialog, which, isChecked ->
                     mCheckedItems[which] = isChecked
-                    val name = mSourcesNames[which] // Get the clicked item
-                    Toast.makeText(activity, name, Toast.LENGTH_LONG).show()
                 }
                 .setPositiveButton("Set sources"
                 ) {
