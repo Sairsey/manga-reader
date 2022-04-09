@@ -1,4 +1,4 @@
-package com.mangajet.mangajet.ui.recommendations
+package com.mangajet.mangajet.ui.forYou
 
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 
 // Class which represents "Recommendations" ViewModel
-class RecommendationsViewModel : ViewModel() {
+class ForYouViewModel : ViewModel() {
     var isInited = false                            // is init boolean flag
     val mangasNames = ArrayList<String>()           // mangas names for list
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
