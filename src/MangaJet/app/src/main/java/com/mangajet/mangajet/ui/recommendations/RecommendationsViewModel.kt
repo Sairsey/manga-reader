@@ -34,6 +34,7 @@ class RecommendationsViewModel : ViewModel() {
             }
             catch (ex: MangaJetException) {
                 // nothing too tragic. If manga not found we can just skip it
+                continue
             }
 
             try {
