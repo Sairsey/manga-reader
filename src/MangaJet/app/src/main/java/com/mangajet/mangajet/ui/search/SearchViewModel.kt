@@ -50,6 +50,7 @@ class SearchViewModel : ViewModel() {
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
+        var fuckUperDetekt = ""
         try {
             job?.ensureActive()
             mangas[i].updateInfo()
@@ -63,9 +64,7 @@ class SearchViewModel : ViewModel() {
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
-            }
+            fuckUperDetekt += ""
             return false
         }
         return true
@@ -76,7 +75,6 @@ class SearchViewModel : ViewModel() {
         queryString : String,
         source : Librarian.LibraryName
     ) {
-        var fuckUperDetekt = ""
         try {
             val libsMangas = Librarian.getLibrary(source)!!
                 .searchManga(queryString, SEARCH_AMOUNT, 0)
@@ -92,7 +90,9 @@ class SearchViewModel : ViewModel() {
             }
 
         } catch (ex : MangaJetException) {
-            fuckUperDetekt += ""
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
