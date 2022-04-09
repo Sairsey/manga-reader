@@ -1,11 +1,11 @@
 package com.mangajet.mangajet.ui.recommendations
 
-import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -25,12 +25,26 @@ class RecommendationsViewModel : ViewModel() {
 
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
-        val mangasSearchWords = listOf("гуль", "Берсерк", "Onepunchman")
+        val mangasSearchWords = listOf("Гуль", "Берсерк", "Onepunchman")
         for (name in mangasSearchWords) {
-            mangas.add(
-                Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
-            )
-            mangas[mangas.size - 1].updateInfo()
+            try {
+                mangas.add(
+                    Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
+                )
+            }
+            catch (ex: MangaJetException) {
+                // nothing too tragic. If manga not found we can just skip it
+            }
+
+            try {
+                mangas[mangas.size - 1].updateInfo()
+            }
+            catch (ex: MangaJetException) {
+                // This may be tragic.
+                // lets remove this manga from mangas
+                mangas.removeLast()
+            }
+
             withContext (Dispatchers.Main) {
                 mangasInfos.add(MangaListElementContainer(
                     mangas[mangas.size - 1].originalName,

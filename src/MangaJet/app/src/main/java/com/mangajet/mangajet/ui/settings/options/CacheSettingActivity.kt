@@ -4,14 +4,11 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MainActivity
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.StorageManager
 import java.text.DecimalFormat

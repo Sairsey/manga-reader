@@ -3,12 +3,14 @@ package com.mangajet.mangajet.mangareader
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +75,6 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             if (position == itemCount - 1) {
                 pageIndex = 0
                 chapterIndex++
-                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
             }
             else
                 pageIndex = position
@@ -83,8 +84,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         else if (currentViewModelWithData.isOnLastChapter()) {
             if (position == 0) {
                 chapterIndex--
-                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
-                pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+                pageIndex = -1
             }
             else
                 pageIndex = position - 1
@@ -94,26 +94,51 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         else {
             if (position == 0) {
                 chapterIndex--
-                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
-                pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+                pageIndex = -1
             }
             else if (position == itemCount - 1) {
                 pageIndex = 0
                 chapterIndex++
-                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
             }
             else
                 pageIndex = position - 1
         }
 
+        if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
+        {
+            try {
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+                if (pageIndex == -1)
+                {
+                    pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+                }
+            }
+            catch (ex : MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
         // bind holder
-        val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
-        holder.bind(mangaPage, position)
+        try {
+            val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
+            holder.bind(mangaPage, position)
+        }
+        catch (ex : MangaJetException) {
+            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun getItemCount(): Int {
-        val count = currentViewModelWithData.manga
-            .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+        var count : Int
+        try {
+            count = currentViewModelWithData.manga
+                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+        }
+        catch (ex : MangaJetException) {
+            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            count = 0
+        }
 
         // Only one chapter
         if (currentViewModelWithData.isSingleChapterManga())

@@ -9,10 +9,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
-import com.mangajet.mangajet.mangareader.MangaReaderViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -52,9 +50,10 @@ class MangaListAdapter(
             i.hashCode()
             try {
                 page.upload(i > 0)
-                val imageFile = page.getFile() // Catch ex here
+                val imageFile = page.getFile()
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
+                // we do not need to catch exceptions here
                 continue
             }
         }
@@ -76,6 +75,9 @@ class MangaListAdapter(
             val cover = v?.findViewById<ImageView>(R.id.coverManga)
             if (p.coverUrl.isNotEmpty()) {
                 val coverSrc = MangaPage(p.coverUrl)
+                // this can only fail if we do not have storage permission
+                // We have blocking dialog in this case, so it someone still
+                // manges to go here, I think we should crash
                 coverSrc.upload()
                 GlobalScope.launch(Dispatchers.Default) {
                     // POTENTIAL EXCEPTION and ERROR

@@ -1,7 +1,6 @@
 package com.mangajet.mangajet.ui.search
 
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -50,10 +49,10 @@ class SearchViewModel : ViewModel() {
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
-        var fuckUperDetekt = ""
         try {
             job?.ensureActive()
             mangas[i].updateInfo()
+            job?.ensureActive()
             withContext(Dispatchers.Main) {
                 mangasInfos.add(MangaListElementContainer(
                     mangas[i].originalName,
@@ -64,7 +63,8 @@ class SearchViewModel : ViewModel() {
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
-            fuckUperDetekt += ""
+            // only thing which may fail here is updateInfo
+            // which will be deleted if we return false
             return false
         }
         return true
