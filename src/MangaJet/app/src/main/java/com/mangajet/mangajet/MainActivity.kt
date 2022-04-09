@@ -1,7 +1,6 @@
 package com.mangajet.mangajet
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.result.ActivityResultCallback
@@ -42,9 +41,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             builder
                 .setTitle("Error")
                 .setMessage("This application cannot work without storage permission." +
-                        "Please open your settings and give this application permission")
+                        "Please open your settings and give this application" +
+                        "external storage permission")
                 .setPositiveButton("Exit",
-                    DialogInterface.OnClickListener { dialog, id ->
+                    { dialog, id ->
                         exitProcess(-1)
                     })
             val dialog = builder.create()
