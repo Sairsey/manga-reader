@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.aboutmanga
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
@@ -22,7 +23,7 @@ class AboutMangaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.about_manga_activity)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // Call viewport to manage low speed downloading data in dat class
         val aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
         aboutMangaViewmodel.initMangaData()
@@ -46,5 +47,9 @@ class AboutMangaActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }
