@@ -22,11 +22,13 @@ class MangaListElementContainer(
     newAuthor : String,
     newSource : String,
     newCover : String,
+    newHeaders : Map<String, String>
 ) {
     var title : String = newTitle       // manga title
     var author : String = newAuthor     // manga author
     var source : String = newSource     // manga source
     var coverUrl : String = newCover    // manga cover url
+    var headers : Map<String, String> = newHeaders   // special headers for manga
 }
 
 // List adapter for "manga" list inner class
@@ -74,7 +76,7 @@ class MangaListAdapter(
         if (p != null) {
             val cover = v?.findViewById<ImageView>(R.id.coverManga)
             if (p.coverUrl.isNotEmpty()) {
-                val coverSrc = MangaPage(p.coverUrl)
+                val coverSrc = MangaPage(p.coverUrl, p.headers)
                 // this can only fail if we do not have storage permission
                 // We have blocking dialog in this case, so it someone still
                 // manges to go here, I think we should crash

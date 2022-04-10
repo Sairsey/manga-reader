@@ -58,7 +58,8 @@ class SearchViewModel : ViewModel() {
                     mangas[i].originalName,
                     mangas[i].author,
                     mangas[i].library.getURL(),
-                    mangas[i].cover
+                    mangas[i].cover,
+                    mangas[mangas.size - 1].library.getHeadersForDownload()
                     ))
                 adapter?.notifyDataSetChanged()
             }

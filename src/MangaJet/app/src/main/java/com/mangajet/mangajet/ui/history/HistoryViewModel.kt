@@ -46,6 +46,7 @@ class HistoryViewModel : ViewModel() {
                         mangas[mangas.size - 1].author,
                         mangas[mangas.size - 1].library.getURL(),
                         mangas[mangas.size - 1].cover,
+                        mangas[mangas.size - 1].library.getHeadersForDownload()
                     ))
                     adapter?.notifyDataSetChanged()
                 }
