@@ -2,8 +2,8 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>NewLineAtEndOfFile:DashboardFragment.kt$com.mangajet.mangajet.ui.recommendations.DashboardFragment.kt</ID>
-    <ID>NewLineAtEndOfFile:DashboardViewModel.kt$com.mangajet.mangajet.ui.recommendations.DashboardViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:DashboardFragment.kt$com.mangajet.mangajet.ui.forYou.DashboardFragment.kt</ID>
+    <ID>NewLineAtEndOfFile:DashboardViewModel.kt$com.mangajet.mangajet.ui.forYou.DashboardViewModel.kt</ID>
     <ID>NewLineAtEndOfFile:ExampleInstrumentedTest.kt$com.mangajet.mangajet.ExampleInstrumentedTest.kt</ID>
     <ID>NewLineAtEndOfFile:ExampleUnitTest.kt$com.mangajet.mangajet.ExampleUnitTest.kt</ID>
     <ID>NewLineAtEndOfFile:HomeFragment.kt$com.mangajet.mangajet.ui.history.HomeFragment.kt</ID>
