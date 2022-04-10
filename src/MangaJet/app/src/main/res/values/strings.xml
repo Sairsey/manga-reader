@@ -13,6 +13,9 @@
     <string name="fragment_title_about">About</string>
     <string name="fragment_title_chapters">Chapters</string>
 
+    <!-- Strings, using in "History" activity -->
+    <string name="history_fragment_no_mangas_text">No watched mangas yet</string>
+
     <!-- Strings, using in "Settings" activity -->
     <string name="setting_Settings">Settings</string>
     <string name="setting_cache">Cache options</string>
@@ -20,4 +23,14 @@
 
     <string name="aboutMangaFragmentTagsText">Tags</string>
     <string name="aboutMangaDescriptionText">Description</string>
+
+    <!-- Strings, using in "Manga reader" activity -->
+    <string name="manga_reader_bad_page">Can\'t upload some pages</string>
+    <string name="manga_reader_refresh_page">Reload page</string>
+
+    <!-- Strings, using in Search -->
+    <string name="search_fragment_no_result_text">No result</string>
+    <string name="search_hint">Write query</string>
+    <string name="search_set_sources">Set sources</string>
+
 </resources>

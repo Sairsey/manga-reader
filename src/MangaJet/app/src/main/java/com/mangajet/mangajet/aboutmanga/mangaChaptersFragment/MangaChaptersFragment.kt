@@ -12,17 +12,28 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
     // scroll position variable
     lateinit var scrollPosition : Parcelable
+    // job for async waiting of 'initManga()' function
+    var job : Job? = null
+    // about manga viewmodel for management UI elements
+    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
@@ -37,8 +48,7 @@ class MangaChaptersFragment : Fragment() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var v: View? = convertView
             if (v == null) {
-                val vi: LayoutInflater
-                vi = LayoutInflater.from(mContext)
+                val vi: LayoutInflater = LayoutInflater.from(mContext)
                 v = vi.inflate(resourceLayout, null)
             }
 
@@ -70,9 +80,6 @@ class MangaChaptersFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    // Adapter on ChapterList for custom ListView
-    private lateinit var adapter: ChapterListAdapter
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,23 +90,67 @@ class MangaChaptersFragment : Fragment() {
         return root
     }
 
-    override fun onStart() {
-        super.onStart()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
-
-        var listView = binding.chaptersList
+    // Function which will init list witch chapters adapter
+    private fun initChaptersListAdapter() {
         activity?.let {
-            adapter = ChapterListAdapter(it,
+            aboutMangaViewmodel.adapter = ChapterListAdapter(
+                it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
                 aboutMangaViewmodel.manga.lastViewedChapter)
 
-            listView.adapter = adapter
-            listView.setOnItemClickListener{ parent, view, position, id ->
-                val intent = Intent(it, MangaReaderActivity::class.java)
-                MangaJetApp.currentManga = aboutMangaViewmodel.manga
-                MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
-                startActivity(intent)}
+            binding.chaptersList.adapter = aboutMangaViewmodel.adapter
+
+            binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
+                if (aboutMangaViewmodel.isInited) {
+                    val intent = Intent(it, MangaReaderActivity::class.java)
+                    MangaJetApp.currentManga = aboutMangaViewmodel.manga
+                    MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
+                    MangaJetApp.currentManga!!
+                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
+                        .lastViewedPage = 0
+                    startActivity(intent)
+                }
+                else
+                    Toast.makeText(it,
+                        "Can't open manga before all chapters are updated...",
+                        Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Function which will async wait for 'initManga()' function finish
+    private suspend fun createChaptersList() {
+        aboutMangaViewmodel.job?.join()
+
+        withContext(Dispatchers.Main) {
+            initChaptersListAdapter()
+            aboutMangaViewmodel.adapter?.notifyDataSetChanged()
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+        }
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        var listView = binding.chaptersList
+
+        binding.loadIndicator.show()
+        binding.chaptersList.visibility = View.INVISIBLE
+
+        // Start async waiting of chapters loading job if its not loaded yet
+        if (aboutMangaViewmodel.job?.isCompleted == false) {
+            job = GlobalScope.launch(Dispatchers.Default) {
+                createChaptersList()
+            }
+        }
+        // if loaded -> show it
+        else {
+            binding.loadIndicator.hide()
+            binding.chaptersList.visibility = View.VISIBLE
+            aboutMangaViewmodel.adapter?.notifyDataSetChanged()
         }
 
         scrollPosition = listView.onSaveInstanceState()!!
@@ -117,8 +168,15 @@ class MangaChaptersFragment : Fragment() {
         super.onResume()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
+        if (aboutMangaViewmodel.isInited) {
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+
+            if (aboutMangaViewmodel.adapter == null)
+                initChaptersListAdapter()
+        }
         binding.chaptersList.onRestoreInstanceState(scrollPosition)
-        adapter.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
-        adapter.notifyDataSetChanged()
+        aboutMangaViewmodel.adapter?.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
+        aboutMangaViewmodel.adapter?.notifyDataSetChanged()
     }
 }

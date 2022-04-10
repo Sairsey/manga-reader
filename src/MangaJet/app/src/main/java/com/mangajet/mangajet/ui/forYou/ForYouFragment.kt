@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.ForYouFragmentBinding
 
@@ -35,10 +36,10 @@ class ForYouFragment : Fragment() {
 
         var listView = binding.forYouListView
         activity?.let {
-            val adapter = ArrayAdapter<String>(
-                it,
-                R.layout.simple_list_item_1,
-                forYouFragmentViewModel.mangasNames
+            val adapter = MangaListAdapter(
+                requireActivity(),
+                com.mangajet.mangajet.R.layout.manga_list_element,
+                forYouFragmentViewModel.mangasInfos
             )
             forYouFragmentViewModel.initMangas(adapter)
 

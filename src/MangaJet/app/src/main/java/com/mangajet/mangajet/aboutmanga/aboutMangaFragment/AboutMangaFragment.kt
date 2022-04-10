@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.R
@@ -26,13 +27,14 @@ import kotlinx.coroutines.launch
 
 // "About manga" fragment with main information
 class AboutMangaFragment : Fragment() {
-    // Async job for loading bitmap
-    var job : Job? = null
     private var _binding: AboutMangaFragmentBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    // Async job for loading bitmap
+    var job : Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,13 +47,12 @@ class AboutMangaFragment : Fragment() {
     }
 
     // Function witch will decode bitmap async
-    fun loadBitmap(cover : MangaPage): Bitmap? {
-        try {
+    private fun loadBitmap(cover : MangaPage): Bitmap? {
+        return try {
             val imageFile = cover.getFile() // Catch ex here
-            return BitmapFactory.decodeFile(imageFile.absolutePath)
-        }
-        catch (ex: MangaJetException) {
-            return null
+            BitmapFactory.decodeFile(imageFile.absolutePath)
+        } catch (ex: MangaJetException) {
+            null
         }
     }
 
@@ -59,7 +60,8 @@ class AboutMangaFragment : Fragment() {
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
-        val cover = MangaPage(aboutMangaViewmodel.manga.cover)
+        val cover = MangaPage(aboutMangaViewmodel.manga.cover,
+            aboutMangaViewmodel.manga.library.getHeadersForDownload())
         cover.upload()
 
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
@@ -79,15 +81,22 @@ class AboutMangaFragment : Fragment() {
 
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
-            val intent = Intent(activity, MangaReaderActivity::class.java)
-            startActivity(intent)}
+            if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
+                val intent = Intent(activity, MangaReaderActivity::class.java)
+                startActivity(intent)
+            }
+            else
+                Toast.makeText(context,
+                    "Can't open manga before all chapters are updated...",
+                    Toast.LENGTH_SHORT).show()
+        }
 
         // Tags TextView generator
         val tagsLayout = binding.tagsLayout
         tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
             val newTextView = TextView(activity)
-            newTextView.setText(it)
+            newTextView.text = it
             newTextView.setPadding(
                 AboutMangaActivity.PADDING_HORZ,
                 AboutMangaActivity.PADDING_VERT,

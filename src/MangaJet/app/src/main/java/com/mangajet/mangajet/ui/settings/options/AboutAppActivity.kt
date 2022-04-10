@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 
 // Dialog with authors
@@ -44,6 +45,8 @@ class AboutAppActivity : AppCompatActivity() {
         setTitle(R.string.setting_aboutapp)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_app)
+
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutAppToolbar))
 
         val aboutAppList = findViewById<ListView>(R.id.aboutAppList)
         val adapter = ArrayAdapter<String> (

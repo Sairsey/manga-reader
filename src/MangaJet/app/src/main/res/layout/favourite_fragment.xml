@@ -5,7 +5,9 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.favourite.FavouriteFragment">
+    tools:context=".ui.favourite.FavouriteFragment"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingBottom="?attr/actionBarSize">
 
     <TextView
         android:id="@+id/favouriteTextView"

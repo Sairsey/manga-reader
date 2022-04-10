@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.data.libraries.AbstractLibrary
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -109,7 +110,11 @@ class Manga {
     // Function to fill chapters array of manga
     // MAY THROW MangaJetException
     fun updateChapters(){
-        chapters = library.getMangaChapters(this) // Exception may be thrown here
+        var tmp = chapters
+        chapters = library.getMangaChapters(this)
+        for (i in tmp.indices) {
+            chapters[i] = tmp[i]
+        }
     }
 
     // Function dump information about manga as JSON string
