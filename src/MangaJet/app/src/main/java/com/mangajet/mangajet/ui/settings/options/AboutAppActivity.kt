@@ -45,7 +45,6 @@ class AboutAppActivity : AppCompatActivity() {
         setTitle(R.string.setting_aboutapp)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_app)
-        //val versionCode = BuildConfig.VERSION_CODE
         val versionName = BuildConfig.VERSION_NAME
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutAppToolbar))
 
@@ -53,7 +52,7 @@ class AboutAppActivity : AppCompatActivity() {
         val adapter = ArrayAdapter<String> (
             this,
             android.R.layout.simple_list_item_1,
-            listOf( "Program version: " + versionName,
+            listOf( "Program version: v" + versionName,
                     "Support",
                     "Authors")
         )
