@@ -17,6 +17,16 @@
         android:theme="@style/Theme.MangaJet"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SplashScreen"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.settings.options.MangaAuthorizationActivity"
             android:exported="false" />
         <activity
@@ -27,25 +37,20 @@
             android:exported="false" />
         <activity
             android:name=".authorization.AuthorizationActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".mangareader.MangaReaderActivity"
             android:exported="false" />
         <activity
             android:name=".aboutmanga.AboutMangaActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
