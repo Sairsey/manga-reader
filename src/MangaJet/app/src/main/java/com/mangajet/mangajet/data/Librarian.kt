@@ -1,7 +1,9 @@
 package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.data.libraries.MangaLibLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
+import com.mangajet.mangajet.data.libraries.AcomicsLibrary
 import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import org.json.JSONObject
 
@@ -29,9 +31,9 @@ object Librarian {
     // Initializer block
     init {
         map[LibraryName.Readmanga] = ReadMangaLibrary(LibraryName.Readmanga.resource)
-        map[LibraryName.Mangalib] = null
+        map[LibraryName.Mangalib] = MangaLibLibrary(LibraryName.Mangalib.resource)
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
-        map[LibraryName.Acomics] = null
+        map[LibraryName.Acomics] = AcomicsLibrary(LibraryName.Acomics.resource)
     }
 
     // Function to get abstractLibrary from map by key(enum)

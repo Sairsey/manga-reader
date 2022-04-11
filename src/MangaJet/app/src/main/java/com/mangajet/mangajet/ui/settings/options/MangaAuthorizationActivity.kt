@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.data.Librarian
@@ -15,6 +16,7 @@ class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manga_authorization)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationToolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle(R.string.title_authorization)
 

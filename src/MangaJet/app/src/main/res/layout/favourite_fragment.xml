@@ -5,14 +5,16 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.updates.UpdatesFragment">
+    tools:context=".ui.favourite.FavouriteFragment"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingBottom="?attr/actionBarSize">
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/favouriteTextView"
         android:layout_width="130dp"
         android:layout_height="48dp"
         android:layout_marginTop="180dp"
-        android:text="@string/title_updates"
+        android:text="@string/title_favourite"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

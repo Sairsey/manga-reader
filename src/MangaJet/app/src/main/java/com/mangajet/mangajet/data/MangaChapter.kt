@@ -11,7 +11,7 @@ class MangaChapter {
     public var id: String        // Id of this Chapter
     public var name: String    // Chapter name (can be zero-size string)
     public var lastViewedPage = 0 // Number of last viewed page
-    private var pagesNumber = -1  // Number of pages in this chapter
+    private var pagesNumber = 0   // Number of pages in this chapter
     private var pagesURLs = arrayListOf<String>()
 
     // Constructor for Libraries
@@ -33,7 +33,7 @@ class MangaChapter {
     // Function for safely retrieving amount of pages
     // MAY THROW MangaJetException
     public fun getPagesNum() : Int {
-        if (pagesNumber == -1)
+        if (pagesNumber <= 0)
             updateInfo()
         return pagesNumber
     }
@@ -56,7 +56,7 @@ class MangaChapter {
     // MAY THROW MangaJetException, ArrayIndexOutOfBoundsException
     public fun getPage(pageNumber : Int) : MangaPage {
         updateInfo()
-        if (pagesNumber == -1)
+        if (pagesNumber <= 0)
             getPagesNum()
         if (pageNumber < 0 || pageNumber >= pagesNumber)
             throw ArrayIndexOutOfBoundsException("Bad page index") // Exception may be thrown here

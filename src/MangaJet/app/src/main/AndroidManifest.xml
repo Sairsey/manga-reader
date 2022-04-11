@@ -20,9 +20,6 @@
             android:name=".ui.settings.options.MangaAuthorizationActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.settings.options.AboutAppWebView"
-            android:exported="false" />
-        <activity
             android:name=".ui.settings.options.AboutAppActivity"
             android:exported="false" />
         <activity

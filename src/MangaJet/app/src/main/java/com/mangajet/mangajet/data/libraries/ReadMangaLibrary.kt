@@ -12,7 +12,8 @@ import org.json.JSONObject
 class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
     val headers = mutableMapOf(
-        "User-Agent" to "readmangafun",
+        "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
+                "Chrome/41.0.2228.0 Safari/537.36",
         "accept" to "*/*")
 
     // Function to get Manga class by its id(name)
@@ -189,8 +190,6 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             f = text.indexOf("item-title", f)
         }
         chapters.reverse()
-        if (chapters.size == 0)
-            chapters.add(MangaChapter(manga, manga.id))
         return chapters.toTypedArray()
     }
 
@@ -202,19 +201,18 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val res = ArrayList<String>()
 
         var f = text.indexOf("initReader")
-        f = text.indexOf("[[", f) + 1
-        var s = text.indexOf("false", f)
+        f = text.indexOf("[[", f)
+
+        var s = text.indexOf("]]", f) + 2
         val subtext = text.substring(f, s)
 
-        f = subtext.indexOf('[')
-        while (f != -1) {
-            f = subtext.indexOf("'", f) + 1
-            s = subtext.indexOf("'", f)
-            val imgBegin = subtext.substring(f, s) + '/'
-            f = subtext.indexOf("\"", s) + 1
-            s = subtext.indexOf("\"", f)
-            res.add(imgBegin + subtext.substring(f, s))
-            f = subtext.indexOf('[', f)
+        val json = JSONArray(subtext)
+
+        for (i in 0 until json.length())
+        {
+            val subjson = json.getJSONArray(i)
+            val link = subjson.getString(0) + subjson.getString(1) + subjson.getString(2)
+            res.add(link)
         }
         return JSONArray(res).toString()
     }
