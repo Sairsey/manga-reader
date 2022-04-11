@@ -1,23 +1,27 @@
 package com.mangajet.mangajet
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
+
 
 // Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boolean>> {
@@ -43,10 +47,17 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                 .setMessage("This application cannot work without storage permission." +
                         "Please open your settings and give this application" +
                         "external storage permission")
-                .setPositiveButton("Exit",
-                    { dialog, id ->
-                        exitProcess(-1)
-                    })
+                .setPositiveButton("Open settings"
+                ) { dialog, id ->
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri: Uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                }
+                .setNegativeButton("Exit"
+                ) { dialog, id ->
+                    exitProcess(-1)
+                }
             val dialog = builder.create()
             dialog.setCancelable(false)
             dialog.setCanceledOnTouchOutside(false)

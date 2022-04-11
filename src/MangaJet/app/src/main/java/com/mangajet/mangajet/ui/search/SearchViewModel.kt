@@ -86,8 +86,11 @@ class SearchViewModel : ViewModel() {
             
             for (i in libsMangas.indices) {
                 mangas.add(libsMangas[i])
-                if (!uploadMangaIntoArray(mangas.size - 1))
+                job?.ensureActive()
+                if (!uploadMangaIntoArray(mangas.size - 1)) {
+                    job?.ensureActive()
                     mangas.removeAt(mangas.size - 1)
+                }
             }
 
         } catch (ex : MangaJetException) {
