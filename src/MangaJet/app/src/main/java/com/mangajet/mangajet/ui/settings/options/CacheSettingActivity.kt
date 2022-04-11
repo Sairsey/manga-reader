@@ -1,5 +1,4 @@
 package com.mangajet.mangajet.ui.settings.options
-
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
@@ -20,7 +19,6 @@ import com.mangajet.mangajet.data.StorageManager
 import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
-
 // Clear cache dialog class
 class ClearCacheDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -56,38 +54,18 @@ class CacheSettingActivity : AppCompatActivity() {
         return DecimalFormat("#,##0.#").format(size / KILO.pow(digitGroups.toDouble())) +
                              " " + units[digitGroups]
     }
+
     fun fillCacheSizeView(){
         val cacheSizeView = findViewById<TextView>(R.id.cacheSize)
         var stringToFillWith = "SIZE: " + getStringSize(StorageManager.usedStorageSizeInBytes())
         cacheSizeView.setText(stringToFillWith)
     }
+
     fun buttonPressed() {
         val myDialogFragment = ClearCacheDialog()
         val manager = supportFragmentManager
         myDialogFragment.show(manager, "'Delete cache' dialog")
     }
-
-    // Function will fill cache list adapter
-  /* fun fillCacheListAdapter() {
-        val cacheSettingsList = findViewById<ListView>(R.id.cacheOptionsList)
-        val adapter = ArrayAdapter<String> (
-            this,
-            android.R.layout.simple_list_item_1,
-            listOf("Storage size: " + getStringSize(StorageManager.usedStorageSizeInBytes()),
-                "Delete cache")
-        )
-
-        cacheSettingsList.adapter = adapter
-        cacheSettingsList.setOnItemClickListener{ parent, view, position, id ->
-            when (id.toInt()) {
-                1 -> {
-                    val myDialogFragment = ClearCacheDialog()
-                    val manager = supportFragmentManager
-                    myDialogFragment.show(manager, "'Delete cache' dialog")
-                }
-            }
-        }
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
@@ -96,6 +74,5 @@ class CacheSettingActivity : AppCompatActivity() {
         fillCacheSizeView()
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         clearCacheButton.setOnClickListener { buttonPressed() }
-        //fillCacheListAdapter()
     }
 }
