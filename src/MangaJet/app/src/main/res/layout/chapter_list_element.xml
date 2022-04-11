@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:descendantFocusability = "blocksDescendants"
     android:layout_width="fill_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
