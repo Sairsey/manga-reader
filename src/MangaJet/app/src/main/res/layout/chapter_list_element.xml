@@ -1,33 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_width="fill_parent">
 
-    <TableRow android:layout_width="fill_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listElementRow"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/viewedIcon"
             android:layout_width="wrap_content"
-            android:layout_marginVertical="@dimen/chapter_half_margin"
-            android:layout_marginHorizontal="@dimen/chapter_half_margin"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
             android:src="@drawable/ic_closed_book"
+            app:layout_constraintEnd_toStartOf="@+id/chapterTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/primary" />
 
         <TextView
             android:id="@+id/chapterTitle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="339dp"
+            android:layout_height="37dp"
             android:height="@dimen/chapter_element_height"
-            android:layout_marginVertical="@dimen/chapter_half_margin"
             android:gravity="left"
             android:text="CHAPTER TITLE"
-            android:typeface="monospace" />
-    </TableRow>
+            android:typeface="monospace"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/viewedIcon"
+            app:layout_constraintTop_toTopOf="@+id/viewedIcon" />
+
+        <Button
+            android:id="@+id/downloadChapter"
+            android:layout_width="38dp"
+            android:layout_height="39dp"
+            android:layout_marginEnd="10dp"
+            android:drawableLeft="@drawable/file_download_black_24dp"
+            android:drawablePadding="2dip"
+            android:paddingLeft="7dip"
+            android:paddingRight="30dip"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/chapterTitle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </TableLayout>

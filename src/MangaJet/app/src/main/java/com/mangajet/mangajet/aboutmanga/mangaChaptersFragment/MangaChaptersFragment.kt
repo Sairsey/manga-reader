@@ -9,14 +9,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.ImageView
+import android.widget.Button
 import android.widget.Toast
+import android.widget.ArrayAdapter
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.withContext
@@ -56,14 +58,25 @@ class MangaChaptersFragment : Fragment() {
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
-
+                val button =  v?.findViewById<Button>(R.id.downloadChapter)
                 if (p.name.isNotEmpty())
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
                             (position + 1).toString() + ": " + p.name)
                 else
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
                             (position + 1).toString())
-
+                button?.setOnClickListener {
+                    try {
+                        for(i in 0 until p.getPagesNum()){
+                            p.getPage(i).getFile()
+                        }
+                        p.manga.saveToFile()
+                        Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                    }
+                    catch (ex: MangaJetException){
+                        Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
                 if (position < lastViewedChapter)
                     icon?.setImageResource(R.drawable.ic_opened_book)
                 else
