@@ -23,76 +23,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/sourceAndRating"
-            android:layout_width="392dp"
-            android:layout_height="73dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:orientation="horizontal"
-            android:weightSum="1"
+            android:divider="@drawable/separator"
+            android:dividerPadding="3dp"
+            android:showDividers="middle"
             app:layout_constraintBottom_toTopOf="@+id/tagsAndButtonLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mainInfoLayout"
             app:layout_constraintVertical_bias="0.0">
-            >
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ratingLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/starImage"
-                android:layout_width="75dp"
-                android:layout_height="70dp"
-                android:src="@drawable/star_rate_black_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-            <TextView
-                android:id="@+id/ratingNum"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:text="-.--"
-                android:textSize="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/starImage"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                <ImageView
+                    android:id="@+id/starImage"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/star_rate_black_24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <View
-                android:id="@+id/separator"
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="32dp"
-                android:background="@color/primary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/ratingNum"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/ratingNum"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="2"
+                    android:gravity="clip_vertical"
+                    android:text="-.--"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/starImage"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/sourceImage"
-                android:layout_width="80dp"
-                android:layout_height="70dp"
-                android:src="@drawable/book_black_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/separator"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/source"
-                android:layout_width="149dp"
-                android:layout_height="71dp"
-                android:gravity="center_vertical"
-                android:text="TextView"
-                android:textSize="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sourceImage"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/sourceLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.8">
+
+                <ImageView
+                    android:id="@+id/sourceImage"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/book_black_24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/source"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="4"
+                    android:gravity="center_vertical"
+                    android:text="TextView"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/sourceImage"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mainInfoLayout"
@@ -106,6 +119,7 @@
                 android:id="@+id/coverManga"
                 android:layout_width="120dp"
                 android:layout_height="170dp"
+                android:layout_weight="1"
                 android:layout_marginStart="@dimen/inner_horizontal_margin"
                 android:layout_marginTop="@dimen/inner_vertical_margin"
                 android:adjustViewBounds="true"
