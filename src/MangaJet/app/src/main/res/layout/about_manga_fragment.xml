@@ -23,66 +23,76 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/sourceAndRating"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="392dp"
+            android:layout_height="73dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
             android:weightSum="1"
-            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toTopOf="@+id/tagsAndButtonLayout"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mainInfoLayout"
             app:layout_constraintVertical_bias="0.0">
             >
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/rateNumberAndStar"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5">
+
+            <ImageView
+                android:id="@+id/starImage"
+                android:layout_width="75dp"
+                android:layout_height="70dp"
+                android:src="@drawable/star_rate_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+            <TextView
+                android:id="@+id/ratingNum"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="-.--"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/starImage"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
-                <TextView
-                    android:id="@+id/ratingNum"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="4dp"
-                    android:gravity="center"
-                    android:text=""
-                    android:textSize="20dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/starImage"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0" />
+            <View
+                android:id="@+id/separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="32dp"
+                android:background="@color/primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ratingNum"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/starImage"
-                    android:layout_width="45dp"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginEnd="55dp"
-                    android:src="@drawable/star_svgrepo_com__1_"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.104"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.444" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/sourceImage"
+                android:layout_width="80dp"
+                android:layout_height="70dp"
+                android:src="@drawable/book_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/separator"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/source"
-                android:layout_width="142dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"
-                android:gravity="center"
+                android:layout_width="149dp"
+                android:layout_height="71dp"
+                android:gravity="center_vertical"
                 android:text="TextView"
-                android:textSize="20dp" />
-
-        </LinearLayout>
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/sourceImage"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mainInfoLayout"

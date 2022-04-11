@@ -58,8 +58,6 @@ class AboutMangaFragment : Fragment() {
     }
 
     override fun onStart() {
-        val emptyRateLayoutweight: Float = 0.0.toFloat()
-        val notEmptyRateLayoutweight: Float = 0.3.toFloat()
         super.onStart()
         val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
@@ -71,18 +69,9 @@ class AboutMangaFragment : Fragment() {
                 aboutMangaViewmodel.manga.russianName + ")")
         binding.authorText.setText(aboutMangaViewmodel.manga.author)
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
-
         binding.source.setText(aboutMangaViewmodel.manga.library.getURL())
-        if(aboutMangaViewmodel.manga.rating.equals(0.0.toDouble())) {
-            (binding.rateNumberAndStar.layoutParams as LinearLayout.LayoutParams).weight = emptyRateLayoutweight
-            (binding.source.layoutParams as LinearLayout.LayoutParams).weight = 1 - emptyRateLayoutweight
-            binding.starImage.setImageDrawable(null)
-        }
-        else {
-            (binding.rateNumberAndStar.layoutParams as LinearLayout.LayoutParams).weight = notEmptyRateLayoutweight
-            (binding.source.layoutParams as LinearLayout.LayoutParams).weight = 1 - notEmptyRateLayoutweight
+        if (aboutMangaViewmodel.manga.rating != 0.0) {
             binding.ratingNum.setText(aboutMangaViewmodel.manga.rating.toString())
-
         }
         job = GlobalScope.launch(Dispatchers.IO) {
             // POTENTIAL EXCEPTION and ERROR
