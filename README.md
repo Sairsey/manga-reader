@@ -1,4 +1,4 @@
-# MangaJet
+# ![icon](bin/logo_64.png) MangaJet
 Manga reader project, SPbSTU 2022.
 
 ### Product description
