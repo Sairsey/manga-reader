@@ -69,12 +69,12 @@ class CacheSettingActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheSizeView()
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         clearCacheButton.setOnClickListener { buttonPressed() }
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
