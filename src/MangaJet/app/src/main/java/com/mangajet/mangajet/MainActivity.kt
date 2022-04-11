@@ -50,6 +50,9 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                 .setPositiveButton("Open settings"
                 ) { dialog, id ->
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                     val uri: Uri = Uri.fromParts("package", packageName, null)
                     intent.data = uri
                     startActivity(intent)
@@ -85,6 +88,13 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         if (permissionsToAsk.size != 0)
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        // you can re-run this function as many times as you want
+        // It will show message-box only if permission is not granted
+        handleStoragePermissions()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
