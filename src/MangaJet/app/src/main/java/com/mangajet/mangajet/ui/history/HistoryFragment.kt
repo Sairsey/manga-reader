@@ -29,6 +29,8 @@ class HistoryFragment : Fragment() {
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 
+        binding.progressBar.show()
+        binding.noResultLayout.visibility = View.INVISIBLE
         historyViewModel.makeListFromStorage(adapter, binding)
     }
 
@@ -38,6 +40,8 @@ class HistoryFragment : Fragment() {
             val historyViewModel =
                 ViewModelProvider(this).get(HistoryViewModel::class.java)
 
+            binding.progressBar.show()
+            binding.noResultLayout.visibility = View.INVISIBLE
             historyViewModel.makeListFromStorage(adapter, binding)
         }
     }

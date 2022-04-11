@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MainActivity
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.StorageManager
 import java.text.DecimalFormat

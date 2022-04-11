@@ -1,7 +1,6 @@
 package com.mangajet.mangajet.ui.search
 
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -50,21 +49,23 @@ class SearchViewModel : ViewModel() {
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
-        var fuckUperDetekt = ""
         try {
             job?.ensureActive()
             mangas[i].updateInfo()
+            job?.ensureActive()
             withContext(Dispatchers.Main) {
                 mangasInfos.add(MangaListElementContainer(
                     mangas[i].originalName,
                     mangas[i].author,
                     mangas[i].library.getURL(),
-                    mangas[i].cover
+                    mangas[i].cover,
+                    mangas[mangas.size - 1].library.getHeadersForDownload()
                     ))
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
-            fuckUperDetekt += ""
+            // only thing which may fail here is updateInfo
+            // which will be deleted if we return false
             return false
         }
         return true
@@ -85,8 +86,11 @@ class SearchViewModel : ViewModel() {
             
             for (i in libsMangas.indices) {
                 mangas.add(libsMangas[i])
-                if (!uploadMangaIntoArray(mangas.size - 1))
+                job?.ensureActive()
+                if (!uploadMangaIntoArray(mangas.size - 1)) {
+                    job?.ensureActive()
                     mangas.removeAt(mangas.size - 1)
+                }
             }
 
         } catch (ex : MangaJetException) {

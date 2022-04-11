@@ -1,9 +1,6 @@
 package com.mangajet.mangajet.data
 
-import android.util.Log
 import org.json.JSONArray
-import org.json.JSONObject
-import javax.net.ssl.ManagerFactoryParameters
 
 // Class that represents one chapter of specific, stores pages of this manga
 class MangaChapter {

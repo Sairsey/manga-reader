@@ -63,6 +63,9 @@ class AboutMangaFragment : Fragment() {
 
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())
+        // this can only fail if we do not have storage permission
+        // We have blocking dialog in this case, so it someone still
+        // manges to go here, I think we should crash
         cover.upload()
 
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +

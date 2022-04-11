@@ -8,8 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.MangaJetException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -39,8 +41,12 @@ class MangaReaderActivity : AppCompatActivity() {
     private fun reloadCurrentPage() {
         val chapter = mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+        // at this point we already downloaded whole chapter so no need to worry about exception
         val page = chapter.getPage(chapter.lastViewedPage)
 
+        // this can only fail if we do not have storage permission
+        // We have blocking dialog in this case, so it someone still
+        // manges to go here, I think we should crash
         page.upload(true)
 
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
@@ -88,12 +94,19 @@ class MangaReaderActivity : AppCompatActivity() {
             // Function which will load previous chapter after scroll
             private fun doToPrevChapter() {
                 // update chapter
-                mangaReaderViewModel.manga.lastViewedChapter--;
+                mangaReaderViewModel.manga.lastViewedChapter--
 
                 // update pages count (and load chapter)
-                mangaReaderViewModel.pagesCount =
-                    mangaReaderViewModel.manga
+                try {
+                    mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
                         .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
+                }
+                catch (ex:MangaJetException) {
+                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
+                    viewPager.setCurrentItem(1, false)
+                    mangaReaderViewModel.manga.lastViewedChapter++
+                    return
+                }
 
                 // start loading all pages
                 val job = GlobalScope.launch(Dispatchers.IO) {
@@ -106,8 +119,12 @@ class MangaReaderActivity : AppCompatActivity() {
                     .lastViewedPage = mangaReaderViewModel.pagesCount - 1
 
                 // save manga state
-                mangaReaderViewModel.manga.saveToFile()
-
+                try {
+                    mangaReaderViewModel.manga.saveToFile()
+                }
+                catch (ex : MangaJetException) {
+                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
+                }
 
                 // update adapter
                 while (job.isActive)
@@ -135,9 +152,19 @@ class MangaReaderActivity : AppCompatActivity() {
                 mangaReaderViewModel.manga.lastViewedChapter++;
 
                 // update pages count (and load chapter)
-                mangaReaderViewModel.pagesCount =
-                    mangaReaderViewModel.manga
+                try {
+                    mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
                         .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
+                }
+                catch (ex:MangaJetException) {
+                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
+                    var delta = 0
+                    if (mangaReaderViewModel.manga.lastViewedChapter == 0)
+                        delta = -1
+                    viewPager.setCurrentItem(mangaReaderViewModel.pagesCount + delta, false)
+                    mangaReaderViewModel.manga.lastViewedChapter++
+                    return
+                }
 
                 // start loading all pages
                 val job = GlobalScope.launch(Dispatchers.IO) {
@@ -150,7 +177,12 @@ class MangaReaderActivity : AppCompatActivity() {
                     .lastViewedPage = 0
 
                 // save manga state
-                mangaReaderViewModel.manga.saveToFile()
+                try {
+                    mangaReaderViewModel.manga.saveToFile()
+                }
+                catch (ex : MangaJetException) {
+                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
+                }
 
                 // update adapter
                 while (job.isActive)
