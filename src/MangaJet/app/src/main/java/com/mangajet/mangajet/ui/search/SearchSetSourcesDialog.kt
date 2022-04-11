@@ -2,8 +2,6 @@ package com.mangajet.mangajet.ui.search
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 

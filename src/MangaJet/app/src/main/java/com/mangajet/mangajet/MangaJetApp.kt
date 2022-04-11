@@ -6,7 +6,6 @@ import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
-import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.data.WebAccessor
 

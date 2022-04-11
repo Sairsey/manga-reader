@@ -1,4 +1,4 @@
-# MangaJet
+# ![icon](bin/logo_64.png) MangaJet
 Manga reader project, SPbSTU 2022.
 
 ### Product description
@@ -32,3 +32,4 @@ In comperison with other manga reader applications (for example, mobile version 
 + [Commit rules](docs/commit-rules.md)
 + [Workflow rules](docs/workflow-rules.md)
 + [Developer guide](docs/developer-guide.md)
++ [System requirements](docs/system-requirements.md)

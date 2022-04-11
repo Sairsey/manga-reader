@@ -1,11 +1,11 @@
 package com.mangajet.mangajet.aboutmanga
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mangajet.mangajet.MangaJetApp
@@ -28,9 +28,8 @@ class AboutMangaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.about_manga_activity)
-
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutMangaToolbar))
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // Call viewport to manage low speed downloading data in dat class
         aboutMangaViewmodel = ViewModelProvider(this)[AboutMangaViewModel::class.java]
         aboutMangaViewmodel.manga = MangaJetApp.currentManga!!
@@ -57,5 +56,9 @@ class AboutMangaActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }

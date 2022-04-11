@@ -38,7 +38,12 @@ class Manga {
         // if file Exist, better to load from json
         if (isExist){
             val json = JSONObject(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
-            fromJSON(json)
+            try {
+                fromJSON(json)
+            }
+            catch (ex : MangaJetException){
+                // nothing too tragic. Just forget about it
+            }
         }
     }
 
@@ -118,6 +123,7 @@ class Manga {
     }
 
     // Function dump information about manga as JSON string
+    // MAY THROW MangaJetException
     fun toJSON(full : Boolean = false) : String {
         val json = JSONObject()
         json.put("id", this.id)

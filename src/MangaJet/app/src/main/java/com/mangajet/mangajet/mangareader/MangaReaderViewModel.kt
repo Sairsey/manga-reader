@@ -1,8 +1,8 @@
 package com.mangajet.mangajet.mangareader
 
-import android.app.ActionBar
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Manga
@@ -58,12 +58,21 @@ class MangaReaderViewModel : ViewModel() {
 
             // Load manga and basic info about it
             manga = MangaJetApp.currentManga!!
-            pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
-
+            try {
+                pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
+            }
+            catch (ex : MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
             uploadPages()
 
             // And save its state to File
-            manga.saveToFile()
+            try {
+                manga.saveToFile()
+            }
+            catch (ex : MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -75,6 +84,10 @@ class MangaReaderViewModel : ViewModel() {
 
         jobs = arrayOfNulls(pagesCount + 2)
 
+        // at this point chapter already loaded so no need to worry about getPage exception
+        // upload() can only fail if we do not have storage permission
+        // We have blocking dialog in this case, so it someone still
+        // manges to go here, I think we should crash
         for (i in 0 until pagesCount)
             manga.chapters[manga.lastViewedChapter].getPage(i).upload()
     }
@@ -85,7 +98,7 @@ class MangaReaderViewModel : ViewModel() {
             i.hashCode()
             try {
                 page.upload(i > 0)
-                val imageFile = page.getFile() // Catch ex here
+                val imageFile = page.getFile()
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
                 continue
@@ -100,7 +113,12 @@ class MangaReaderViewModel : ViewModel() {
         super.onCleared()
         if (isInited) {
             isInited = false
-            manga.saveToFile()
+            try {
+                manga.saveToFile()
+            }
+            catch (ex : MangaJetException) {
+                // nothing
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -62,13 +63,19 @@ class AboutMangaFragment : Fragment() {
 
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())
+        // this can only fail if we do not have storage permission
+        // We have blocking dialog in this case, so it someone still
+        // manges to go here, I think we should crash
         cover.upload()
 
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
                 aboutMangaViewmodel.manga.russianName + ")")
         binding.authorText.setText(aboutMangaViewmodel.manga.author)
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
-
+        binding.source.setText(aboutMangaViewmodel.manga.library.getURL())
+        if (aboutMangaViewmodel.manga.rating != 0.0) {
+            binding.ratingNum.setText(aboutMangaViewmodel.manga.rating.toString())
+        }
         job = GlobalScope.launch(Dispatchers.IO) {
             // POTENTIAL EXCEPTION and ERROR
             // Cover isn't downloaded but we try to draw it => terminate
