@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
-
+import com.mangajet.mangajet.BuildConfig;
 // Dialog with authors
 class AuthorsDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -45,14 +45,14 @@ class AboutAppActivity : AppCompatActivity() {
         setTitle(R.string.setting_aboutapp)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_app)
-
+        val versionName = BuildConfig.VERSION_NAME
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.aboutAppToolbar))
 
         val aboutAppList = findViewById<ListView>(R.id.aboutAppList)
         val adapter = ArrayAdapter<String> (
             this,
             android.R.layout.simple_list_item_1,
-            listOf( "Program version: v0.1.0",
+            listOf( "Program version: v" + versionName,
                     "Support",
                     "Authors")
         )
