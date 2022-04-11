@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.mainToolbar)
+
         val navView: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -83,9 +85,9 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_history,
-                R.id.navigation_recommendations,
+                R.id.navigation_favourite,
                 R.id.navigation_search,
-                R.id.navigation_updates,
+                R.id.navigation_for_you,
                 R.id.navigation_settings
             )
         )

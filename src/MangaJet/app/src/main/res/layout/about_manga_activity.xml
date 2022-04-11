@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/aboutMangaContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="@string/app_name"
+        android:id="@+id/aboutMangaToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="@id/aboutMangaToolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/aboutMangaTabs"
@@ -11,7 +31,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/aboutMangaToolbar"
         app:tabBackground="?android:attr/windowBackground"
         app:tabSelectedTextColor="?attr/colorControlActivated"
         app:tabTextColor="?attr/colorControlNormal">

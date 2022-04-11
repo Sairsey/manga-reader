@@ -13,9 +13,13 @@ class MangaPage {
         this.url = link
         this.mangaHeaders = headers
         var f = link.indexOf(".") + 1
-        this.localPath = link.subSequence(f, link.length).toString()
+        var s = link.indexOf("?", f)
+        if (s == -1)
+            s = link.length
+        this.localPath = link.subSequence(f, s).toString()
         this.localPath = this.localPath.replace(".", "_")
         f = this.localPath.lastIndexOf("_")
+
         this.localPath = this.localPath.substring(0, f) + '.' + this.localPath.substring(f + 1)
     }
 

@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.settings.options.AboutAppActivity">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="@string/setting_aboutapp"
+        android:id="@+id/aboutAppToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints" />
+
     <ListView
         android:id="@+id/aboutAppList"
         android:layout_width="0dp"
@@ -14,5 +24,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/aboutAppToolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>
