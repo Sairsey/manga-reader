@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.preference.PreferenceManager.getDefaultSharedPreferences
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -68,11 +69,18 @@ class CacheSettingActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheSizeView()
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         clearCacheButton.setOnClickListener { buttonPressed() }
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }
+
