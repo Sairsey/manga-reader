@@ -52,8 +52,8 @@ android {
         applicationId "com.mangajet.mangajet"
         minSdk 26
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "0.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -79,6 +79,8 @@ android {
 preBuild.dependsOn detektAll
 
 dependencies {
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+
     implementation platform('com.squareup.okhttp3:okhttp-bom:4.9.3')
     implementation 'com.squareup.okhttp3:okhttp'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'

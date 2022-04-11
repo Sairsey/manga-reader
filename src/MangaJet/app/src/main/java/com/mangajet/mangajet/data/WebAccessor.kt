@@ -6,7 +6,6 @@ import okhttp3.Response
 import okhttp3.Callback
 import okhttp3.Call
 import okio.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

@@ -4,41 +4,53 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.ImageView
+import android.widget.Button
+import android.widget.Toast
+import android.widget.ArrayAdapter
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
 
 // "About manga" chapter fragment class
 class MangaChaptersFragment : Fragment() {
+    // scroll position variable
+    lateinit var scrollPosition : Parcelable
+    // job for async waiting of 'initManga()' function
+    var job : Job? = null
+    // about manga viewmodel for management UI elements
+    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
+
     // List adapter for "chapters" list inner class
     class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
                              items: Array<MangaChapter>,
-                             private val lastViewedChapter : Int) :
+                             public var lastViewedChapter : Int) :
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
-        private val mContext: Context
-
-        // init block
-        init {
-            mContext = context
-        }
+        private val mContext: Context = context
 
         // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var v: View? = convertView
             if (v == null) {
-                val vi: LayoutInflater
-                vi = LayoutInflater.from(mContext)
+                val vi: LayoutInflater = LayoutInflater.from(mContext)
                 v = vi.inflate(resourceLayout, null)
             }
 
@@ -46,9 +58,25 @@ class MangaChaptersFragment : Fragment() {
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
-
-                chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                        (position + 1).toString())
+                val button =  v?.findViewById<Button>(R.id.downloadChapter)
+                if (p.name.isNotEmpty())
+                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
+                            (position + 1).toString() + ": " + p.name)
+                else
+                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
+                            (position + 1).toString())
+                button?.setOnClickListener {
+                    try {
+                        for(i in 0 until p.getPagesNum()){
+                            p.getPage(i).getFile()
+                        }
+                        p.manga.saveToFile()
+                        Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                    }
+                    catch (ex: MangaJetException){
+                        Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
                 if (position < lastViewedChapter)
                     icon?.setImageResource(R.drawable.ic_opened_book)
                 else
@@ -75,23 +103,93 @@ class MangaChaptersFragment : Fragment() {
         return root
     }
 
-    override fun onStart() {
-        super.onStart()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
-
-        var listView = binding.chaptersList
+    // Function which will init list witch chapters adapter
+    private fun initChaptersListAdapter() {
         activity?.let {
-            val adapter = ChapterListAdapter(it,
+            aboutMangaViewmodel.adapter = ChapterListAdapter(
+                it,
                 R.layout.chapter_list_element,
                 aboutMangaViewmodel.manga.chapters,
                 aboutMangaViewmodel.manga.lastViewedChapter)
 
-            listView.adapter = adapter
-            listView.setOnItemClickListener{ parent, view, position, id ->
-                val intent = Intent(it, MangaReaderActivity::class.java)
-                intent.putExtra("Manga",aboutMangaViewmodel.manga.toJSON())
-                intent.putExtra("Chapter", id.toInt())
-                startActivity(intent)}
+            binding.chaptersList.adapter = aboutMangaViewmodel.adapter
+
+            binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
+                if (aboutMangaViewmodel.isInited) {
+                    val intent = Intent(it, MangaReaderActivity::class.java)
+                    MangaJetApp.currentManga = aboutMangaViewmodel.manga
+                    MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
+                    MangaJetApp.currentManga!!
+                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
+                        .lastViewedPage = 0
+                    startActivity(intent)
+                }
+                else
+                    Toast.makeText(it,
+                        "Can't open manga before all chapters are updated...",
+                        Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    // Function which will async wait for 'initManga()' function finish
+    private suspend fun createChaptersList() {
+        aboutMangaViewmodel.job?.join()
+
+        withContext(Dispatchers.Main) {
+            initChaptersListAdapter()
+            aboutMangaViewmodel.adapter?.notifyDataSetChanged()
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+        }
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        var listView = binding.chaptersList
+
+        binding.loadIndicator.show()
+        binding.chaptersList.visibility = View.INVISIBLE
+
+        // Start async waiting of chapters loading job if its not loaded yet
+        if (aboutMangaViewmodel.job?.isCompleted == false) {
+            job = GlobalScope.launch(Dispatchers.Default) {
+                createChaptersList()
+            }
+        }
+        // if loaded -> show it
+        else {
+            binding.loadIndicator.hide()
+            binding.chaptersList.visibility = View.VISIBLE
+            aboutMangaViewmodel.adapter?.notifyDataSetChanged()
+        }
+
+        scrollPosition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will save scroll position
+    override fun onPause() {
+        super.onPause()
+        var listView = binding.chaptersList
+        scrollPosition = listView.onSaveInstanceState()!!
+    }
+
+    // Overridden func which will restore scroll position
+    override fun onResume() {
+        super.onResume()
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+
+        if (aboutMangaViewmodel.isInited) {
+            binding.chaptersList.visibility = View.VISIBLE
+            binding.loadIndicator.hide()
+
+            if (aboutMangaViewmodel.adapter == null)
+                initChaptersListAdapter()
+        }
+        binding.chaptersList.onRestoreInstanceState(scrollPosition)
+        aboutMangaViewmodel.adapter?.lastViewedChapter = aboutMangaViewmodel.manga.lastViewedChapter
+        aboutMangaViewmodel.adapter?.notifyDataSetChanged()
     }
 }

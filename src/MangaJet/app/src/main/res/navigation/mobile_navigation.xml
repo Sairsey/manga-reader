@@ -12,10 +12,10 @@
         tools:layout="@layout/history_fragment" />
 
     <fragment
-        android:id="@+id/navigation_recommendations"
-        android:name="com.mangajet.mangajet.ui.recommendations.RecommendationsFragment"
-        android:label="@string/title_recommendations"
-        tools:layout="@layout/recommendations_fragment" />
+        android:id="@+id/navigation_for_you"
+        android:name="com.mangajet.mangajet.ui.forYou.ForYouFragment"
+        android:label="@string/title_for_you"
+        tools:layout="@layout/for_you_fragment" />
 
     <fragment
         android:id="@+id/navigation_search"
@@ -23,10 +23,10 @@
         android:label="@string/title_search"
         tools:layout="@layout/search_fragment" />
     <fragment
-        android:id="@+id/navigation_updates"
-        android:name="com.mangajet.mangajet.ui.updates.UpdatesFragment"
-        android:label="@string/title_updates"
-        tools:layout="@layout/updates_fragment" />
+        android:id="@+id/navigation_favourite"
+        android:name="com.mangajet.mangajet.ui.favourite.FavouriteFragment"
+        android:label="@string/title_favourite"
+        tools:layout="@layout/favourite_fragment" />
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.mangajet.mangajet.ui.settings.SettingFragment"

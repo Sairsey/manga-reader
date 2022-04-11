@@ -6,14 +6,20 @@ import java.io.File
 class MangaPage {
     var url: String // url to online version of page
     var localPath: String // Path to file in local storage
+    var mangaHeaders: Map<String, String>
 
     // Constructor for Libraries
-    constructor(link: String) {
+    constructor(link: String, headers: Map<String, String> = mapOf()) {
         this.url = link
+        this.mangaHeaders = headers
         var f = link.indexOf(".") + 1
-        this.localPath = link.subSequence(f, link.length).toString()
+        var s = link.indexOf("?", f)
+        if (s == -1)
+            s = link.length
+        this.localPath = link.subSequence(f, s).toString()
         this.localPath = this.localPath.replace(".", "_")
         f = this.localPath.lastIndexOf("_")
+
         this.localPath = this.localPath.substring(0, f) + '.' + this.localPath.substring(f + 1)
     }
 
@@ -21,7 +27,11 @@ class MangaPage {
     // MAY THROW MangaJetException
     fun upload(force: Boolean = false) {
         if (force || !StorageManager.isExist(this.localPath)) { // Exception may be thrown here
-            StorageManager.download(this.url, this.localPath) // Exception may be thrown here
+            StorageManager.download(
+                url = this.url,
+                path = this.localPath,
+                headers = mangaHeaders,
+                type = StorageManager.FileType.CachedPages)  // Exception may be thrown here
         }
     }
 

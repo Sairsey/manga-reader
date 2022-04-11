@@ -32,3 +32,4 @@ In comperison with other manga reader applications (for example, mobile version 
 + [Commit rules](docs/commit-rules.md)
 + [Workflow rules](docs/workflow-rules.md)
 + [Developer guide](docs/developer-guide.md)
++ [System requirements](docs/system-requirements.md)

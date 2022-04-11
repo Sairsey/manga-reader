@@ -1,33 +1,35 @@
 package com.mangajet.mangajet.ui.settings.options
-
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.preference.PreferenceManager.getDefaultSharedPreferences
+import android.view.MenuItem
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment
-import com.mangajet.mangajet.MainActivity
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.StorageManager
 import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
-
 // Clear cache dialog class
 class ClearCacheDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
-            builder.setTitle("Delete cache")
-                .setMessage("Are you sure about deleting cache?")
+            builder.setTitle("Clear cache")
+                .setMessage("Are you sure you want to clear your cache?")
                 .setCancelable(true)
                 .setPositiveButton("Delete") { dialog, id ->
-                    StorageManager.removeDirectory()
-                    (activity as CacheSettingActivity?)?.fillCacheListAdapter()
+                    StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
+                    (activity as CacheSettingActivity?)?.fillCacheSizeView()
                 }
                 .setNegativeButton("Cancel",
                     DialogInterface.OnClickListener { dialog, id ->
@@ -53,32 +55,31 @@ class CacheSettingActivity : AppCompatActivity() {
                              " " + units[digitGroups]
     }
 
-    // Function will fill cache list adapter
-    fun fillCacheListAdapter() {
-        val cacheSettingsList = findViewById<ListView>(R.id.cacheOptionsList)
-        val adapter = ArrayAdapter<String> (
-            this,
-            android.R.layout.simple_list_item_1,
-            listOf("Storage size: " + getStringSize(StorageManager.usedStorageSizeInBytes()),
-                "Delete cache")
-        )
+    fun fillCacheSizeView(){
+        val cacheSizeView = findViewById<TextView>(R.id.cacheSize)
+        var stringToFillWith = "SIZE: " + getStringSize(StorageManager.usedStorageSizeInBytes())
+        cacheSizeView.setText(stringToFillWith)
+    }
 
-        cacheSettingsList.adapter = adapter
-        cacheSettingsList.setOnItemClickListener{ parent, view, position, id ->
-            when (id.toInt()) {
-                1 -> {
-                    val myDialogFragment = ClearCacheDialog()
-                    val manager = supportFragmentManager
-                    myDialogFragment.show(manager, "'Delete cache' dialog")
-                }
-            }
-        }
+    fun buttonPressed() {
+        val myDialogFragment = ClearCacheDialog()
+        val manager = supportFragmentManager
+        myDialogFragment.show(manager, "'Delete cache' dialog")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTitle(R.string.setting_cache)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
-        fillCacheListAdapter()
+        fillCacheSizeView()
+        val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
+        clearCacheButton.setOnClickListener { buttonPressed() }
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) finish()
+        return true
     }
 }
+

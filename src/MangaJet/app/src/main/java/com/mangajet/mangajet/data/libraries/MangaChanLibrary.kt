@@ -1,5 +1,10 @@
-package com.mangajet.mangajet.data
+package com.mangajet.mangajet.data.libraries
 
+import android.os.Build
+import android.text.Html
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaChapter
+import com.mangajet.mangajet.data.WebAccessor
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -24,6 +29,11 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // Function to get cookies after authentication
     override fun getCookies(): String {
         return headers.getOrDefault("Cookie", "")
+    }
+
+    // Function to get headers if we need
+    override fun getHeadersForDownload(): Map<String, String> {
+        return headers.toMap()
     }
 
     // Function to get array of Manga classes by its id(name), amount of mangas(optional)
@@ -55,6 +65,14 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
 
         return res.toTypedArray()
+    }
+
+    // Helper function to delete weird Html symbols
+    private fun transformFromHtml(text : String) : String{
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
+        else
+            Html.fromHtml(text).toString()
     }
 
     // Helper class for some functions
@@ -142,11 +160,11 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val json = JSONObject()
-        json.put("name", MangaChanLibraryHelper().getName(text))
-        json.put("cover", MangaChanLibraryHelper().getTitleImageURL(text))
-        json.put("rus_name", MangaChanLibraryHelper().getRusName(text))
-        json.put("author", MangaChanLibraryHelper().getAuthor(text))
-        json.put("description", MangaChanLibraryHelper().getDescr(text))
+        json.put("name", transformFromHtml(MangaChanLibraryHelper().getName(text)))
+        json.put("cover", transformFromHtml(MangaChanLibraryHelper().getTitleImageURL(text)))
+        json.put("rus_name", transformFromHtml(MangaChanLibraryHelper().getRusName(text)))
+        json.put("author", transformFromHtml(MangaChanLibraryHelper().getAuthor(text)))
+        json.put("description", transformFromHtml(MangaChanLibraryHelper().getDescr(text)))
         val tagArray = JSONArray(MangaChanLibraryHelper().getTags(text))
         json.put("tags", tagArray)
         return json.toString()
@@ -177,8 +195,16 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
-                chapters.add(MangaChapter(manga, table.substring(f, s)))
-                f = table.indexOf("zaliv", f)
+                var nameStart = table.indexOf("&nbsp;&nbsp;", s) + "&nbsp;&nbsp;".length + 1
+                nameStart = table.indexOf("&nbsp;&nbsp;", nameStart) + "&nbsp;&nbsp;".length
+                if(nameStart == "&nbsp;&nbsp;".length - 1)
+                    chapters.add(MangaChapter(manga, table.substring(f, s)))
+                else{
+                    var nameFinish = table.indexOf("<", nameStart)
+                    chapters.add(MangaChapter(manga, table.substring(f, s),
+                        transformFromHtml(table.substring(nameStart, nameFinish))))
+                    f = table.indexOf("zaliv", f)
+                }
             }
         }
         chapters.reverse()

@@ -5,6 +5,7 @@ import android.content.Context
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.data.WebAccessor
 
@@ -13,6 +14,7 @@ class MangaJetApp : Application() {
     companion object
     {
         var context: Context? = null
+        var currentManga : Manga? = null // used for fast sending data between activities without json
     }
 
     override fun onCreate() {
