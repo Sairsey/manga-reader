@@ -2,9 +2,16 @@ package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.MangaJetApp
 import java.io.File
+import java.io.FileOutputStream
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.Arrays
-import kotlin.Comparator
-import kotlin.collections.ArrayList
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+
 
 // Singleton which will do everything about memory management
 // it also will map files from Android filesystem to ours filesystem
@@ -239,6 +246,56 @@ object StorageManager {
                 throw MangaJetException("Cannot find file " + path)
             return f.readText()
         }
+    }
+
+    // Function which will create ZIP archive of specific file types
+    fun createZipArchive(
+        outputStream: OutputStream,
+        fileTypes: ArrayList<FileType> =
+                             arrayListOf(
+                                 FileType.LibraryInfo,
+                                 FileType.MangaInfo)) {
+        val zos = ZipOutputStream(BufferedOutputStream(outputStream))
+        for (type in fileTypes) {
+            val inputDirectory = File(storageDirectory + type.subdirectoryPath)
+            inputDirectory.walkTopDown().forEach { file ->
+                val zipFileName = file.absolutePath.removePrefix(storageDirectory).removePrefix("/")
+                val entry = ZipEntry( "$zipFileName${(if (file.isDirectory) "/" else "" )}")
+                zos.putNextEntry(entry)
+                if (file.isFile) {
+                    file.inputStream().copyTo(zos)
+                }
+                zos.closeEntry()
+            }
+        }
+        zos.close()
+        return
+    }
+
+    // Function which will create ZIP archive of specific file types
+    fun unpackZipArchive(inputStream: InputStream) {
+        val zip = ZipInputStream(BufferedInputStream(inputStream))
+
+        var entry = zip.getNextEntry()
+
+        while (entry != null) {
+            val filePath = storageDirectory + "/" + entry.name
+
+            // if directory - create it
+            if (entry.isDirectory) {
+                val unzipFile = File(filePath)
+                if (!unzipFile.isDirectory) unzipFile.mkdirs()
+            }
+            // if file - fill it with data
+            else {
+                BufferedOutputStream(FileOutputStream(filePath)).use { fileOutputStream ->
+                    zip.copyTo(fileOutputStream)
+                }
+            }
+            entry = zip.getNextEntry()
+        }
+
+        return
     }
 
     // Function which will return paths for all elements of specific file type in order of modification date
