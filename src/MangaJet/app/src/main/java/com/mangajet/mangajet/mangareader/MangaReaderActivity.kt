@@ -208,8 +208,9 @@ class MangaReaderActivity : AppCompatActivity() {
 
                 // SPECIAL CASES
                 // only one chapter
-                if (mangaReaderViewModel.isSingleChapterManga())
-                    return // do nothing
+                if (mangaReaderViewModel.isSingleChapterManga()) {
+                    // do nothing
+                }
                 // First chapter
                 else if (mangaReaderViewModel.isOnFirstChapter()) {
                     if (position == pagerAdapter.itemCount - 1) {
