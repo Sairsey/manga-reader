@@ -298,6 +298,46 @@ object StorageManager {
         return
     }
 
+    // Function which will copy file from one File type to another
+    // MAY THROW MangaJetException
+    fun copyToType(path: String, inType : FileType, outType : FileType) {
+        val fileIn = File(storageDirectory + inType.subdirectoryPath + "/" + path)
+
+        if (!writePermission)
+            throw MangaJetException("Write permission not granted")
+
+        if (outType == FileType.Auto)
+            throw MangaJetException("Request is too strange")
+
+        var new_path = outType.subdirectoryPath + "/" + path
+
+        // lock this scope with java-style mutex
+        // this means that only 1 thread can access to this block
+        // at a time
+        synchronized(loadPromises) {
+            // Create file handle
+            val file = File(storageDirectory + new_path)
+
+            // If file already already exist - delete it
+            if (file.exists()) {
+                file.delete()
+            }
+
+            // Create all Directories
+            file.mkdirs()
+
+            // Delete our file, which was created as directory by file.mkdirs()
+            file.delete()
+
+            // Create file
+            if (!file.createNewFile())
+                throw MangaJetException(
+                    "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
+
+            file.writeBytes(fileIn.readBytes())
+        }
+    }
+
     // Function which will return paths for all elements of specific file type in order of modification date
     fun getAllPathsForType(type: FileType) : Array<String> {
         if (!readPermission)

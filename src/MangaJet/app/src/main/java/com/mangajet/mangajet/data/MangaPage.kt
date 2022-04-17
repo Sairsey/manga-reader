@@ -6,12 +6,14 @@ import java.io.File
 class MangaPage {
     var url: String // url to online version of page
     var localPath: String // Path to file in local storage
-    var mangaHeaders: Map<String, String>
+    var mangaHeaders: Map<String, String> // Headers for downloading
+    var shouldBeInDownloaded : Boolean // flag for downloaded support
 
     // Constructor for Libraries
     constructor(link: String, headers: Map<String, String> = mapOf()) {
         this.url = link
         this.mangaHeaders = headers
+        this.shouldBeInDownloaded = false
         var f = link.indexOf(".") + 1
         var s = link.indexOf("?", f)
         if (s == -1)
@@ -25,7 +27,8 @@ class MangaPage {
 
     // Function for checking if page downloaded. If not - it will start to upload to storage
     // MAY THROW MangaJetException
-    fun upload(force: Boolean = false) {
+    fun upload(force: Boolean = false, isToDownload: Boolean = false) {
+        // if we do not load some file - load it to cache at first
         if (force || !StorageManager.isExist(this.localPath)) { // Exception may be thrown here
             StorageManager.download(
                 url = this.url,
@@ -33,6 +36,8 @@ class MangaPage {
                 headers = mangaHeaders,
                 type = StorageManager.FileType.CachedPages)  // Exception may be thrown here
         }
+
+        shouldBeInDownloaded = isToDownload
     }
 
     // Function will return File instance of this image
@@ -44,6 +49,43 @@ class MangaPage {
         // wait if not loaded
         StorageManager.await(this.localPath) // Exception may be thrown here
 
+        // If we wanted to load it to downloaded pages, we should just move it from cached
+        // Exception may be thrown here
+        if (shouldBeInDownloaded &&
+            StorageManager.isExist(this.localPath, StorageManager.FileType.CachedPages) &&
+            !StorageManager.isExist(this.localPath, StorageManager.FileType.DownloadedPages)) {
+            StorageManager.copyToType(this.localPath,
+                StorageManager.FileType.CachedPages,
+                StorageManager.FileType.DownloadedPages)
+        }
+
         return StorageManager.getFile(this.localPath) // Exception may be thrown here
     }
+
+     // Function will delete File from storage if it exist there
+     // returns True if something was deleted, False otherwise
+     // MAY THROW MangaJetException
+     fun removeFileIfExist() : Boolean {
+         var success = false
+
+         // wait while all operation will be completed
+         try {
+             getFile()
+         }
+         catch (ex: MangaJetException) {
+             return success
+         }
+
+         // Exception may be thrown here
+         if (StorageManager.isExist(this.localPath, StorageManager.FileType.CachedPages))
+            success = success ||
+                    StorageManager.getFile(this.localPath, StorageManager.FileType.CachedPages).delete()
+
+         // Exception may be thrown here
+         if (StorageManager.isExist(this.localPath, StorageManager.FileType.DownloadedPages))
+             success = success ||
+                     StorageManager.getFile(this.localPath, StorageManager.FileType.DownloadedPages).delete()
+
+         return success
+     }
 }
