@@ -14,13 +14,9 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
     private val defaultUEH : Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
     private val stackTraceFileName = "stackTrace.txt"
 
-    init{
-        sendToMail()
-    }
-
     // Function to handle exceptions
     override fun uncaughtException(t: Thread, e: Throwable) {
-        Logger.log("Uncaught exception was thrown")
+        Logger.log("Uncaught exception was thrown", Logger.Lvl.SEVERE)
         var report = e.toString() + "\n\n"
         report += "------------------ Stack trace ------------------\n\n"
         for (elem in e.stackTrace)
@@ -57,14 +53,15 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         defaultUEH.uncaughtException(t, e)
     }
 
-    // Function to send report to email
-    private fun sendToMail(){
+    // Function to send get crash report as String
+    // If no crash => return empty String
+    fun getCrashReport() : String {
         var trace : String = ""
         // Add log and stack trace to mail
         val path = StorageManager.storageDirectory + Logger.fileLogPath + "/"
         try{
             if (!File( path, stackTraceFileName).exists())
-                return
+                return ""
             val reader = BufferedReader(FileReader(File(path, Logger.fileLogName)))
             var line = reader.readLine()
             while(line != null){
@@ -74,24 +71,16 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         }
         catch (e : IOException){
             e.hashCode()
-            return// If couldn't read or open file => let it go
+            // If couldn't read or open file => let it go
         }
         catch (e : FileNotFoundException){
             e.hashCode()
-            return// If couldn't read or open file => let it go
+            // If couldn't read or open file => let it go
         }
-        println(trace)
-        val sendIntent = Intent(Intent.ACTION_SEND)
-        val subject = "Error report"
-        val body = "Mail this to loko201195@gmail.com: \n$trace\n"
-
-        sendIntent.putExtra(Intent.EXTRA_EMAIL,  "readerscope@altcanvas.com");
-        sendIntent.putExtra(Intent.EXTRA_TEXT, body);
-        sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        sendIntent.setType("message/rfc822");
 
         val file = File(path,stackTraceFileName)
         if (file.exists())
             file.delete()
+        return trace
     }
 }

@@ -1,11 +1,17 @@
 package com.mangajet.mangajet
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.CheckBox
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +21,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
@@ -43,7 +50,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         if (!StorageManager.readPermission || !StorageManager.writePermission)
         {
-            Logger.log("Dialog to ask set permission in settings started")
+            Logger.log("Ask user to set permissions dialog opened")
             val builder = AlertDialog.Builder(this)
             builder
                 .setTitle("Error")
@@ -78,7 +85,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
     // Function which will handle updating StorageManager permissions
     private fun handleStoragePermissions() {
-        Logger.log("Check permission")
         StorageManager.writePermission =
             checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         StorageManager.readPermission =
@@ -108,6 +114,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         // Set logger and UEH
         Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
+        checkForCrash(UncaughtExceptionHandler().getCrashReport())
         Logger.log("Logger initialized")
 
         // you can re-run this function as many times as you want
@@ -120,7 +127,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                 StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
         }
         catch (ex: MangaJetException) {
-            Logger.log("Could not set libraries json", Logger.Lvl.WARNING)
+            Logger.log("Could not set libraries json: " + ex.message, Logger.Lvl.WARNING)
             // in this case we can just skip, because if file not found it isnt a big deal.
         }
 
@@ -145,5 +152,50 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    // Functions that checks report for crash => sends it to email
+    // Functions that checks report for crash => sends it to email
+    private fun checkForCrash(report : String){
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        if(report.isEmpty() || preferences.getBoolean("CrashNeverAskAgain", false))
+            return
+        val dialogMsg = "App crashed. Can you send info about it?"
+
+        var checkBoxText = arrayOf("Never ask gain")
+        var wasPressed = false
+        val email = "mangajetmailbot@gmail.com"
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(dialogMsg)
+            .setMultiChoiceItems(checkBoxText, null) {
+                    dialog, which, isChecked ->
+                println(isChecked)
+                wasPressed = isChecked
+            }
+            .setPositiveButton("Send") {
+                    dialog, id ->
+                val sendIntent = Intent(Intent.ACTION_SEND)
+                val subject = "Error report"
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                sendIntent.putExtra(Intent.EXTRA_TEXT, report)
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+                sendIntent.type = "message/rfc822"
+                this.startActivity(Intent.createChooser(sendIntent, "Title:"))
+            }
+            .setNegativeButton("Cancel") {
+                    dialog, _ ->
+                if (wasPressed) {
+                    val editor = preferences.edit()
+                    editor.putBoolean("CrashNeverAskAgain", true)
+                    editor.apply()
+                }
+                dialog.cancel()
+            }
+        val alert = builder.create()
+        alert.show()
+        alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        
     }
 }

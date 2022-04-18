@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
@@ -36,6 +37,7 @@ class SettingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ) : View? {
+        Logger.log("Settings opened")
         val settingsViewModel =
             ViewModelProvider(this).get(SettingViewModel::class.java)
 

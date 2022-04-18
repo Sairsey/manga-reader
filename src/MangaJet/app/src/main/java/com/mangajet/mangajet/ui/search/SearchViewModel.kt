@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.ui.search
 
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
@@ -11,6 +12,7 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.SearchFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +68,7 @@ class SearchViewModel : ViewModel() {
         } catch (ex : MangaJetException) {
             // only thing which may fail here is updateInfo
             // which will be deleted if we return false
+            Logger.log("Catch MJE in uploadMangaInto Array: " + ex.message, Logger.Lvl.WARNING)
             return false
         }
         return true
@@ -94,6 +97,8 @@ class SearchViewModel : ViewModel() {
             }
 
         } catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to load info about some manga while searching"
+                    + ex.message, Logger.Lvl.WARNING)
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
             }
@@ -127,6 +132,13 @@ class SearchViewModel : ViewModel() {
         binding.noResultLayout.visibility = View.INVISIBLE
 
         adapter = adapterNew
+
+        //All libraries
+        var sources = ""
+        for(i in allLibraries.indices)
+            if(chosenLibraries[i])
+                sources += allLibraries[i].resource + " "
+        Logger.log("Search \"$queryString\" with these sources: $sources")
 
         destroyAll()
         job = GlobalScope.launch(Dispatchers.IO) {

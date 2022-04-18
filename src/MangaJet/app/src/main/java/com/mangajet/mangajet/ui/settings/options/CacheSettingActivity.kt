@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.StorageManager
+import com.mangajet.mangajet.log.Logger
 import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
@@ -23,6 +24,7 @@ import kotlin.math.pow
 class ClearCacheDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
+            Logger.log("Clear cache dialog opened")
             val builder = AlertDialog.Builder(it)
             builder.setTitle("Clear cache")
                 .setMessage("Are you sure you want to clear your cache?")
@@ -30,9 +32,11 @@ class ClearCacheDialog : DialogFragment() {
                 .setPositiveButton("Delete") { dialog, id ->
                     StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
                     (activity as CacheSettingActivity?)?.fillCacheSizeView()
+                    Logger.log("Delete clicked")
                 }
                 .setNegativeButton("Cancel",
                     DialogInterface.OnClickListener { dialog, id ->
+                        Logger.log("Cancel clicked")
                     })
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -68,6 +72,7 @@ class CacheSettingActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Logger.log("Cache options in Settings opened")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         fillCacheSizeView()

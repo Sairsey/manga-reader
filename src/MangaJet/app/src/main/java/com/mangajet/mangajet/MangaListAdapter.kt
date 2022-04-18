@@ -50,7 +50,6 @@ class MangaListAdapter(
     // Function which will decode bitmap async
     private fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
-            Logger.log("Start loading" + page.url)
             i.hashCode()
             try {
                 page.upload(i > 0)
@@ -58,7 +57,7 @@ class MangaListAdapter(
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
                 // we do not need to catch exceptions here
-                Logger.log("Catch MJE exception in loadBitmap", Logger.Lvl.WARNING)
+                Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
                 continue
             }
         }
@@ -69,7 +68,6 @@ class MangaListAdapter(
 
     // Function which will fill every list element
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        Logger.log("Begin to fill MangaListAdapter")
         var v: View? = convertView
         if (v == null) {
             val vi: LayoutInflater
@@ -112,7 +110,6 @@ class MangaListAdapter(
                 author?.text = "Creative work from Web"
 
             source?.text = "Source: " + p.source
-            Logger.log("Filled " + p.title + " in Manga List Adapter")
         }
         return v!!
     }

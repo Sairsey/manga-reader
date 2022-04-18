@@ -12,6 +12,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -61,6 +62,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         )
     }
 
+    @Suppress("LongMethod")
     override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
         var pageIndex = 0
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
@@ -114,6 +116,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 }
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to get number of pages: " + ex.message, Logger.Lvl.WARNING)
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
                 return
             }
@@ -125,6 +128,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             holder.bind(mangaPage, position)
         }
         catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to bind holder: " + ex.message, Logger.Lvl.WARNING)
             Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -136,6 +140,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
         }
         catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to get number of pages: " + ex.message, Logger.Lvl.WARNING)
             Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
             count = 0
         }

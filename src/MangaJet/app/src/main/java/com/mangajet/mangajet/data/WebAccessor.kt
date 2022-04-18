@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.log.Logger
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -89,6 +90,7 @@ object WebAccessor {
                             str = response.body!!.string()
                         }
                         catch (expected: NullPointerException) {
+                            Logger.log("Null Pointer exception in getTextSync", Logger.Lvl.WARNING)
                             isError = BODY_NULL_ERROR
                             retCode = NOT_FOUND
                         }
@@ -148,6 +150,7 @@ object WebAccessor {
                             }
                         }
                         catch (expected: NullPointerException) {
+                            Logger.log("Null Pointer exception in Promise in WebAccessor", Logger.Lvl.WARNING)
                             isError = BODY_NULL_ERROR
                             retCode = NOT_FOUND
                         }

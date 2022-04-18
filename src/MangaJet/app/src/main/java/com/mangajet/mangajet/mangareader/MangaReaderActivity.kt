@@ -91,6 +91,7 @@ class MangaReaderActivity : AppCompatActivity() {
         viewPager.setCurrentItem(mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage + delta, false)
+        Logger.log("Chapter " + (mangaReaderViewModel.manga.lastViewedChapter + 1).toString() + " opened")
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             // Function which will load previous chapter after scroll
@@ -98,15 +99,15 @@ class MangaReaderActivity : AppCompatActivity() {
                 Logger.log("To previous chapter")
                 // update chapter
                 mangaReaderViewModel.manga.lastViewedChapter--
+                Logger.log("Chapter " + (mangaReaderViewModel.manga.lastViewedChapter + 1).toString() + " opened")
 
                 // update pages count (and load chapter)
                 try {
-                    Logger.log("Try update pages count")
                     mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
                         .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
                 }
                 catch (ex:MangaJetException) {
-                    Logger.log("Catch MJE exception while updating pages count", Logger.Lvl.WARNING)
+                    Logger.log("Catch MJE exception while updating pages count: " + ex.message, Logger.Lvl.WARNING)
                     Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
                     viewPager.setCurrentItem(1, false)
                     mangaReaderViewModel.manga.lastViewedChapter++
@@ -115,7 +116,6 @@ class MangaReaderActivity : AppCompatActivity() {
 
                 // start loading all pages
                 val job = GlobalScope.launch(Dispatchers.IO) {
-                    Logger.log("Start loading pages of chapter")
                     mangaReaderViewModel.uploadPages()
                 }
 
@@ -126,11 +126,10 @@ class MangaReaderActivity : AppCompatActivity() {
 
                 // save manga state
                 try {
-                    Logger.log("Try to save manga state")
                     mangaReaderViewModel.manga.saveToFile()
                 }
                 catch (ex : MangaJetException) {
-                    Logger.log("Catch MJE exception while trying to save to json", Logger.Lvl.WARNING)
+                    Logger.log("Catch MJE exception while trying to save to json: " + ex.message, Logger.Lvl.WARNING)
                     Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -159,15 +158,15 @@ class MangaReaderActivity : AppCompatActivity() {
                 Logger.log("To next chapter")
                 // update chapter
                 mangaReaderViewModel.manga.lastViewedChapter++;
+                Logger.log("Chapter " + (mangaReaderViewModel.manga.lastViewedChapter + 1).toString() + " opened")
 
                 // update pages count (and load chapter)
                 try {
-                    Logger.log("Try update pages count")
                     mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
                         .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
                 }
                 catch (ex:MangaJetException) {
-                    Logger.log("Catch MJE exception while updating pages count", Logger.Lvl.WARNING)
+                    Logger.log("Catch MJE exception while updating pages count: " + ex.message, Logger.Lvl.WARNING)
                     Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
                     var delta = 0
                     if (mangaReaderViewModel.manga.lastViewedChapter == 0)
@@ -179,7 +178,6 @@ class MangaReaderActivity : AppCompatActivity() {
 
                 // start loading all pages
                 val job = GlobalScope.launch(Dispatchers.IO) {
-                    Logger.log("Start loading pages of chapter")
                     mangaReaderViewModel.uploadPages()
                 }
 
@@ -190,11 +188,10 @@ class MangaReaderActivity : AppCompatActivity() {
 
                 // save manga state
                 try {
-                    Logger.log("Try to save manga state")
                     mangaReaderViewModel.manga.saveToFile()
                 }
                 catch (ex : MangaJetException) {
-                    Logger.log("Catch MJE exception while trying to save to json", Logger.Lvl.WARNING)
+                    Logger.log("Catch MJE exception while trying to save to json: " + ex.message, Logger.Lvl.WARNING)
                     Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
                 }
 

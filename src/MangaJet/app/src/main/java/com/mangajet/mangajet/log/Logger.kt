@@ -17,7 +17,7 @@ object Logger {
     const val fileLogName = "log.txt"
 
     // Enum class that level of logging data
-    enum class Lvl(){
+    enum class Lvl{
         INFO(){
             override fun get() : Level = Level.INFO
               },
@@ -49,9 +49,11 @@ object Logger {
             l.useParentHandlers = false
         }
         catch (e : SecurityException){
+            log("Could connect file to logger: " + e.message, Lvl.WARNING)
             e.hashCode()// Could not open file, so log to console at least
         }
         catch (e : IOException){
+            log("Could connect file to logger: " + e.message, Lvl.WARNING)
             e.hashCode()// Could not open file, so log to console at least
         }
     }
