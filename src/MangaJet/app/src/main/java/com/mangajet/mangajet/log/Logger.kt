@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.log
 
+import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.data.StorageManager
 import java.io.File
 import java.io.IOException
@@ -56,6 +57,8 @@ object Logger {
             log("Could connect file to logger: " + e.message, Lvl.WARNING)
             e.hashCode()// Could not open file, so log to console at least
         }
+        // Info about project version
+        log(BuildConfig.BUILD_TYPE + " version: "+ BuildConfig.VERSION_NAME)
     }
 
     // Function to add info to the log
