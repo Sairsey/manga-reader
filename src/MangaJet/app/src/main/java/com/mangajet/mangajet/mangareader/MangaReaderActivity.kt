@@ -1,35 +1,40 @@
 package com.mangajet.mangajet.mangareader
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.R
-import com.mangajet.mangajet.data.MangaJetException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+
 
 // Class which represents "Manga Reader" Activity
+@Suppress("TooManyFunctions")
 class MangaReaderActivity : AppCompatActivity() {
     companion object {
         const val SINGLE_TOUCH_RAD = 100
+
+        const val TRANSLATE_MENU_UP = -200F
+        const val TRANSLATE_MENU_DOWN = 200F
+        const val ANIMATION_DURATION = 750L
+
+        const val MIDDLE_SCREEN_SQUARE_PART = 5
     }
 
     // Manga reader activity ViewModel variable
     lateinit var mangaReaderViewModel : MangaReaderViewModel
-    private val touchHandler = MangaLayoutTouchListener()
+
+    // touch down coords
+    var xTouch : Float = 0.0F
+    var yTouch : Float = 0.0F
+    var isHidden = false
 
     // Function which will set activity title by current opened page
     fun setPageTitle(
@@ -81,9 +86,16 @@ class MangaReaderActivity : AppCompatActivity() {
         viewPager.setCurrentItem(position, false)
     }
 
+    // Function which will call dialog for changing format
+    private fun callChangeFormatDialog() {
+        val myDialogFragment = ChangeMangaReaderFormatDialog(mangaReaderViewModel)
+        myDialogFragment.show(supportFragmentManager, "Change reader format dialog")
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.reloadPage -> reloadCurrentPage()
+            R.id.changeFormat -> callChangeFormatDialog()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -103,9 +115,8 @@ class MangaReaderActivity : AppCompatActivity() {
                 .chapters[mangaReaderViewModel.manga.lastViewedChapter]
                 .lastViewedPage)
 
-        val menuLayout = findViewById<ConstraintLayout>(R.id.menuLayout)
-        menuLayout.setOnTouchListener(touchHandler)
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
+        mangaReaderViewModel.mangaReaderVP2 = viewPager
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewModel)
         viewPager.adapter = pagerAdapter
 
@@ -116,126 +127,29 @@ class MangaReaderActivity : AppCompatActivity() {
 
         val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
         prevChapterButton.setOnClickListener {
-            viewPager.setCurrentItem(0, false)
+            if (!mangaReaderViewModel.isOnFirstChapter()) {
+                mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+                val startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
+                viewPager.setCurrentItem(startPage, false)
+                setPageTitle(mangaReaderViewModel,
+                    mangaReaderViewModel.manga
+                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+                        .lastViewedPage)
+            }
         }
 
         val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
         nextChapterButton.setOnClickListener {
-            var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-
-            viewPager.setCurrentItem(mangaReaderViewModel.manga
-                .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum() + delta,
-                false)
+            if (!mangaReaderViewModel.isOnLastChapter()) {
+                mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
+                setPageTitle(mangaReaderViewModel,
+                    mangaReaderViewModel.manga
+                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+                        .lastViewedPage)
+            }
         }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            // Function which will load previous chapter after scroll
-            private fun doToPrevChapter() {
-                // update chapter
-                mangaReaderViewModel.manga.lastViewedChapter--
-
-                // update pages count (and load chapter)
-                try {
-                    mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
-                        .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
-                }
-                catch (ex:MangaJetException) {
-                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
-                    viewPager.setCurrentItem(1, false)
-                    mangaReaderViewModel.manga.lastViewedChapter++
-                    return
-                }
-
-                // start loading all pages
-                val job = GlobalScope.launch(Dispatchers.IO) {
-                    mangaReaderViewModel.uploadPages()
-                }
-
-                // set correct page
-                mangaReaderViewModel.manga
-                    .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                    .lastViewedPage = mangaReaderViewModel.pagesCount - 1
-
-                // save manga state
-                try {
-                    mangaReaderViewModel.manga.saveToFile()
-                }
-                catch (ex : MangaJetException) {
-                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
-                }
-
-                // update adapter
-                while (job.isActive)
-                    println("Im busy man too")
-
-                viewPager.adapter = null
-                pagerAdapter.notifyDataSetChanged()
-                viewPager.adapter = pagerAdapter
-
-                // determine delta
-                var delta = 0
-                if (mangaReaderViewModel.manga.lastViewedChapter == 0)
-                    delta = -1
-
-                viewPager.setCurrentItem(mangaReaderViewModel.pagesCount + delta, false)
-
-                val chapter = mangaReaderViewModel.manga.lastViewedChapter + 1
-                Toast.makeText(context, "Chapter $chapter",
-                    Toast.LENGTH_SHORT).show()
-            }
-
-            // Function which will load next chapter after scroll
-            private fun doToNextChapter() {
-                // update chapter
-                mangaReaderViewModel.manga.lastViewedChapter++;
-
-                // update pages count (and load chapter)
-                try {
-                    mangaReaderViewModel.pagesCount = mangaReaderViewModel.manga
-                        .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum()
-                }
-                catch (ex:MangaJetException) {
-                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
-                    var delta = 0
-                    if (mangaReaderViewModel.manga.lastViewedChapter == 0)
-                        delta = -1
-                    viewPager.setCurrentItem(mangaReaderViewModel.pagesCount + delta, false)
-                    mangaReaderViewModel.manga.lastViewedChapter++
-                    return
-                }
-
-                // start loading all pages
-                val job = GlobalScope.launch(Dispatchers.IO) {
-                    mangaReaderViewModel.uploadPages()
-                }
-
-                // set correct page
-                mangaReaderViewModel.manga
-                    .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                    .lastViewedPage = 0
-
-                // save manga state
-                try {
-                    mangaReaderViewModel.manga.saveToFile()
-                }
-                catch (ex : MangaJetException) {
-                    Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
-                }
-
-                // update adapter
-                while (job.isActive)
-                    println("Im busy man")
-
-                viewPager.adapter = null
-                pagerAdapter.notifyDataSetChanged()
-                viewPager.adapter = pagerAdapter
-                viewPager.setCurrentItem(1, false)
-
-                val chapter = mangaReaderViewModel.manga.lastViewedChapter + 1
-                Toast.makeText(context, "Chapter $chapter",
-                    Toast.LENGTH_SHORT).show()
-            }
-
             // Function which will be tried to load prev or next chapter
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -252,20 +166,20 @@ class MangaReaderActivity : AppCompatActivity() {
                 // First chapter
                 else if (mangaReaderViewModel.isOnFirstChapter()) {
                     if (position == pagerAdapter.itemCount - 1) {
-                        doToNextChapter()
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                     }
                 }
                 // Last chapter
                 else if (mangaReaderViewModel.manga.lastViewedChapter == mangaReaderViewModel.manga.chapters.size - 1) {
                     if (position == 0)
-                        doToPrevChapter()
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
                 }
                 // Other cases
                 else {
                     if (position == 0)
-                        doToPrevChapter()
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
                     else if (position == pagerAdapter.itemCount - 1)
-                        doToNextChapter()
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 }
 
                 setPageTitle(mangaReaderViewModel,
@@ -276,4 +190,66 @@ class MangaReaderActivity : AppCompatActivity() {
         })
     }
 
+
+    private fun hideMenu() {
+        val topMenu = findViewById<MaterialToolbar>(R.id.headerToolbar)
+        val bottomMenu = findViewById<MaterialToolbar>(R.id.bottomToolbar)
+
+
+        ObjectAnimator.ofFloat(topMenu, "translationY", TRANSLATE_MENU_UP).apply {
+            duration = ANIMATION_DURATION
+            start()
+        }
+
+        ObjectAnimator.ofFloat(bottomMenu, "translationY", TRANSLATE_MENU_DOWN).apply {
+            duration = ANIMATION_DURATION
+            start()
+        }
+    }
+
+    private fun showMenu() {
+        val topMenu = findViewById<MaterialToolbar>(R.id.headerToolbar)
+        val bottomMenu = findViewById<MaterialToolbar>(R.id.bottomToolbar)
+
+        ObjectAnimator.ofFloat(topMenu, "translationY", 0F).apply {
+            duration = ANIMATION_DURATION
+            start()
+        }
+
+        ObjectAnimator.ofFloat(bottomMenu, "translationY", 0F).apply {
+            duration = ANIMATION_DURATION
+            start()
+        }
+    }
+
+    private fun isInMiddleSquare() : Boolean {
+        val width: Int = context!!.resources.displayMetrics.widthPixels
+        val height: Int = context!!.resources.displayMetrics.heightPixels
+
+        return (xTouch >= width / MIDDLE_SCREEN_SQUARE_PART
+                && xTouch <= width - width / MIDDLE_SCREEN_SQUARE_PART
+                && yTouch >= height / MIDDLE_SCREEN_SQUARE_PART
+                && yTouch <= height - height / MIDDLE_SCREEN_SQUARE_PART)
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                xTouch = event.x
+                yTouch = event.y
+            }
+            MotionEvent.ACTION_UP -> {
+                if ((xTouch - event.x) * (xTouch - event.x)
+                    + (yTouch - event.y) * (yTouch - event.y) < SINGLE_TOUCH_RAD
+                    && isInMiddleSquare()) {
+                    if (isHidden)
+                        showMenu()
+                    else
+                        hideMenu()
+                    isHidden = !isHidden
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event)
+    }
 }

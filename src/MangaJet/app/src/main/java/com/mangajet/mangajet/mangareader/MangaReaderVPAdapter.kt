@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.mangareader
 
+import android.graphics.PointF
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,14 +10,15 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
 
 
 class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
@@ -45,8 +47,16 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                 currentViewModelWithData.jobs[position]?.ensureActive()
                 withContext(Dispatchers.Main) {
-                    if (pageFile != null)
+                    if (pageFile != null) {
                         imagePage.setImage(ImageSource.bitmap(pageFile))
+                        //if (currentViewModelWithData.currentReaderFormat ==
+                        //    MangaReaderViewModel.READER_FORMAT_MANHWA) {
+                        //    val width: Int = context!!.resources.displayMetrics.widthPixels
+                        //    val height: Int = context!!.resources.displayMetrics.heightPixels
+                        //    val center = PointF((width / 2).toFloat(), (height / 2).toFloat())
+                        //    imagePage.setScaleAndCenter((imagePage.width/width).toFloat(), center)
+                        //}
+                    }
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
             }

@@ -6,78 +6,66 @@
     android:layout_height="match_parent"
     tools:context=".mangareader.MangaReaderActivity">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/menuLayout"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:translationZ="90dp"
+        android:background="?attr/android:navigationBarColor"
+        android:minHeight="?attr/actionBarSize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:titleTextColor="?attr/android:textColorPrimary">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/bottomToolbar"
-            android:layout_width="match_parent"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/android:navigationBarColor"
-            android:minHeight="?attr/actionBarSize"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:titleTextColor="?attr/android:textColorPrimary">
+            android:layout_gravity="center">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <ImageButton
+                android:id="@+id/prevChapter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
-                
-                <ImageButton
-                    android:id="@+id/prevChapter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_previous"
-                    android:background="?attr/android:navigationBarColor"
-                    app:tint="?attr/android:textColorPrimary"
-                    />
+                android:src="@drawable/ic_previous"
+                android:background="?attr/android:navigationBarColor"
+                app:tint="?attr/android:textColorPrimary"
+                />
 
-                <TextView
-                    android:id="@+id/currentPageText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
+            <TextView
+                android:id="@+id/currentPageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
 
-                <ImageButton
-                    android:id="@+id/nextChapter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_next"
-                    android:background="?attr/android:navigationBarColor"
-                    app:tint="?attr/android:textColorPrimary"/>
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            <ImageButton
+                android:id="@+id/nextChapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_next"
+                android:background="?attr/android:navigationBarColor"
+                app:tint="?attr/android:textColorPrimary"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.appbar.MaterialToolbar>
 
-        </com.google.android.material.appbar.MaterialToolbar>
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/headerToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/android:navigationBarColor"
-            android:minHeight="?attr/actionBarSize"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/manga_reader_menu"
-            app:title="@string/app_name"
-            app:titleTextColor="?attr/android:textColorPrimary" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/headerToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:translationZ="90dp"
+        android:background="?attr/android:navigationBarColor"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/manga_reader_menu"
+        app:title="@string/app_name"
+        app:titleTextColor="?attr/android:textColorPrimary" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/mangaViewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="?attr/actionBarSize"
-        android:layout_marginTop="?attr/actionBarSize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
