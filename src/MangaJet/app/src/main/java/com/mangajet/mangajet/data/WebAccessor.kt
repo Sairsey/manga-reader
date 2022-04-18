@@ -79,6 +79,7 @@ object WebAccessor {
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 isError = IO_ERROR
+                Logger.log("OnFailure response in WebAccessor: " + e.message, Logger.Lvl.WARNING)
                 println(e.message) // for debugging purposes
                 countDownLatch.countDown()
             }
@@ -134,6 +135,7 @@ object WebAccessor {
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 isError = IO_ERROR
+                Logger.log("OnFailure response in WebAccessor: " + e.message, Logger.Lvl.WARNING)
                 println(e.message) // for debugging purposes
                 countDownLatch.countDown()
             }

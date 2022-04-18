@@ -1,10 +1,9 @@
 package com.mangajet.mangajet.log
 
 import com.mangajet.mangajet.BuildConfig
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
-import java.io.File
 import java.io.IOException
-import java.util.*
 import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -14,7 +13,6 @@ import java.util.logging.SimpleFormatter
 object Logger {
     //Create logger
     private var l = Logger.getLogger(javaClass.toString())
-    const val fileLogPath = "/LogFiles"
     const val fileLogName = "log.txt"
 
     // Enum class that level of logging data
@@ -35,19 +33,20 @@ object Logger {
 
     init{
         try {
-            val path = StorageManager.storageDirectory + fileLogPath + "/"
-            val myDir = File(path)
-            if(!myDir.exists())
-                myDir.mkdirs()
-            val file = File(myDir, fileLogName)
-            if(file.exists())
-                file.delete()
-            else
-                file.createNewFile()
-            var fh = FileHandler(path + fileLogName)
+
+            if(StorageManager.isExist(fileLogName, StorageManager.FileType.LibraryInfo))
+               StorageManager.getFile(fileLogName, StorageManager.FileType.LibraryInfo).delete()
+            StorageManager.saveString(fileLogName, "", StorageManager.FileType.LibraryInfo)
+            val file = StorageManager.getFile(fileLogName, StorageManager.FileType.LibraryInfo)
+
+            var fh = FileHandler(file.absolutePath)
             l.addHandler(fh)
             fh.formatter = SimpleFormatter()
             l.useParentHandlers = false
+        }
+        catch (e : MangaJetException){
+            log("Could connect file to logger: " + e.message, Lvl.WARNING)
+            e.hashCode()// Could not open file, so log to console at least
         }
         catch (e : SecurityException){
             log("Could connect file to logger: " + e.message, Lvl.WARNING)

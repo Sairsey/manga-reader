@@ -1,17 +1,12 @@
 package com.mangajet.mangajet
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.CheckBox
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -21,7 +16,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
@@ -50,7 +44,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         if (!StorageManager.readPermission || !StorageManager.writePermission)
         {
-            Logger.log("Ask user to set permissions dialog opened")
             val builder = AlertDialog.Builder(this)
             builder
                 .setTitle("Error")
@@ -97,7 +90,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             permissionsToAsk.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (permissionsToAsk.size != 0) {
-            Logger.log("Ask permission")
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
         }
     }
@@ -112,14 +104,16 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Set logger and UEH
-        Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
-        checkForCrash(UncaughtExceptionHandler().getCrashReport())
-        Logger.log("Logger initialized")
+
 
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
+
+        // Set logger and UEH
+        Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
+        checkForCrash(UncaughtExceptionHandler().getCrashReport())
+        Logger.log("Logger initialized")
 
         // on start it is good idea to load all cookies and Authentication from Librarian
         try {
@@ -155,25 +149,15 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     }
 
     // Functions that checks report for crash => sends it to email
-    // Functions that checks report for crash => sends it to email
     private fun checkForCrash(report : String){
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        if(report.isEmpty() || preferences.getBoolean("CrashNeverAskAgain", false))
+        if(report.isEmpty())
             return
-        val dialogMsg = "App crashed. Can you send info about it?"
-
-        var checkBoxText = arrayOf("Never ask gain")
-        var wasPressed = false
         val email = "mangajetmailbot@gmail.com"
 
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(dialogMsg)
-            .setMultiChoiceItems(checkBoxText, null) {
-                    dialog, which, isChecked ->
-                println(isChecked)
-                wasPressed = isChecked
-            }
+        builder.setTitle("Ooopsie..")
+            .setMessage("App crashed. Can you send info about it via email?")
             .setPositiveButton("Send") {
                     dialog, id ->
                 val sendIntent = Intent(Intent.ACTION_SEND)
@@ -186,11 +170,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             }
             .setNegativeButton("Cancel") {
                     dialog, _ ->
-                if (wasPressed) {
-                    val editor = preferences.edit()
-                    editor.putBoolean("CrashNeverAskAgain", true)
-                    editor.apply()
-                }
                 dialog.cancel()
             }
         val alert = builder.create()

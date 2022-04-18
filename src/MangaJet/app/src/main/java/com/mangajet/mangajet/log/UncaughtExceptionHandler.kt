@@ -1,10 +1,8 @@
 package com.mangajet.mangajet.log
 
-import android.content.Intent
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
-import java.io.File
 import java.io.IOException
-import java.io.FileNotFoundException
 import java.io.BufferedReader
 import java.io.FileReader
 
@@ -35,18 +33,11 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
 
         // Create flag app
         try {
-            val path = StorageManager.storageDirectory + Logger.fileLogPath + "/"
-            val myDir = File(path)
-            if(!myDir.exists())
-                myDir.mkdirs()
-            val file = File(myDir, stackTraceFileName)
-            if(file.exists())
-                file.delete()
-            else
-                file.createNewFile()
+            if(!StorageManager.isExist(stackTraceFileName, StorageManager.FileType.LibraryInfo))
+                StorageManager.saveString(stackTraceFileName, "", StorageManager.FileType.LibraryInfo)
         }
-        catch (ex : IOException){
-            ex.hashCode()// It is okay if couldn't create
+        catch (ex : MangaJetException){
+            // It is okay if couldn't create
         }
 
         // Kill the app
@@ -58,11 +49,13 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
     fun getCrashReport() : String {
         var trace : String = ""
         // Add log and stack trace to mail
-        val path = StorageManager.storageDirectory + Logger.fileLogPath + "/"
         try{
-            if (!File( path, stackTraceFileName).exists())
+            if (!StorageManager.isExist(stackTraceFileName, StorageManager.FileType.LibraryInfo))
                 return ""
-            val reader = BufferedReader(FileReader(File(path, Logger.fileLogName)))
+            else
+                StorageManager.getFile(stackTraceFileName, StorageManager.FileType.LibraryInfo).delete()
+            var file = StorageManager.getFile(Logger.fileLogName, StorageManager.FileType.LibraryInfo)
+            val reader = BufferedReader(FileReader(file))
             var line = reader.readLine()
             while(line != null){
                 trace += line + "\n"
@@ -73,14 +66,10 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
             e.hashCode()
             // If couldn't read or open file => let it go
         }
-        catch (e : FileNotFoundException){
-            e.hashCode()
+        catch (e : MangaJetException){
             // If couldn't read or open file => let it go
         }
 
-        val file = File(path,stackTraceFileName)
-        if (file.exists())
-            file.delete()
         return trace
     }
 }
