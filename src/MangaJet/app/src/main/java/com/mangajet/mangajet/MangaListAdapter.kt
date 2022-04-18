@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ class MangaListAdapter(
     // Function which will decode bitmap async
     private fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
+            Logger.log("Start loading" + page.url)
             i.hashCode()
             try {
                 page.upload(i > 0)
@@ -56,15 +58,18 @@ class MangaListAdapter(
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
                 // we do not need to catch exceptions here
+                Logger.log("Catch MJE exception in loadBitmap", Logger.Lvl.WARNING)
                 continue
             }
         }
         // maybe throw exception or reload?
+        Logger.log("Return null in loadBitMap", Logger.Lvl.WARNING)
         return null
     }
 
     // Function which will fill every list element
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        Logger.log("Begin to fill MangaListAdapter")
         var v: View? = convertView
         if (v == null) {
             val vi: LayoutInflater
@@ -107,6 +112,7 @@ class MangaListAdapter(
                 author?.text = "Creative work from Web"
 
             source?.text = "Source: " + p.source
+            Logger.log("Filled " + p.title + " in Manga List Adapter")
         }
         return v!!
     }

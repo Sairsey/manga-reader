@@ -20,6 +20,8 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
+import com.mangajet.mangajet.log.Logger
+import com.mangajet.mangajet.log.UncaughtExceptionHandler
 import kotlin.system.exitProcess
 
 
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         if (!StorageManager.readPermission || !StorageManager.writePermission)
         {
+            Logger.log("Dialog to ask set permission in settings started")
             val builder = AlertDialog.Builder(this)
             builder
                 .setTitle("Error")
@@ -75,6 +78,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
     // Function which will handle updating StorageManager permissions
     private fun handleStoragePermissions() {
+        Logger.log("Check permission")
         StorageManager.writePermission =
             checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         StorageManager.readPermission =
@@ -86,8 +90,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if (!StorageManager.writePermission)
             permissionsToAsk.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        if (permissionsToAsk.size != 0)
+        if (permissionsToAsk.size != 0) {
+            Logger.log("Ask permission")
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
+        }
     }
 
     override fun onRestart() {
@@ -100,6 +106,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Set logger and UEH
+        Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
+        Logger.log("Logger initialized")
+
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
@@ -110,6 +120,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                 StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
         }
         catch (ex: MangaJetException) {
+            Logger.log("Could not set libraries json", Logger.Lvl.WARNING)
             // in this case we can just skip, because if file not found it isnt a big deal.
         }
 

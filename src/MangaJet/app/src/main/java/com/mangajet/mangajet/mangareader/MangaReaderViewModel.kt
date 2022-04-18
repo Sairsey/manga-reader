@@ -8,6 +8,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 
 
@@ -58,19 +59,24 @@ class MangaReaderViewModel : ViewModel() {
 
             // Load manga and basic info about it
             manga = MangaJetApp.currentManga!!
+            Logger.log("Start initMangaData() with " + manga.id)
             try {
+                Logger.log("Try to get pages count")
                 pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to get pages count", Logger.Lvl.WARNING)
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
             }
             uploadPages()
 
             // And save its state to File
             try {
+                Logger.log("Try to save manga as json")
                 manga.saveToFile()
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to save manga as json", Logger.Lvl.WARNING)
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
             }
         }
