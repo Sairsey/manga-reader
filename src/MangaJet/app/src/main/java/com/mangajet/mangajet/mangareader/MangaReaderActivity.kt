@@ -3,12 +3,17 @@ package com.mangajet.mangajet.mangareader
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
@@ -18,8 +23,13 @@ import kotlinx.coroutines.launch
 
 // Class which represents "Manga Reader" Activity
 class MangaReaderActivity : AppCompatActivity() {
+    companion object {
+        const val SINGLE_TOUCH_RAD = 100
+    }
+
     // Manga reader activity ViewModel variable
     lateinit var mangaReaderViewModel : MangaReaderViewModel
+    private val touchHandler = MangaLayoutTouchListener()
 
     // Function which will set activity title by current opened page
     fun setPageTitle(
@@ -29,7 +39,18 @@ class MangaReaderActivity : AppCompatActivity() {
         val page = position + 1
         val chapter = mangaReaderViewModel.manga.lastViewedChapter + 1
         val totalPages = mangaReaderViewModel.pagesCount
-        supportActionBar?.title = "Chapter $chapter, page $page/$totalPages"
+
+        val navTextView = findViewById<TextView>(R.id.currentPageText)
+        navTextView.text = "Chapter $chapter, page $page/$totalPages"
+    }
+
+    fun setTitle () {
+        var title = if (mangaReaderViewModel.manga.originalName != ""
+            && mangaReaderViewModel.manga.originalName != null)
+            mangaReaderViewModel.manga.originalName
+        else
+            mangaReaderViewModel.manga.russianName
+        supportActionBar?.title = title
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -71,16 +92,19 @@ class MangaReaderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.manga_reader_activity)
 
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.mangaReaderToolbar))
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
 
         mangaReaderViewModel = ViewModelProvider(this).get(MangaReaderViewModel::class.java)
 
         mangaReaderViewModel.initMangaData()
+        setTitle()
         setPageTitle(mangaReaderViewModel,
             mangaReaderViewModel.manga
                 .chapters[mangaReaderViewModel.manga.lastViewedChapter]
                 .lastViewedPage)
 
+        val menuLayout = findViewById<ConstraintLayout>(R.id.menuLayout)
+        menuLayout.setOnTouchListener(touchHandler)
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewModel)
         viewPager.adapter = pagerAdapter
@@ -89,6 +113,20 @@ class MangaReaderActivity : AppCompatActivity() {
         viewPager.setCurrentItem(mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage + delta, false)
+
+        val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
+        prevChapterButton.setOnClickListener {
+            viewPager.setCurrentItem(0, false)
+        }
+
+        val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
+        nextChapterButton.setOnClickListener {
+            var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
+
+            viewPager.setCurrentItem(mangaReaderViewModel.manga
+                .chapters[mangaReaderViewModel.manga.lastViewedChapter].getPagesNum() + delta,
+                false)
+        }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             // Function which will load previous chapter after scroll
@@ -237,4 +275,5 @@ class MangaReaderActivity : AppCompatActivity() {
             }
         })
     }
+
 }
