@@ -10,10 +10,12 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.authorization.AuthorizationActivity
 import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.log.Logger
 
 // Authorization in different manga libraries Activity class
 class MangaAuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        Logger.log("Authorization in Settings opened")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manga_authorization)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationToolbar))

@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.log.Logger
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -32,6 +33,7 @@ class Manga {
             isExist = StorageManager.isExist(path, StorageManager.FileType.MangaInfo)
         }
         catch (ex : MangaJetException) {
+            Logger.log("Can't check if manga exist, because no permission granted:" + ex.message, Logger.Lvl.WARNING)
             // user didn`t gave permission to us. Very bad.
         }
 
@@ -42,6 +44,7 @@ class Manga {
                 fromJSON(json)
             }
             catch (ex : MangaJetException){
+                Logger.log("Could not create manga " + id + " from JSON" + ex.message, Logger.Lvl.WARNING)
                 // nothing too tragic. Just forget about it
             }
         }
@@ -78,6 +81,7 @@ class Manga {
             )!!
         }
         catch (expected: NullPointerException) {
+            Logger.log("Unknown library: " + expected.message, Logger.Lvl.WARNING)
             throw MangaJetException("Unknown library")
         }
         this.lastViewedChapter = json.optInt("lastViewedChapter", 0)

@@ -20,6 +20,7 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,7 @@ class MangaChaptersFragment : Fragment() {
                         Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
                     }
                     catch (ex: MangaJetException){
+                        Logger.log("Catch MJE while filling mangaChapterFragment: " + ex.message)
                         Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
                     }
                 }

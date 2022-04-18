@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.ViewGroup
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -20,6 +21,8 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
+import com.mangajet.mangajet.log.Logger
+import com.mangajet.mangajet.log.UncaughtExceptionHandler
 import kotlin.system.exitProcess
 
 
@@ -86,8 +89,9 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if (!StorageManager.writePermission)
             permissionsToAsk.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        if (permissionsToAsk.size != 0)
+        if (permissionsToAsk.size != 0) {
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
+        }
     }
 
     override fun onRestart() {
@@ -100,9 +104,16 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
+
+        // Set logger and UEH
+        Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
+        checkForCrash(UncaughtExceptionHandler().getCrashReport())
+        Logger.log("Logger initialized")
 
         // on start it is good idea to load all cookies and Authentication from Librarian
         try {
@@ -110,6 +121,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                 StorageManager.loadString(Librarian.path, StorageManager.FileType.LibraryInfo))
         }
         catch (ex: MangaJetException) {
+            Logger.log("Could not set libraries json: " + ex.message, Logger.Lvl.WARNING)
             // in this case we can just skip, because if file not found it isnt a big deal.
         }
 
@@ -134,5 +146,35 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    // Functions that checks report for crash => sends it to email
+    private fun checkForCrash(report : String){
+
+        if(report.isEmpty())
+            return
+        val email = "mangajetmailbot@gmail.com"
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Ooopsie..")
+            .setMessage("App crashed. Can you send info about it via email?")
+            .setPositiveButton("Send") {
+                    dialog, id ->
+                val sendIntent = Intent(Intent.ACTION_SEND)
+                val subject = "Error report"
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                sendIntent.putExtra(Intent.EXTRA_TEXT, report)
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+                sendIntent.type = "message/rfc822"
+                this.startActivity(Intent.createChooser(sendIntent, "Title:"))
+            }
+            .setNegativeButton("Cancel") {
+                    dialog, _ ->
+                dialog.cancel()
+            }
+        val alert = builder.create()
+        alert.show()
+        alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        
     }
 }

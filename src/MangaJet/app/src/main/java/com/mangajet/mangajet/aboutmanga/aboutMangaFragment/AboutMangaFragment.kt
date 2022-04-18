@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
@@ -53,14 +55,17 @@ class AboutMangaFragment : Fragment() {
             val imageFile = cover.getFile() // Catch ex here
             BitmapFactory.decodeFile(imageFile.absolutePath)
         } catch (ex: MangaJetException) {
+            Logger.log("Catch MJE while decoding bitmap of " + cover.url + " : "
+                    + ex.message, Logger.Lvl.WARNING)
             null
         }
     }
 
     override fun onStart() {
         super.onStart()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        Logger.log("About " + aboutMangaViewmodel.manga.id + " fragment opened")
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())
         // this can only fail if we do not have storage permission
