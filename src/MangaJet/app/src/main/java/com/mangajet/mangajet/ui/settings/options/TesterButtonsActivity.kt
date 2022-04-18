@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
+import java.lang.NullPointerException
 
 // Activity with some buttons which will be avaliable only in develop build
 class TesterButtonsActivity : AppCompatActivity() {
@@ -15,13 +16,15 @@ class TesterButtonsActivity : AppCompatActivity() {
         const val GEN_SMALL_HISTORY = 0; // Button on generating small history
         const val GEN_BIG_HISTORY = 1;   // Button on generating big history
         const val GEN_HUGE_HISTORY = 2;  // Button on generating very big history
+        const val CRASH_APP = 3;         // Button on crash app
     }
 
     // names of every button
     val buttonNames = listOf(
         "Generate small history",
         "Generate big history",
-        "Generate fucking huge history")
+        "Generate fucking huge history",
+        "Crash app")
 
     // Function for generating history based on search words
     private fun genHistory(words : ArrayList<String>) {
@@ -37,6 +40,12 @@ class TesterButtonsActivity : AppCompatActivity() {
             }
         }
         Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
+    }
+
+    // Function for crashing app
+    // Maybe I came up with something more interesting later
+    private fun crashApp() {
+        throw NullPointerException("BOOOOOOOOOOOOOOOOOOM!")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +76,7 @@ class TesterButtonsActivity : AppCompatActivity() {
                     "Переро",
                     "Блич",
                     "Человек"))
+                CRASH_APP -> crashApp()
             }
         }
 
