@@ -64,4 +64,12 @@ class MangaChapter {
     public fun getJSON() : String {
         return JSONArray(pagesURLs).toString()
     }
+
+    // Delete chapter from localStorage
+    // MAY THROW MangaJetException
+    fun delete() {
+        for (i in 0 until pagesNumber) {
+            MangaPage(pagesURLs[i], manga.library.getHeadersForDownload()).removeFileIfExist()
+        }
+    }
 }
