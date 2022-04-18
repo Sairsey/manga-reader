@@ -34,6 +34,7 @@ class MangaReaderViewModel : ViewModel() {
 
     // data for mangaReader format
     var currentReaderFormat = READER_FORMAT_BOOK
+    var wasReaderFormat  = READER_FORMAT_BOOK
     lateinit var mangaReaderVP2 : ViewPager2
 
     /**
@@ -88,7 +89,7 @@ class MangaReaderViewModel : ViewModel() {
     }
 
     // Function which will upload pages
-    fun uploadPages() {
+    private fun uploadPages() {
         for (job in jobs)
             if (job != null && job.isActive)
                 job.cancel()
@@ -120,12 +121,41 @@ class MangaReaderViewModel : ViewModel() {
     }
 
     fun redrawMangaReader() {
+        // change orientation
         if (currentReaderFormat == READER_FORMAT_MANHWA) {
             mangaReaderVP2.orientation = ViewPager2.ORIENTATION_VERTICAL
         }
         else
             mangaReaderVP2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        // change viewpager position
+        if (currentReaderFormat == READER_FORMAT_MANGA &&
+            wasReaderFormat != READER_FORMAT_MANGA) {
+            val pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
+            val delta = if (isSingleChapterManga() || isOnLastChapter())
+                0
+            else
+                1
+
+            mangaReaderVP2.setCurrentItem(
+                (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex,
+                false)
+        }
+        else if (currentReaderFormat != READER_FORMAT_MANGA &&
+            wasReaderFormat == READER_FORMAT_MANGA) {
+            val pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
+            val delta = if (isSingleChapterManga() || isOnLastChapter())
+                0
+            else
+                -1
+
+            mangaReaderVP2.setCurrentItem(
+                (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex - delta,
+                false)
+        }
+
         mangaReaderVP2.refreshDrawableState()
+        wasReaderFormat = currentReaderFormat
     }
 
     // Function which will load previous chapter after scroll
@@ -174,7 +204,10 @@ class MangaReaderViewModel : ViewModel() {
         if (manga.lastViewedChapter == 0)
             delta = -1
 
-        viewPager.setCurrentItem(pagesCount + delta, false)
+        if (currentReaderFormat != READER_FORMAT_MANGA)
+            viewPager.setCurrentItem(pagesCount + delta, false)
+        else
+            viewPager.setCurrentItem(1, false)
 
         val chapter = manga.lastViewedChapter + 1
         Toast.makeText(
@@ -226,7 +259,16 @@ class MangaReaderViewModel : ViewModel() {
         viewPager.adapter = null
         pagerAdapter.notifyDataSetChanged()
         viewPager.adapter = pagerAdapter
-        viewPager.setCurrentItem(1, false)
+        if (currentReaderFormat != READER_FORMAT_MANGA)
+            viewPager.setCurrentItem(1, false)
+        else {
+            // determine delta
+            var delta = 0
+            if (manga.lastViewedChapter == manga.chapters.size - 1)
+                delta = -1
+
+            viewPager.setCurrentItem(pagesCount + delta, false)
+        }
 
         val chapter = manga.lastViewedChapter + 1
         Toast.makeText(

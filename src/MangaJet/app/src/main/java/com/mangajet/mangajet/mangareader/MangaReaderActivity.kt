@@ -165,20 +165,35 @@ class MangaReaderActivity : AppCompatActivity() {
                 }
                 // First chapter
                 else if (mangaReaderViewModel.isOnFirstChapter()) {
-                    if (position == pagerAdapter.itemCount - 1) {
+                    if (position == pagerAdapter.itemCount - 1
+                        && mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
                         mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-                    }
+                    else if (position == 0
+                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 }
                 // Last chapter
                 else if (mangaReaderViewModel.manga.lastViewedChapter == mangaReaderViewModel.manga.chapters.size - 1) {
-                    if (position == 0)
+                    if (position == 0 && mangaReaderViewModel.currentReaderFormat
+                        != MangaReaderViewModel.READER_FORMAT_MANGA)
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+                    else if (position == pagerAdapter.itemCount - 1
+                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
                         mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
                 }
                 // Other cases
                 else {
-                    if (position == 0)
+                    if (position == 0 && mangaReaderViewModel.currentReaderFormat
+                        != MangaReaderViewModel.READER_FORMAT_MANGA)
                         mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-                    else if (position == pagerAdapter.itemCount - 1)
+                    else if (position == pagerAdapter.itemCount - 1
+                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+                    else if (position == pagerAdapter.itemCount - 1
+                        && mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
+                    else if (position == 0
+                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
                         mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 }
 

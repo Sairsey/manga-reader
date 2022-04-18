@@ -49,13 +49,6 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 withContext(Dispatchers.Main) {
                     if (pageFile != null) {
                         imagePage.setImage(ImageSource.bitmap(pageFile))
-                        //if (currentViewModelWithData.currentReaderFormat ==
-                        //    MangaReaderViewModel.READER_FORMAT_MANHWA) {
-                        //    val width: Int = context!!.resources.displayMetrics.widthPixels
-                        //    val height: Int = context!!.resources.displayMetrics.heightPixels
-                        //    val center = PointF((width / 2).toFloat(), (height / 2).toFloat())
-                        //    imagePage.setScaleAndCenter((imagePage.width/width).toFloat(), center)
-                        //}
                     }
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
@@ -71,57 +64,170 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         )
     }
 
-    override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
+    private fun getPageIndexBookFormat(position : Int) : Int {
         var pageIndex = 0
-        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
         // SPECIAL CASES:
         // only one chapter
         if (currentViewModelWithData.isSingleChapterManga())
             pageIndex = position
 
-        // First chapter
+        // First chapter of book
         else if (currentViewModelWithData.isOnFirstChapter()) {
-            if (position == itemCount - 1) {
-                pageIndex = 0
-                chapterIndex++
-            }
+            pageIndex = if (position == itemCount - 1)
+                0
             else
-                pageIndex = position
+                position
         }
 
         // Last chapter
         else if (currentViewModelWithData.isOnLastChapter()) {
-            if (position == 0) {
-                chapterIndex--
-                pageIndex = -1
-            }
+            pageIndex = if (position == 0)
+                -1
             else
-                pageIndex = position - 1
+                position - 1
         }
 
         // Other cases
         else {
-            if (position == 0) {
-                chapterIndex--
+            if (position == 0)
                 pageIndex = -1
-            }
-            else if (position == itemCount - 1) {
+            else if (position == itemCount - 1)
                 pageIndex = 0
-                chapterIndex++
-            }
             else
                 pageIndex = position - 1
+        }
+
+        return pageIndex
+    }
+
+    private fun getPageIndexMangaFormat(position : Int) : Int {
+        var pageIndex = 0
+        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
+        val totalPages = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum()
+
+        // SPECIAL CASES:
+        // only one chapter
+        if (currentViewModelWithData.isSingleChapterManga())
+            pageIndex = totalPages - position
+
+        // First chapter of book
+        else if (currentViewModelWithData.isOnFirstChapter()) {
+            if (position == 0) {
+                pageIndex = 0
+            }
+            else
+                pageIndex = totalPages - position
+        }
+
+        // Last chapter
+        else if (currentViewModelWithData.isOnLastChapter()) {
+            if (position == itemCount - 1)
+                pageIndex = -1
+            else
+                pageIndex = totalPages - (position - 1)
+        }
+
+        // Other cases
+        else {
+            if (position == itemCount - 1)
+                pageIndex = -1
+            else if (position == 0) {
+                pageIndex = 0
+            }
+            else
+                pageIndex = (totalPages - 1) - (position - 1)
+        }
+
+        return pageIndex
+    }
+
+    private fun getChapterIndexBookFormat(position : Int) : Int {
+        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
+
+        // SPECIAL CASES:
+        // First chapter of book
+        if (currentViewModelWithData.isOnFirstChapter()) {
+            if (position == itemCount - 1)
+                chapterIndex++
+        }
+
+        // Last chapter
+        else if (currentViewModelWithData.isOnLastChapter()) {
+            if (position == 0)
+                chapterIndex--
+        }
+
+        // Other cases
+        else {
+            if (position == 0)
+                chapterIndex--
+            else if (position == itemCount - 1)
+                chapterIndex++
+        }
+
+        return chapterIndex
+    }
+
+    private fun getChapterIndexMangaFormat(position : Int) : Int {
+        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
+
+        // SPECIAL CASES:
+        // First chapter of book
+        if (currentViewModelWithData.isOnFirstChapter()) {
+            if (position == 0)
+                chapterIndex++
+        }
+
+        // Last chapter
+        else if (currentViewModelWithData.isOnLastChapter()) {
+            if (position == itemCount - 1)
+                chapterIndex--
+        }
+
+        // Other cases
+        else {
+            if (position == itemCount - 1)
+                chapterIndex--
+            else if (position == 0)
+                chapterIndex++
+        }
+
+        return chapterIndex
+    }
+
+    private fun updateSomePages(pageIndex : Int, chapterIndex : Int) : Int {
+        var newPageIndex = pageIndex
+        currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+        if (pageIndex == -1)
+        {
+            newPageIndex = if (currentViewModelWithData.currentReaderFormat !=
+                MangaReaderViewModel.READER_FORMAT_MANGA)
+                currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+            else
+                0
+        }
+        return newPageIndex
+    }
+
+    override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
+        var pageIndex : Int
+        var chapterIndex : Int
+
+        if (currentViewModelWithData.currentReaderFormat ==
+            MangaReaderViewModel.READER_FORMAT_MANGA) {
+            pageIndex = getPageIndexMangaFormat(position)
+            chapterIndex = getChapterIndexMangaFormat(position)
+        }
+        else {
+            pageIndex = getPageIndexBookFormat(position)
+            chapterIndex = getChapterIndexBookFormat(position)
         }
 
         if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
         {
             try {
-                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
-                if (pageIndex == -1)
-                {
-                    pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
-                }
+                pageIndex = updateSomePages(pageIndex, chapterIndex)
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
@@ -135,19 +241,17 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             holder.bind(mangaPage, position)
         }
         catch (ex : MangaJetException) {
-            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun getItemCount(): Int {
-        var count : Int
-        try {
-            count = currentViewModelWithData.manga
+        val count = try {
+            currentViewModelWithData.manga
                 .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
-        }
-        catch (ex : MangaJetException) {
+        } catch (ex : MangaJetException) {
             Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-            count = 0
+            0
         }
 
         // Only one chapter
