@@ -31,6 +31,10 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         const val REVERSED_PAGES_AMOUNT_SIDE_CHAPTER   = 1
         // reserved pages count for middle chapters
         const val REVERSED_PAGES_AMOUNT_MIDDLE_CHAPTER = 2
+
+        const val SKIP_LEFT_FAKE_PAGE     = 1
+        const val SKIP_RIGHT_FAKE_PAGE    = 1
+        const val SKIP_ONE_PAGE_FOR_INDEX = 1
     }
 
     // viewModel, which contains our interesting data
@@ -45,10 +49,13 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         fun bind(mangaPage : MangaPage, position : Int) {
             currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
                 val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
-                currentViewModelWithData.jobs[position]?.ensureActive()
+                ensureActive()
                 withContext(Dispatchers.Main) {
                     if (pageFile != null) {
                         imagePage.setImage(ImageSource.bitmap(pageFile))
+                        //if (currentViewModelWithData.currentReaderFormat ==
+                        //        MangaReaderViewModel.READER_FORMAT_MANHWA)
+                        //    imagePage.z = 2 * imagePage.z
                     }
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
@@ -74,7 +81,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
 
         // First chapter of book
         else if (currentViewModelWithData.isOnFirstChapter()) {
-            pageIndex = if (position == itemCount - 1)
+            pageIndex = if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 0
             else
                 position
@@ -85,17 +92,17 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
             pageIndex = if (position == 0)
                 -1
             else
-                position - 1
+                position - SKIP_LEFT_FAKE_PAGE
         }
 
         // Other cases
         else {
             if (position == 0)
                 pageIndex = -1
-            else if (position == itemCount - 1)
+            else if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 pageIndex = 0
             else
-                pageIndex = position - 1
+                pageIndex = position - SKIP_LEFT_FAKE_PAGE
         }
 
         return pageIndex
@@ -117,26 +124,29 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                 pageIndex = 0
             }
             else
-                pageIndex = totalPages - position
+                pageIndex = (totalPages - SKIP_ONE_PAGE_FOR_INDEX) -
+                        (position - SKIP_LEFT_FAKE_PAGE)
         }
 
         // Last chapter
         else if (currentViewModelWithData.isOnLastChapter()) {
-            if (position == itemCount - 1)
+            if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 pageIndex = -1
             else
-                pageIndex = totalPages - (position - 1)
+                pageIndex = (totalPages - SKIP_ONE_PAGE_FOR_INDEX) -
+                            (position)
         }
 
         // Other cases
         else {
-            if (position == itemCount - 1)
+            if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 pageIndex = -1
             else if (position == 0) {
                 pageIndex = 0
             }
             else
-                pageIndex = (totalPages - 1) - (position - 1)
+                pageIndex = (totalPages - SKIP_ONE_PAGE_FOR_INDEX) -
+                            (position - SKIP_RIGHT_FAKE_PAGE)
         }
 
         return pageIndex
@@ -148,7 +158,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         // SPECIAL CASES:
         // First chapter of book
         if (currentViewModelWithData.isOnFirstChapter()) {
-            if (position == itemCount - 1)
+            if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 chapterIndex++
         }
 
@@ -162,7 +172,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         else {
             if (position == 0)
                 chapterIndex--
-            else if (position == itemCount - 1)
+            else if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 chapterIndex++
         }
 
@@ -181,13 +191,13 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
 
         // Last chapter
         else if (currentViewModelWithData.isOnLastChapter()) {
-            if (position == itemCount - 1)
+            if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 chapterIndex--
         }
 
         // Other cases
         else {
-            if (position == itemCount - 1)
+            if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
                 chapterIndex--
             else if (position == 0)
                 chapterIndex++
@@ -201,11 +211,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
         if (pageIndex == -1)
         {
-            newPageIndex = if (currentViewModelWithData.currentReaderFormat !=
-                MangaReaderViewModel.READER_FORMAT_MANGA)
-                currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
-            else
-                0
+            newPageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
         }
         return newPageIndex
     }

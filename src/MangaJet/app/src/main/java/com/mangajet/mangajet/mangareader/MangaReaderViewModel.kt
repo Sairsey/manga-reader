@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.text.FieldPosition
 
 
 // Class which represents "Manga Reader" ViewModel
@@ -120,6 +121,14 @@ class MangaReaderViewModel : ViewModel() {
         return null
     }
 
+    private fun isChangedToManga() : Boolean {
+        return currentReaderFormat == READER_FORMAT_MANGA && wasReaderFormat != READER_FORMAT_MANGA
+    }
+
+    private fun isChangedToBook() : Boolean {
+        return currentReaderFormat != READER_FORMAT_MANGA && wasReaderFormat == READER_FORMAT_MANGA
+    }
+
     fun redrawMangaReader() {
         // change orientation
         if (currentReaderFormat == READER_FORMAT_MANHWA) {
@@ -129,25 +138,14 @@ class MangaReaderViewModel : ViewModel() {
             mangaReaderVP2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
         // change viewpager position
-        if (currentReaderFormat == READER_FORMAT_MANGA &&
-            wasReaderFormat != READER_FORMAT_MANGA) {
+        if (isChangedToManga() || isChangedToBook()) {
             val pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
-            val delta = if (isSingleChapterManga() || isOnLastChapter())
-                0
-            else
-                1
-
-            mangaReaderVP2.setCurrentItem(
-                (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex,
-                false)
-        }
-        else if (currentReaderFormat != READER_FORMAT_MANGA &&
-            wasReaderFormat == READER_FORMAT_MANGA) {
-            val pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
-            val delta = if (isSingleChapterManga() || isOnLastChapter())
-                0
-            else
-                -1
+            val delta = when {
+                isSingleChapterManga() -> 0
+                isOnFirstChapter() -> 0
+                isOnLastChapter() -> 1
+                else -> 1
+            }
 
             mangaReaderVP2.setCurrentItem(
                 (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex - delta,

@@ -150,13 +150,17 @@ class MangaReaderActivity : AppCompatActivity() {
         }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            // Function which will be tried to load prev or next chapter
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
+            private fun onPageSelectedInMangaFormat(position : Int) {
                 mangaReaderViewModel.manga
+                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+                        .lastViewedPage = mangaReaderViewModel.manga
                     .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                    .lastViewedPage = if (mangaReaderViewModel.isOnFirstChapter()) position
-                                      else position - 1
+                    .getPagesNum() - position
+                if (mangaReaderViewModel.isOnLastChapter())
+                    mangaReaderViewModel.manga
+                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+                        .lastViewedPage -= 1
+
 
                 // SPECIAL CASES
                 // only one chapter
@@ -165,37 +169,62 @@ class MangaReaderActivity : AppCompatActivity() {
                 }
                 // First chapter
                 else if (mangaReaderViewModel.isOnFirstChapter()) {
-                    if (position == pagerAdapter.itemCount - 1
-                        && mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
-                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-                    else if (position == 0
-                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                    if (position == 0)
                         mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 }
                 // Last chapter
                 else if (mangaReaderViewModel.manga.lastViewedChapter == mangaReaderViewModel.manga.chapters.size - 1) {
-                    if (position == 0 && mangaReaderViewModel.currentReaderFormat
-                        != MangaReaderViewModel.READER_FORMAT_MANGA)
-                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-                    else if (position == pagerAdapter.itemCount - 1
-                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                    if (position == pagerAdapter.itemCount - 1)
                         mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
                 }
                 // Other cases
                 else {
-                    if (position == 0 && mangaReaderViewModel.currentReaderFormat
-                        != MangaReaderViewModel.READER_FORMAT_MANGA)
+                    if (position == pagerAdapter.itemCount - 1)
                         mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-                    else if (position == pagerAdapter.itemCount - 1
-                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
-                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-                    else if (position == pagerAdapter.itemCount - 1
-                        && mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
-                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-                    else if (position == 0
-                        && mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                    else if (position == 0)
                         mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 }
+            }
+
+            private fun onPageSelectedInBookFormat(position : Int) {
+                if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
+                    mangaReaderViewModel.manga
+                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
+                        .lastViewedPage = if (mangaReaderViewModel.isOnFirstChapter()) position
+                    else position - 1
+
+                // SPECIAL CASES
+                // only one chapter
+                if (mangaReaderViewModel.isSingleChapterManga()) {
+                    // do nothing
+                }
+                // First chapter
+                else if (mangaReaderViewModel.isOnFirstChapter()) {
+                    if (position == pagerAdapter.itemCount - 1)
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
+                }
+                // Last chapter
+                else if (mangaReaderViewModel.manga.lastViewedChapter == mangaReaderViewModel.manga.chapters.size - 1) {
+                    if (position == 0)
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+                }
+                // Other cases
+                else {
+                    if (position == 0)
+                        mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+                    else if (position == pagerAdapter.itemCount - 1)
+                        mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
+                }
+            }
+
+            // Function which will be tried to load prev or next chapter
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                if (mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA)
+                    onPageSelectedInMangaFormat(position)
+                else
+                    onPageSelectedInBookFormat(position)
 
                 setPageTitle(mangaReaderViewModel,
                     mangaReaderViewModel.manga
