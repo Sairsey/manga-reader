@@ -21,11 +21,11 @@ import java.text.FieldPosition
 @Suppress("TooManyFunctions")
 class MangaReaderViewModel : ViewModel() {
     companion object {
-        const val LOAD_REPEATS = 5      // Load repeat count (if prev load failed -> repeat)
+        const val LOAD_REPEATS = 5          // Load repeat count (if prev load failed -> repeat)
 
-        const val READER_FORMAT_BOOK = 0
-        const val READER_FORMAT_MANHWA = 1
-        const val READER_FORMAT_MANGA = 2
+        const val READER_FORMAT_BOOK   = 0  // Book format reader
+        const val READER_FORMAT_MANHWA = 1  // Manhwa format reader
+        const val READER_FORMAT_MANGA  = 2  // Reverse format reader
     }
 
     // Initialize data to work
@@ -35,10 +35,10 @@ class MangaReaderViewModel : ViewModel() {
     var jobs = arrayOf<Job?>()
 
     // data for mangaReader format
-    var currentReaderFormat = READER_FORMAT_BOOK
-    var wasReaderFormat  = READER_FORMAT_BOOK
-    lateinit var mangaReaderVP2 : ViewPager2
-    lateinit var currentActivityRef : Activity
+    var currentReaderFormat = READER_FORMAT_BOOK    // current reader format
+    var wasReaderFormat  = READER_FORMAT_BOOK       // previous reader format
+    lateinit var mangaReaderVP2 : ViewPager2        // reference on ViewPager2
+    var displayWidth : Float = 0F                   // reference on Activity
 
     /**
      * Case-check functions block
@@ -123,14 +123,17 @@ class MangaReaderViewModel : ViewModel() {
         return null
     }
 
+    // Function which will return True if format changes to 'reverse' format
     private fun isChangedToManga() : Boolean {
         return currentReaderFormat == READER_FORMAT_MANGA && wasReaderFormat != READER_FORMAT_MANGA
     }
 
+    // Function which will return True if format changes from 'reverse' format to some else
     private fun isChangedToBook() : Boolean {
         return currentReaderFormat != READER_FORMAT_MANGA && wasReaderFormat == READER_FORMAT_MANGA
     }
 
+    // Function which will redraw viewPager2 with pages with correct chosen format
     fun redrawMangaReader() {
         // change orientation
         if (currentReaderFormat == READER_FORMAT_MANHWA) {
@@ -141,13 +144,23 @@ class MangaReaderViewModel : ViewModel() {
 
         // change viewpager position
         if (isChangedToManga() || isChangedToBook()) {
-            val pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
-            val delta = when {
-                isSingleChapterManga() -> 0
-                isOnFirstChapter() -> 0
-                isOnLastChapter() -> 1
-                else -> 1
+            var pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
+            var delta = if (isChangedToBook()) {
+                pageIndex = (pagesCount - 1) - pageIndex
+                when {
+                    isSingleChapterManga() -> 0
+                    isOnFirstChapter() -> 1
+                    isOnLastChapter() -> 0
+                    else -> 1
+                }
             }
+            else
+                when {
+                    isSingleChapterManga() -> 0
+                    isOnFirstChapter() -> 0
+                    isOnLastChapter() -> 1
+                    else -> 1
+                }
 
             mangaReaderVP2.setCurrentItem(
                 (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex - delta,
@@ -156,6 +169,7 @@ class MangaReaderViewModel : ViewModel() {
 
         val pagerAdapter = mangaReaderVP2.adapter
         pagerAdapter?.notifyDataSetChanged()
+        wasReaderFormat = currentReaderFormat
     }
 
     // Function which will load previous chapter after scroll

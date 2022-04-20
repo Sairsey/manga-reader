@@ -2,6 +2,7 @@ package com.mangajet.mangajet.mangareader
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -18,37 +19,26 @@ import com.mangajet.mangajet.R
 // Class which represents "Manga Reader" Activity
 @Suppress("TooManyFunctions")
 class MangaReaderActivity : AppCompatActivity() {
-    companion object {
-        const val SINGLE_TOUCH_RAD = 100
-
-        const val TRANSLATE_MENU_UP = -200F
-        const val TRANSLATE_MENU_DOWN = 200F
-        const val ANIMATION_DURATION = 750L
-
-        const val MIDDLE_SCREEN_SQUARE_PART = 5
-    }
-
     // Manga reader activity ViewModel variable
     lateinit var mangaReaderViewModel : MangaReaderViewModel
-
-    // touch down coords
-    var xTouch : Float = 0.0F
-    var yTouch : Float = 0.0F
-    var isHidden = false
+    // handler, which will provide behavior with toolbars
+    lateinit var toolbarHandler : MangaReaderToolbarHandler
+    // handler, which will provide behavior with menu on toolbars
+    lateinit var menuHandler : MangaReaderMenuHandler
 
     // Function which will set activity title by current opened page
-    fun setPageTitle(
-        mangaReaderViewModel : MangaReaderViewModel,
-        position: Int
-    ) {
-        val page = position + 1
-        val chapter = mangaReaderViewModel.manga.lastViewedChapter + 1
+    fun setPageTitle() {
+        var chapter = mangaReaderViewModel.manga.lastViewedChapter
+        val page = mangaReaderViewModel.manga.chapters[chapter].lastViewedPage + 1
         val totalPages = mangaReaderViewModel.pagesCount
-
         val navTextView = findViewById<TextView>(R.id.currentPageText)
+
+        // increase for correct output
+        chapter++
         navTextView.text = "Chapter $chapter, page $page/$totalPages"
     }
 
+    // Function which will set title in Action bar
     fun setTitle () {
         var title = if (mangaReaderViewModel.manga.originalName != ""
             && mangaReaderViewModel.manga.originalName != null)
@@ -58,44 +48,22 @@ class MangaReaderActivity : AppCompatActivity() {
         supportActionBar?.title = title
     }
 
+    // Function which will get display width in pixels
+    private fun getScreenWidth(): Float {
+        val metrics = DisplayMetrics()
+        this.windowManager.defaultDisplay.getMetrics(metrics)
+        return metrics.widthPixels.toFloat()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.manga_reader_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    // Function which will brute forced reload page
-    private fun reloadCurrentPage() {
-        val chapter = mangaReaderViewModel.manga
-            .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-        // at this point we already downloaded whole chapter so no need to worry about exception
-        val page = chapter.getPage(chapter.lastViewedPage)
-
-        // this can only fail if we do not have storage permission
-        // We have blocking dialog in this case, so it someone still
-        // manges to go here, I think we should crash
-        page.upload(true)
-
-        val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
-        var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-        var position = chapter.lastViewedPage + delta
-
-        val pagerAdapter = viewPager.adapter
-        viewPager.adapter = null
-        pagerAdapter?.notifyDataSetChanged()
-        viewPager.adapter = pagerAdapter
-        viewPager.setCurrentItem(position, false)
-    }
-
-    // Function which will call dialog for changing format
-    private fun callChangeFormatDialog() {
-        val myDialogFragment = ChangeMangaReaderFormatDialog(mangaReaderViewModel)
-        myDialogFragment.show(supportFragmentManager, "Change reader format dialog")
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.reloadPage -> reloadCurrentPage()
-            R.id.changeFormat -> callChangeFormatDialog()
+            R.id.reloadPage -> menuHandler.reloadCurrentPage()
+            R.id.changeFormat -> menuHandler.callChangeFormatDialog()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -106,20 +74,27 @@ class MangaReaderActivity : AppCompatActivity() {
 
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
 
+        // init viewmodel and some params
         mangaReaderViewModel = ViewModelProvider(this).get(MangaReaderViewModel::class.java)
-
+        mangaReaderViewModel.displayWidth = getScreenWidth()
         mangaReaderViewModel.initMangaData()
         setTitle()
-        setPageTitle(mangaReaderViewModel,
-            mangaReaderViewModel.manga
-                .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                .lastViewedPage)
+        setPageTitle()
 
+        // init toolbar handler
+        val headerToolbar = findViewById<MaterialToolbar>(R.id.headerToolbar)
+        val bottomToolbar = findViewById<MaterialToolbar>(R.id.bottomToolbar)
+        toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
+
+        // init viewpager
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
         mangaReaderViewModel.mangaReaderVP2 = viewPager
-        mangaReaderViewModel.currentActivityRef = this
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewModel)
         viewPager.adapter = pagerAdapter
+
+        // init menu handler
+        menuHandler = MangaReaderMenuHandler(mangaReaderViewModel, viewPager,
+            supportFragmentManager)
 
         var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
         viewPager.setCurrentItem(mangaReaderViewModel.manga
@@ -132,10 +107,7 @@ class MangaReaderActivity : AppCompatActivity() {
                 mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
                 val startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
                 viewPager.setCurrentItem(startPage, false)
-                setPageTitle(mangaReaderViewModel,
-                    mangaReaderViewModel.manga
-                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                        .lastViewedPage)
+                setPageTitle()
             }
         }
 
@@ -143,10 +115,7 @@ class MangaReaderActivity : AppCompatActivity() {
         nextChapterButton.setOnClickListener {
             if (!mangaReaderViewModel.isOnLastChapter()) {
                 mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-                setPageTitle(mangaReaderViewModel,
-                    mangaReaderViewModel.manga
-                        .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                        .lastViewedPage)
+                setPageTitle()
             }
         }
 
@@ -188,8 +157,7 @@ class MangaReaderActivity : AppCompatActivity() {
             }
 
             private fun onPageSelectedInBookFormat(position : Int) {
-                if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA)
-                    mangaReaderViewModel.manga
+                mangaReaderViewModel.manga
                         .chapters[mangaReaderViewModel.manga.lastViewedChapter]
                         .lastViewedPage = if (mangaReaderViewModel.isOnFirstChapter()) position
                     else position - 1
@@ -227,73 +195,17 @@ class MangaReaderActivity : AppCompatActivity() {
                 else
                     onPageSelectedInBookFormat(position)
 
-                setPageTitle(mangaReaderViewModel,
-                    mangaReaderViewModel.manga
-                    .chapters[mangaReaderViewModel.manga.lastViewedChapter]
-                    .lastViewedPage)
+                setPageTitle()
             }
         })
     }
 
-
-    private fun hideMenu() {
-        val topMenu = findViewById<MaterialToolbar>(R.id.headerToolbar)
-        val bottomMenu = findViewById<MaterialToolbar>(R.id.bottomToolbar)
-
-
-        ObjectAnimator.ofFloat(topMenu, "translationY", TRANSLATE_MENU_UP).apply {
-            duration = ANIMATION_DURATION
-            start()
-        }
-
-        ObjectAnimator.ofFloat(bottomMenu, "translationY", TRANSLATE_MENU_DOWN).apply {
-            duration = ANIMATION_DURATION
-            start()
-        }
-    }
-
-    private fun showMenu() {
-        val topMenu = findViewById<MaterialToolbar>(R.id.headerToolbar)
-        val bottomMenu = findViewById<MaterialToolbar>(R.id.bottomToolbar)
-
-        ObjectAnimator.ofFloat(topMenu, "translationY", 0F).apply {
-            duration = ANIMATION_DURATION
-            start()
-        }
-
-        ObjectAnimator.ofFloat(bottomMenu, "translationY", 0F).apply {
-            duration = ANIMATION_DURATION
-            start()
-        }
-    }
-
-    private fun isInMiddleSquare() : Boolean {
-        val width: Int = context!!.resources.displayMetrics.widthPixels
-        val height: Int = context!!.resources.displayMetrics.heightPixels
-
-        return (xTouch >= width / MIDDLE_SCREEN_SQUARE_PART
-                && xTouch <= width - width / MIDDLE_SCREEN_SQUARE_PART
-                && yTouch >= height / MIDDLE_SCREEN_SQUARE_PART
-                && yTouch <= height - height / MIDDLE_SCREEN_SQUARE_PART)
-    }
-
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
-            MotionEvent.ACTION_DOWN -> {
-                xTouch = event.x
-                yTouch = event.y
-            }
-            MotionEvent.ACTION_UP -> {
-                if ((xTouch - event.x) * (xTouch - event.x)
-                    + (yTouch - event.y) * (yTouch - event.y) < SINGLE_TOUCH_RAD
-                    && isInMiddleSquare()) {
-                    if (isHidden)
-                        showMenu()
-                    else
-                        hideMenu()
-                    isHidden = !isHidden
-                }
-            }
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_UP ->
+                toolbarHandler.touchEventDispatcher(event)
+
         }
         return super.dispatchTouchEvent(event)
     }

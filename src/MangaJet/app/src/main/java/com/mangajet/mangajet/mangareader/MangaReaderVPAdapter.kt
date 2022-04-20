@@ -1,8 +1,6 @@
 package com.mangajet.mangajet.mangareader
 
 import android.graphics.PointF
-import android.util.DisplayMetrics
-import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,8 +32,11 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         // reserved pages count for middle chapters
         const val REVERSED_PAGES_AMOUNT_MIDDLE_CHAPTER = 2
 
+        // Fake left page count
         const val SKIP_LEFT_FAKE_PAGE     = 1
+        // Fake right page count
         const val SKIP_RIGHT_FAKE_PAGE    = 1
+        // Value to go form 'Count' values to 'Index' values
         const val SKIP_ONE_PAGE_FOR_INDEX = 1
     }
 
@@ -46,13 +47,6 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
     inner class MangaReaderPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // ImageView on ViewPager2 pager with our page
         private val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
-
-        /* private fun getScreenHeight(): Float {
-            val metrics = DisplayMetrics()
-            currentViewModelWithData.currentActivityRef.windowManager
-                .defaultDisplay.getMetrics(metrics)
-            return metrics.heightPixels.toFloat()
-        } */
 
         // Function which will bind pager with content
         fun bind(mangaPage : MangaPage, position : Int) {
@@ -66,18 +60,8 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
                         imagePage.setImage(imageSrc)
                         if (currentViewModelWithData.currentReaderFormat ==
                                 MangaReaderViewModel.READER_FORMAT_MANHWA) {
-                            // first scale to reset fixed width and height of layout (kinda strange,
-                            // but it works)
-                            var scaleCoef = 1F
-                            //imagePage.setScaleAndCenter(scaleCoef, PointF(0F, 0F))
-
-                            // second scale to reset fixed width and height of layout (kinda strange,
-                            // but it works)
-                            //val height: Float = getScreenHeight()
-                            //scaleCoef = (imagePage.measuredHeight.toFloat() / height)
-                            imagePage.minScale = scaleCoef
-                            //imagePage.scaleX = scaleCoef
-                            //imagePage.scaleY = scaleCoef
+                            val scaleCoef = (currentViewModelWithData.displayWidth /
+                                    imagePage.sWidth.toFloat())
                             imagePage.setScaleAndCenter(scaleCoef, PointF(0F, 0F))
                         }
                     }
@@ -95,6 +79,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         )
     }
 
+    // Function which will get page index for not-reverse reader format
     private fun getPageIndexBookFormat(position : Int) : Int {
         var pageIndex = 0
 
@@ -132,6 +117,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         return pageIndex
     }
 
+    // Function which will get page index for reverse reader format
     private fun getPageIndexMangaFormat(position : Int) : Int {
         var pageIndex = 0
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
@@ -176,6 +162,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         return pageIndex
     }
 
+    // Function which will get chapter index for not-reverse reader format
     private fun getChapterIndexBookFormat(position : Int) : Int {
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
@@ -203,6 +190,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         return chapterIndex
     }
 
+    // Function which will get chapter index for reverse reader format
     private fun getChapterIndexMangaFormat(position : Int) : Int {
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
@@ -230,6 +218,7 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         return chapterIndex
     }
 
+    // Function which will update pages
     private fun updateSomePages(pageIndex : Int, chapterIndex : Int) : Int {
         var newPageIndex = pageIndex
         currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
