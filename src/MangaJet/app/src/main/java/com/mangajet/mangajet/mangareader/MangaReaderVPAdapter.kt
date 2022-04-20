@@ -167,6 +167,9 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
         // SPECIAL CASES:
+        if (currentViewModelWithData.isSingleChapterManga())
+            return chapterIndex
+
         // First chapter of book
         if (currentViewModelWithData.isOnFirstChapter()) {
             if (position == itemCount - SKIP_ONE_PAGE_FOR_INDEX)
@@ -195,6 +198,9 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 
         // SPECIAL CASES:
+        if (currentViewModelWithData.isSingleChapterManga())
+            return chapterIndex
+
         // First chapter of book
         if (currentViewModelWithData.isOnFirstChapter()) {
             if (position == 0)

@@ -18,7 +18,8 @@ class ChangeMangaReaderFormatDialog(mMangaReaderViewModel: MangaReaderViewModel)
         return activity?.let {
             val builder = android.app.AlertDialog.Builder(it)
             builder.setTitle("Choose format")
-                .setItems(formatNames) { dialog, which ->
+                .setSingleChoiceItems(formatNames, mMangaReaderViewModelReference
+                    .currentReaderFormat) { dialog, which ->
                     mMangaReaderViewModelReference.currentReaderFormat = which
                     mMangaReaderViewModelReference.redrawMangaReader()
                     dialog.cancel()

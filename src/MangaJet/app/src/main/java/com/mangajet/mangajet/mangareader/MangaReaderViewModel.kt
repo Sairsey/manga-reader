@@ -26,6 +26,9 @@ class MangaReaderViewModel : ViewModel() {
         const val READER_FORMAT_BOOK   = 0  // Book format reader
         const val READER_FORMAT_MANHWA = 1  // Manhwa format reader
         const val READER_FORMAT_MANGA  = 2  // Reverse format reader
+
+        // 'Height/Width' coefficient to select optimize format
+        const val HEIGHT_WIDTH_MIN_COEF_TO_MANHWA = 2.5F
     }
 
     // Initialize data to work
@@ -66,6 +69,23 @@ class MangaReaderViewModel : ViewModel() {
     /**
      * Other functions
      */
+    private fun selectOptimizeFormat() {
+        val middlePage = (pagesCount - 1) / 2
+        val mangaPage = manga.chapters[manga.lastViewedChapter].getPage(middlePage)
+        mangaPage.upload()
+        try {
+            val imageFile = mangaPage.getFile() // Catch ex here
+            val pageImage = BitmapFactory.decodeFile(imageFile.absolutePath)
+            if (pageImage.height.toFloat() / pageImage.width.toFloat() >
+                HEIGHT_WIDTH_MIN_COEF_TO_MANHWA) {
+                currentReaderFormat = READER_FORMAT_MANHWA
+                wasReaderFormat = READER_FORMAT_MANHWA
+            }
+        } catch (ex: MangaJetException) {
+            // nothing critical
+        }
+    }
+
     // Function which will init all data about manga
     fun initMangaData() {
         if (!isInited) {
@@ -75,15 +95,18 @@ class MangaReaderViewModel : ViewModel() {
             manga = MangaJetApp.currentManga!!
             try {
                 pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
-            }
-            catch (ex : MangaJetException) {
-                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-            }
-            uploadPages()
+                uploadPages()
 
-            // And save its state to File
-            try {
-                manga.saveToFile()
+                // Get recommended format
+                selectOptimizeFormat()
+
+                // And save its state to File
+                try {
+                    manga.saveToFile()
+                }
+                catch (ex : MangaJetException) {
+                    Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                }
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
