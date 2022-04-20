@@ -1,6 +1,8 @@
 package com.mangajet.mangajet.mangareader
 
 import android.graphics.PointF
+import android.util.DisplayMetrics
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,17 +47,39 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         // ImageView on ViewPager2 pager with our page
         private val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
 
+        /* private fun getScreenHeight(): Float {
+            val metrics = DisplayMetrics()
+            currentViewModelWithData.currentActivityRef.windowManager
+                .defaultDisplay.getMetrics(metrics)
+            return metrics.heightPixels.toFloat()
+        } */
+
         // Function which will bind pager with content
         fun bind(mangaPage : MangaPage, position : Int) {
+
             currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
                 val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                 ensureActive()
                 withContext(Dispatchers.Main) {
                     if (pageFile != null) {
-                        imagePage.setImage(ImageSource.bitmap(pageFile))
-                        //if (currentViewModelWithData.currentReaderFormat ==
-                        //        MangaReaderViewModel.READER_FORMAT_MANHWA)
-                        //    imagePage.z = 2 * imagePage.z
+                        val imageSrc = ImageSource.bitmap(pageFile)
+                        imagePage.setImage(imageSrc)
+                        if (currentViewModelWithData.currentReaderFormat ==
+                                MangaReaderViewModel.READER_FORMAT_MANHWA) {
+                            // first scale to reset fixed width and height of layout (kinda strange,
+                            // but it works)
+                            var scaleCoef = 1F
+                            //imagePage.setScaleAndCenter(scaleCoef, PointF(0F, 0F))
+
+                            // second scale to reset fixed width and height of layout (kinda strange,
+                            // but it works)
+                            //val height: Float = getScreenHeight()
+                            //scaleCoef = (imagePage.measuredHeight.toFloat() / height)
+                            imagePage.minScale = scaleCoef
+                            //imagePage.scaleX = scaleCoef
+                            //imagePage.scaleY = scaleCoef
+                            imagePage.setScaleAndCenter(scaleCoef, PointF(0F, 0F))
+                        }
                     }
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                 }
@@ -272,4 +296,5 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         else
             return count + REVERSED_PAGES_AMOUNT_MIDDLE_CHAPTER
     }
+
 }

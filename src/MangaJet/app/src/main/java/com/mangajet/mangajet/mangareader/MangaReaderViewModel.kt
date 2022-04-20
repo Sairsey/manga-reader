@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.mangareader
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.Toast
@@ -37,6 +38,7 @@ class MangaReaderViewModel : ViewModel() {
     var currentReaderFormat = READER_FORMAT_BOOK
     var wasReaderFormat  = READER_FORMAT_BOOK
     lateinit var mangaReaderVP2 : ViewPager2
+    lateinit var currentActivityRef : Activity
 
     /**
      * Case-check functions block
@@ -152,8 +154,8 @@ class MangaReaderViewModel : ViewModel() {
                 false)
         }
 
-        mangaReaderVP2.refreshDrawableState()
-        wasReaderFormat = currentReaderFormat
+        val pagerAdapter = mangaReaderVP2.adapter
+        pagerAdapter?.notifyDataSetChanged()
     }
 
     // Function which will load previous chapter after scroll

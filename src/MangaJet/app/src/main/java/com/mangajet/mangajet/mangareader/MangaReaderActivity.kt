@@ -117,6 +117,7 @@ class MangaReaderActivity : AppCompatActivity() {
 
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
         mangaReaderViewModel.mangaReaderVP2 = viewPager
+        mangaReaderViewModel.currentActivityRef = this
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewModel)
         viewPager.adapter = pagerAdapter
 
