@@ -26,6 +26,8 @@ class AboutMangaViewModel : ViewModel() {
     var adapter : MangaChaptersFragment.ChapterListAdapter? = null
     var progressIndicator : LinearProgressIndicator? = null
 
+    var isChaptersListReversed = false          // Flag to reverse chapters list
+
     // Function will
     fun initMangaData() {
         if (!isInited) {

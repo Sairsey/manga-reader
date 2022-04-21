@@ -5,15 +5,19 @@ import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.fragment.app.Fragment
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.MenuItem
+import androidx.fragment.app.Fragment
 import android.widget.TextView
 import android.widget.ImageView
 import android.widget.Button
 import android.widget.Toast
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
@@ -36,10 +40,10 @@ class MangaChaptersFragment : Fragment() {
     // job for async waiting of 'initManga()' function
     var job : Job? = null
     // about manga viewmodel for management UI elements
-    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
+    lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     // List adapter for "chapters" list inner class
-    class ChapterListAdapter(context: Context,
+    inner class ChapterListAdapter(context: Context,
                              private val resourceLayout: Int,
                              items: Array<MangaChapter>,
                              public var lastViewedChapter : Int) :
@@ -55,17 +59,22 @@ class MangaChaptersFragment : Fragment() {
                 v = vi.inflate(resourceLayout, null)
             }
 
-            val p = getItem(position)
+            val pos = if (!aboutMangaViewmodel.isChaptersListReversed)
+                position
+            else
+                (aboutMangaViewmodel.manga.chapters.size - 1) - position
+
+            val p = getItem(pos)
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
                 val button =  v?.findViewById<Button>(R.id.downloadChapter)
                 if (p.name.isNotEmpty())
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (position + 1).toString() + ": " + p.name)
+                            (pos + 1).toString() + ": " + p.name)
                 else
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (position + 1).toString())
+                            (pos + 1).toString())
                 button?.setOnClickListener {
                     try {
                         for(i in 0 until p.getPagesNum()){
@@ -79,10 +88,18 @@ class MangaChaptersFragment : Fragment() {
                         Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
                     }
                 }
-                if (position < lastViewedChapter)
-                    icon?.setImageResource(R.drawable.ic_opened_book)
-                else
-                    icon?.setImageResource(R.drawable.ic_closed_book)
+                if (!aboutMangaViewmodel.isChaptersListReversed) {
+                    if (pos < lastViewedChapter)
+                        icon?.setImageResource(R.drawable.ic_opened_book)
+                    else
+                        icon?.setImageResource(R.drawable.ic_closed_book)
+                }
+                else {
+                    if (pos < lastViewedChapter)
+                        icon?.setImageResource(R.drawable.ic_opened_book)
+                    else
+                        icon?.setImageResource(R.drawable.ic_closed_book)
+                }
             }
             return v!!
         }
@@ -90,6 +107,28 @@ class MangaChaptersFragment : Fragment() {
 
     // Binding tool for "MangaChapterFragment"
     private var _binding: MangaChaptersFragmentBinding? = null
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+    }
+
+    // Function which will reverse all list with chapters in chaptersList
+    private fun reverseChaptersList() {
+        aboutMangaViewmodel.isChaptersListReversed = !aboutMangaViewmodel.isChaptersListReversed
+        aboutMangaViewmodel.adapter?.notifyDataSetChanged()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.reverseList -> reverseChaptersList()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -117,14 +156,28 @@ class MangaChaptersFragment : Fragment() {
             binding.chaptersList.adapter = aboutMangaViewmodel.adapter
 
             binding.chaptersList.setOnItemClickListener { parent, view, position, id ->
+                val pos = if (!aboutMangaViewmodel.isChaptersListReversed)
+                    id
+                else
+                    (aboutMangaViewmodel.manga.chapters.size - 1) - id
+
                 if (aboutMangaViewmodel.isInited) {
                     val intent = Intent(it, MangaReaderActivity::class.java)
                     MangaJetApp.currentManga = aboutMangaViewmodel.manga
-                    MangaJetApp.currentManga!!.lastViewedChapter = id.toInt()
+                    MangaJetApp.currentManga!!.lastViewedChapter = pos.toInt()
                     MangaJetApp.currentManga!!
                         .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
                         .lastViewedPage = 0
-                    startActivity(intent)
+
+                    // check if we need authorization
+                    val pagesCnt = MangaJetApp.currentManga!!
+                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter].getPagesNum()
+                    if (pagesCnt > 0)
+                        startActivity(intent)
+                    else
+                        Toast.makeText(it,
+                        "Can't open chapter: maybe its empty or you need to authorizes on site",
+                            Toast.LENGTH_SHORT).show()
                 }
                 else
                     Toast.makeText(it,
@@ -181,7 +234,12 @@ class MangaChaptersFragment : Fragment() {
     // Overridden func which will restore scroll position
     override fun onResume() {
         super.onResume()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+
+        val mToolbar = activity?.findViewById<MaterialToolbar>(R.id.aboutMangaToolbar)
+        mToolbar?.inflateMenu(R.menu.chapters_fragment_menu)
+        mToolbar?.setOnMenuItemClickListener{
+            onOptionsItemSelected(it)
+        }
 
         if (aboutMangaViewmodel.isInited) {
             binding.chaptersList.visibility = View.VISIBLE
