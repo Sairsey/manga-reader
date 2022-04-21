@@ -48,7 +48,7 @@ class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseA
         // SPECIAL CASES:
         // only one chapter
         if (currentViewModelWithData.isSingleChapterManga())
-            pageIndex = totalPages - position
+            pageIndex = (totalPages - SKIP_ONE_PAGE_FOR_INDEX) - position
 
         // First chapter of book
         else if (currentViewModelWithData.isOnFirstChapter()) {
