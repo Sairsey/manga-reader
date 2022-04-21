@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.mangareader
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.Toast
@@ -10,12 +9,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import java.text.FieldPosition
-
 
 // Class which represents "Manga Reader" ViewModel
 @Suppress("TooManyFunctions")
@@ -80,6 +74,7 @@ class MangaReaderViewModel : ViewModel() {
                 HEIGHT_WIDTH_MIN_COEF_TO_MANHWA) {
                 currentReaderFormat = READER_FORMAT_MANHWA
                 wasReaderFormat = READER_FORMAT_MANHWA
+                mangaReaderVP2.orientation = ViewPager2.ORIENTATION_VERTICAL
             }
         } catch (ex: MangaJetException) {
             // nothing critical
@@ -99,14 +94,14 @@ class MangaReaderViewModel : ViewModel() {
 
                 // Get recommended format
                 selectOptimizeFormat()
+            }
+            catch (ex : MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
 
-                // And save its state to File
-                try {
-                    manga.saveToFile()
-                }
-                catch (ex : MangaJetException) {
-                    Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-                }
+            // And save its state to File
+            try {
+                manga.saveToFile()
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
@@ -117,8 +112,7 @@ class MangaReaderViewModel : ViewModel() {
     // Function which will upload pages
     private fun uploadPages() {
         for (job in jobs)
-            if (job != null && job.isActive)
-                job.cancel()
+            job?.cancel()
 
         jobs = arrayOfNulls(pagesCount + 2)
 
@@ -213,9 +207,7 @@ class MangaReaderViewModel : ViewModel() {
         }
 
         // start loading all pages
-        val job = GlobalScope.launch(Dispatchers.IO) {
-            uploadPages()
-        }
+        uploadPages()
 
         // set correct page
         manga.chapters[manga.lastViewedChapter].lastViewedPage = pagesCount - 1
@@ -227,10 +219,6 @@ class MangaReaderViewModel : ViewModel() {
         catch (ex : MangaJetException) {
             Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
         }
-
-        // update adapter
-        while (job.isActive)
-            println("Im busy man too")
 
         viewPager.adapter = null
         pagerAdapter.notifyDataSetChanged()
@@ -273,9 +261,7 @@ class MangaReaderViewModel : ViewModel() {
         }
 
         // start loading all pages
-        val job = GlobalScope.launch(Dispatchers.IO) {
-            uploadPages()
-        }
+        uploadPages()
 
         // set correct page
         manga.chapters[manga.lastViewedChapter]
@@ -288,10 +274,6 @@ class MangaReaderViewModel : ViewModel() {
         catch (ex : MangaJetException) {
             Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
         }
-
-        // update adapter
-        while (job.isActive)
-            println("Im busy man")
 
         viewPager.adapter = null
         pagerAdapter.notifyDataSetChanged()

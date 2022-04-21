@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
@@ -15,7 +16,6 @@ import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ensureActive
@@ -51,12 +51,14 @@ class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
         // Function which will bind pager with content
         fun bind(mangaPage : MangaPage, position : Int) {
 
-            currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
+            currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
+                .launch(Dispatchers.IO) {
                 val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                 ensureActive()
                 withContext(Dispatchers.Main) {
                     if (pageFile != null) {
                         val imageSrc = ImageSource.bitmap(pageFile)
+                        ensureActive()
                         imagePage.setImage(imageSrc)
                         if (currentViewModelWithData.currentReaderFormat ==
                                 MangaReaderViewModel.READER_FORMAT_MANHWA) {

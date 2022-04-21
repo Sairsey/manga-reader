@@ -75,8 +75,10 @@ class MangaReaderActivity : AppCompatActivity() {
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
 
         // init viewmodel and some params
-        mangaReaderViewModel = ViewModelProvider(this).get(MangaReaderViewModel::class.java)
+        mangaReaderViewModel = ViewModelProvider(this)[MangaReaderViewModel::class.java]
         mangaReaderViewModel.displayWidth = getScreenWidth()
+        val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
+        mangaReaderViewModel.mangaReaderVP2 = viewPager
         mangaReaderViewModel.initMangaData()
         setTitle()
         setPageTitle()
@@ -87,8 +89,6 @@ class MangaReaderActivity : AppCompatActivity() {
         toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
 
         // init viewpager
-        val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
-        mangaReaderViewModel.mangaReaderVP2 = viewPager
         val pagerAdapter = MangaReaderVPAdapter(mangaReaderViewModel)
         viewPager.adapter = pagerAdapter
 
