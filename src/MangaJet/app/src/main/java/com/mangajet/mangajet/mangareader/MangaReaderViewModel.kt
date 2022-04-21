@@ -2,14 +2,19 @@ package com.mangajet.mangajet.mangareader
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.mangareader.formatchangeholder.FormatChangerHandler
+import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import kotlinx.coroutines.Job
+import org.w3c.dom.Text
 
 // Class which represents "Manga Reader" ViewModel
 @Suppress("TooManyFunctions")
@@ -36,6 +41,9 @@ class MangaReaderViewModel : ViewModel() {
     var wasReaderFormat  = READER_FORMAT_BOOK       // previous reader format
     lateinit var mangaReaderVP2 : ViewPager2        // reference on ViewPager2
     var displayWidth : Float = 0F                   // reference on Activity
+    // class which will handle all changes in viewpager2 when reader format is changed
+    private val formatChangerHandler = FormatChangerHandler(this)
+    lateinit var navTextView : TextView             // textview with page and chapter number
 
     /**
      * Case-check functions block
@@ -94,6 +102,8 @@ class MangaReaderViewModel : ViewModel() {
 
                 // Get recommended format
                 selectOptimizeFormat()
+                // init pager with current format
+                formatChangerHandler.updateReaderFormat()
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
@@ -150,47 +160,52 @@ class MangaReaderViewModel : ViewModel() {
         return currentReaderFormat != READER_FORMAT_MANGA && wasReaderFormat == READER_FORMAT_MANGA
     }
 
+    // Function which will return delta to set item in pager when reader format changes to book
+    private fun getDeltaWhenChangerToBook() : Int {
+        return when {
+            isSingleChapterManga() -> 0
+            isOnFirstChapter() -> 1
+            isOnLastChapter() -> 0
+            else -> 1
+        }
+    }
+
+    private fun getDeltaWhenChangerToManga() : Int {
+        return when {
+            isSingleChapterManga() -> 0
+            isOnFirstChapter() -> 0
+            isOnLastChapter() -> 1
+            else -> 1
+        }
+    }
+
     // Function which will redraw viewPager2 with pages with correct chosen format
     fun redrawMangaReader() {
-        // change orientation
-        if (currentReaderFormat == READER_FORMAT_MANHWA) {
-            mangaReaderVP2.orientation = ViewPager2.ORIENTATION_VERTICAL
-        }
-        else
-            mangaReaderVP2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        if (wasReaderFormat != currentReaderFormat) {
+            // change viewpager params
+            formatChangerHandler.updateReaderFormat()
 
-        // change viewpager position
-        if (isChangedToManga() || isChangedToBook()) {
-            var pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
-            var delta = if (isChangedToBook()) {
-                pageIndex = (pagesCount - 1) - pageIndex
-                when {
-                    isSingleChapterManga() -> 0
-                    isOnFirstChapter() -> 1
-                    isOnLastChapter() -> 0
-                    else -> 1
-                }
+            // change viewpager position
+            if (isChangedToManga() || isChangedToBook()) {
+                var pageIndex = manga.chapters[manga.lastViewedChapter].lastViewedPage
+                if (isChangedToBook())
+                    pageIndex = (pagesCount - 1) - pageIndex
+
+                val delta = if (isChangedToBook()) getDeltaWhenChangerToBook()
+                    else getDeltaWhenChangerToManga()
+
+                mangaReaderVP2.setCurrentItem(
+                    (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex - delta,
+                    false
+                )
             }
-            else
-                when {
-                    isSingleChapterManga() -> 0
-                    isOnFirstChapter() -> 0
-                    isOnLastChapter() -> 1
-                    else -> 1
-                }
 
-            mangaReaderVP2.setCurrentItem(
-                (mangaReaderVP2.adapter!!.itemCount - 1) - pageIndex - delta,
-                false)
+            wasReaderFormat = currentReaderFormat
         }
-
-        val pagerAdapter = mangaReaderVP2.adapter
-        pagerAdapter?.notifyDataSetChanged()
-        wasReaderFormat = currentReaderFormat
     }
 
     // Function which will load previous chapter after scroll
-    fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderVPAdapter) {
+    fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
         // update chapter
         manga.lastViewedChapter--
 
@@ -241,7 +256,7 @@ class MangaReaderViewModel : ViewModel() {
     }
 
     // Function which will load next chapter after scroll
-    fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderVPAdapter) {
+    fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
         // update chapter
         manga.lastViewedChapter++;
 
@@ -293,6 +308,17 @@ class MangaReaderViewModel : ViewModel() {
         Toast.makeText(
             MangaJetApp.context, "Chapter $chapter",
             Toast.LENGTH_SHORT).show()
+    }
+
+    // Function which will set activity title by current opened page
+    fun setPageTitle() {
+        var chapter = manga.lastViewedChapter
+        val page = manga.chapters[chapter].lastViewedPage + 1
+        val totalPages = pagesCount
+
+        // increase for correct output
+        chapter++
+        navTextView.text = "Chapter $chapter, page $page/$totalPages"
     }
 
     // Function will save manga instance on destroy 'MangaReaderActivity'
