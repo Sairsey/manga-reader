@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 
 // Class which will create adapter for manhwa reader
 class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
+    // Class for holger reverse format viewpage page
     inner class ManhwaReaderPageHolder(itemView: View) : MangaReaderBaseAdapter.MangaReaderPageHolder(
         itemView
     )  {
@@ -44,6 +45,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         }
     }
 
+    // Function which will get page index
     override fun getPageIndex(position: Int) : Int {
         var pageIndex = 0
 
@@ -81,6 +83,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         return pageIndex
     }
 
+    // Function which will get chapter index
     override fun getChapterIndex(position: Int) : Int {
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 

@@ -10,7 +10,7 @@ import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
 
-//
+// Base class for adapters to all manga reader formats
 abstract class MangaReaderBaseAdapter(viewModel: MangaReaderViewModel) :
     RecyclerView.Adapter<MangaReaderBaseAdapter.MangaReaderPageHolder>() {
     // We add some amount of pages in ViewPager2 for scrolling between chapters

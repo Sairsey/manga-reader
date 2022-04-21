@@ -4,13 +4,17 @@ import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 
+// Class which will listen page changes in 'Manhwa' format reader
 class ManhwaPageChangeListener(
     mangaReaderVM : MangaReaderViewModel,
     mangaReaderViewPager : ViewPager2
     ) :
     ViewPager2.OnPageChangeCallback() {
+    // manga reader viewModel reference with data
     val mangaReaderViewModel = mangaReaderVM
+    // viewpager2 reference to listen for
     val viewPager = mangaReaderViewPager
+    // viewpager2 page adapter
     lateinit var pagerAdapter : MangaReaderBaseAdapter
 
     // Function which will be tried to load prev or next chapter

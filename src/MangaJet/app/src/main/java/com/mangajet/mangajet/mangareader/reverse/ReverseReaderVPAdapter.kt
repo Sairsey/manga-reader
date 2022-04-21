@@ -18,7 +18,9 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+// Class which will create adapter for reverse (manga) format reader
 class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
+    // Class for holger reverse format viewpage page
     inner class ReverseReaderPageHolder(itemView: View) : MangaReaderPageHolder(itemView) {
         override fun bind(mangaPage: MangaPage, position: Int) {
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
@@ -37,6 +39,7 @@ class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseA
         }
     }
 
+    // Function which will get page index
     override fun getPageIndex(position: Int): Int {
         var pageIndex = 0
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
@@ -80,6 +83,7 @@ class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseA
         return pageIndex
     }
 
+    // Function which will get chapter index
     override fun getChapterIndex(position: Int): Int {
         var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
 

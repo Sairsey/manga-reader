@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.mangareader.formatchangeholder
 
-import android.view.View
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
 import com.mangajet.mangajet.mangareader.manhwa.ManhwaPageChangeListener
@@ -10,20 +9,30 @@ import com.mangajet.mangajet.mangareader.reverse.ReverseReaderVPAdapter
 import com.mangajet.mangajet.mangareader.straight.StraightPageChangeListener
 import com.mangajet.mangajet.mangareader.straight.StraightReaderVPAdapter
 
+// Class which will handle changes in viewPager2 when changes reader format
 class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
+    // mangaReader viewModel reference with data
     private val mMangaReaderViewModel = mangaReaderViewModel
-    private var isInited = false
+    private var isInited = false            // Flag : if was inited = true, else = false
 
+    // reference to viewPager2 (which we will change)
     private lateinit var mMangaReaderViewPager : ViewPager2
 
+    // adapter for 'Manhwa' reader format
     private lateinit var  adapterManhwa : MangaReaderBaseAdapter
+    // adapter for 'Manga (reverse)' reader format
     private lateinit var  adapterReverse : MangaReaderBaseAdapter
+    // adapter for 'Book (straight)' reader format
     private lateinit var  adapterStraight : MangaReaderBaseAdapter
 
+    // page change listener for 'Manhwa' reader format
     private lateinit var  manhwaPageChangeListener : ViewPager2.OnPageChangeCallback
+    // page change listener for 'Manga (reverse)' reader format
     private lateinit var  reversePageChangeListener : ViewPager2.OnPageChangeCallback
+    // page change listener for 'Book (straight)' reader format
     private lateinit var  straightPageChangeListener : ViewPager2.OnPageChangeCallback
 
+    // Function which will init all 'lateinit' variables
     private fun initHandler() {
         if (!isInited) {
             mMangaReaderViewPager = mMangaReaderViewModel.mangaReaderVP2
@@ -43,6 +52,7 @@ class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
         }
     }
 
+    // Function which will change adapter
     private fun adapterChangeHandler() {
         var newAdapter = when(mMangaReaderViewModel.currentReaderFormat) {
             MangaReaderViewModel.READER_FORMAT_BOOK -> {
@@ -70,6 +80,7 @@ class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
         }
     }
 
+    // Function which will change page change listener
     private fun pageChangeListenerHandler() {
         mMangaReaderViewPager.unregisterOnPageChangeCallback(straightPageChangeListener)
         mMangaReaderViewPager.unregisterOnPageChangeCallback(manhwaPageChangeListener)
@@ -94,6 +105,7 @@ class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
         }
     }
 
+    // Function which will update viewPager2
     fun updateReaderFormat() {
         initHandler()
         adapterChangeHandler()
