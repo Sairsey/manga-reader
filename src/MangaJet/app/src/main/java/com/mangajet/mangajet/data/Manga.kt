@@ -3,6 +3,7 @@ package com.mangajet.mangajet.data
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 // Class that represents one specific manga, stores info about it(name, author, genre...) and chapters of this manga
@@ -39,11 +40,15 @@ class Manga {
 
         // if file Exist, better to load from json
         if (isExist){
-            val json = JSONObject(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
             try {
+                val json = JSONObject(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
                 fromJSON(json)
             }
             catch (ex : MangaJetException){
+                Logger.log("Could not create manga " + id + " from JSON" + ex.message, Logger.Lvl.WARNING)
+                // nothing too tragic. Just forget about it
+            }
+            catch(ex : JSONException){
                 Logger.log("Could not create manga " + id + " from JSON" + ex.message, Logger.Lvl.WARNING)
                 // nothing too tragic. Just forget about it
             }
@@ -106,8 +111,13 @@ class Manga {
     // Constructor from JSON string
     // MAY THROW MangaJetException
     constructor(jsonStr: String){
-        val json = JSONObject(jsonStr)
-        fromJSON(json)
+        try {
+            val json = JSONObject(jsonStr)
+            fromJSON(json)
+        }
+        catch (es :JSONException){
+            throw MangaJetException("Bad json " + jsonStr)
+        }
     }
 
     // Function to fill all manga info except chapters
