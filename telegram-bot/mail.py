@@ -57,9 +57,8 @@ class mail:
         if self.text:
             f = self.text.find('------------------ Stack trace ------------------')
             if f == -1:
-                 mail_str += '<b>Text: </b>%s\n' % self.text
+                 mail_str += '<b>Text: </b><pre language="c++">%s</pre>\n' % self.text
                  return mail_str
-            mail_str += '<b>Text: </b>%s\n' % self.text[:f]
-            mail_str +='%s\n' % self.text[f:len(self.text)]
-
+            mail_str += '<b>Text: </b><pre language="c++">%s</pre>\n' % self.text[:f]
+            mail_str += '<pre language="c++">%s</pre>\n' % self.text[f:len(self.text)]
         return mail_str
