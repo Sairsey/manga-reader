@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.ui.search
 
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
@@ -22,32 +21,13 @@ import kotlinx.coroutines.withContext
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
-    companion object {
-        const val SEARCH_AMOUNT = 20        // Amount of searchable mangas
-    }
+
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null          // adapter for list
 
     // mangas info for list
     val mangasInfos = ArrayList<MangaListElementContainer>()
-
-    // Selected resources
-    var allLibraries = arrayOf(
-        Librarian.LibraryName.Readmanga,
-        Librarian.LibraryName.Mangachan,
-        Librarian.LibraryName.Mangalib,
-        Librarian.LibraryName.Acomics
-    )
-    // flags for each resource
-    private var chosenLibraries = BooleanArray(allLibraries.size)
-
-    // init flags
-    init {
-        chosenLibraries[0] = true
-        for (i in 1 until chosenLibraries.size)
-            chosenLibraries[i] = false
-    }
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
@@ -81,7 +61,7 @@ class SearchViewModel : ViewModel() {
     ) {
         try {
             val libsMangas = Librarian.getLibrary(source)!!
-                .searchManga(queryString, SEARCH_AMOUNT, 0)
+                .searchManga(queryString, Librarian.settings.MANGA_SEARCH_AMOUNT, 0)
 
             if (libsMangas.isEmpty()) {
                 return
@@ -107,13 +87,14 @@ class SearchViewModel : ViewModel() {
 
     // Function which will update all sources flags in 'chosenLibraries', where will be searching
     fun updateLibsSources(fragmentManager : FragmentManager?) {
-        val librariesNames = Array(allLibraries.size) { i -> allLibraries[i].resource}
-        val choseResourceDialog = SearchSetSourcesDialog(librariesNames, chosenLibraries)
+        val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
+            Librarian.LibraryName.values()[i].resource}
+        val choseResourceDialog = SearchSetSourcesDialog(librariesNames, Librarian.settings.CHOSEN_RESOURCES)
         if (fragmentManager != null) {
             choseResourceDialog.show(fragmentManager, "Choose resource dialog")
             if (choseResourceDialog.wasSelected) {
                 for (i in choseResourceDialog.mCheckedItems.indices)
-                    chosenLibraries[i] = choseResourceDialog.mCheckedItems[i]
+                    Librarian.settings.CHOSEN_RESOURCES[i] = choseResourceDialog.mCheckedItems[i]
             }
         }
     }
@@ -135,16 +116,16 @@ class SearchViewModel : ViewModel() {
 
         //All libraries
         var sources = ""
-        for(i in allLibraries.indices)
-            if(chosenLibraries[i])
-                sources += allLibraries[i].resource + " "
+        for(i in Librarian.LibraryName.values().indices)
+            if(Librarian.settings.CHOSEN_RESOURCES[i])
+                sources += Librarian.LibraryName.values()[i].resource + " "
         Logger.log("Search \"$queryString\" with these sources: $sources")
 
         destroyAll()
         job = GlobalScope.launch(Dispatchers.IO) {
-            for (i in allLibraries.indices) {
-                if (chosenLibraries[i])
-                    addElementsToMangas(queryString, allLibraries[i])
+            for (i in Librarian.LibraryName.values().indices) {
+                if (Librarian.settings.CHOSEN_RESOURCES[i])
+                    addElementsToMangas(queryString, Librarian.LibraryName.values()[i])
             }
 
             withContext(Dispatchers.Main) {

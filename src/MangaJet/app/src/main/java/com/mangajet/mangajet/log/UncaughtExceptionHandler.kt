@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.log
 
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import java.io.IOException
@@ -10,7 +11,6 @@ import java.io.FileReader
 class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
 
     private val defaultUEH : Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
-    private val stackTraceFileName = "stackTrace.txt"
 
     // Function to handle exceptions
     override fun uncaughtException(t: Thread, e: Throwable) {
@@ -33,8 +33,9 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
 
         // Create flag app
         try {
-            if(!StorageManager.isExist(stackTraceFileName, StorageManager.FileType.LibraryInfo))
-                StorageManager.saveString(stackTraceFileName, "", StorageManager.FileType.LibraryInfo)
+            if(!StorageManager.isExist(Librarian.settings.STACK_TRACE_FILE_NAME, StorageManager.FileType.LibraryInfo))
+                StorageManager.saveString(Librarian.settings.STACK_TRACE_FILE_NAME,
+                    "", StorageManager.FileType.LibraryInfo)
         }
         catch (ex : MangaJetException){
             // It is okay if couldn't create
@@ -50,11 +51,12 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         var trace : String = ""
         // Add log and stack trace to mail
         try{
-            if (!StorageManager.isExist(stackTraceFileName, StorageManager.FileType.LibraryInfo))
+            if (!StorageManager.isExist(Librarian.settings.STACK_TRACE_FILE_NAME, StorageManager.FileType.LibraryInfo))
                 return ""
             else
-                StorageManager.getFile(stackTraceFileName, StorageManager.FileType.LibraryInfo).delete()
-            var file = StorageManager.getFile(Logger.fileLogName, StorageManager.FileType.LibraryInfo)
+                StorageManager.getFile(Librarian.settings.STACK_TRACE_FILE_NAME,
+                    StorageManager.FileType.LibraryInfo).delete()
+            var file = StorageManager.getFile(Librarian.settings.LOG_FILE_NAME, StorageManager.FileType.LibraryInfo)
             val reader = BufferedReader(FileReader(file))
             var line = reader.readLine()
             while(line != null){

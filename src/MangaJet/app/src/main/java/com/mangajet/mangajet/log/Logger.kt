@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.log
 
 import com.mangajet.mangajet.BuildConfig
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import java.io.IOException
@@ -13,7 +14,6 @@ import java.util.logging.SimpleFormatter
 object Logger {
     //Create logger
     private var l = Logger.getLogger(javaClass.toString())
-    const val fileLogName = "log.txt"
 
     // Enum class that level of logging data
     enum class Lvl{
@@ -34,10 +34,10 @@ object Logger {
     init{
         try {
 
-            if(StorageManager.isExist(fileLogName, StorageManager.FileType.LibraryInfo))
-               StorageManager.getFile(fileLogName, StorageManager.FileType.LibraryInfo).delete()
-            StorageManager.saveString(fileLogName, "", StorageManager.FileType.LibraryInfo)
-            val file = StorageManager.getFile(fileLogName, StorageManager.FileType.LibraryInfo)
+            if(StorageManager.isExist(Librarian.settings.LOG_FILE_NAME, StorageManager.FileType.LibraryInfo))
+               StorageManager.getFile(Librarian.settings.LOG_FILE_NAME, StorageManager.FileType.LibraryInfo).delete()
+            StorageManager.saveString(Librarian.settings.LOG_FILE_NAME, "", StorageManager.FileType.LibraryInfo)
+            val file = StorageManager.getFile(Librarian.settings.LOG_FILE_NAME, StorageManager.FileType.LibraryInfo)
 
             var fh = FileHandler(file.absolutePath)
             l.addHandler(fh)

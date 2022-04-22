@@ -25,6 +25,8 @@ object Librarian {
     // Map for storing libraries names as keys and abstract libraries as value
     private val map = hashMapOf<LibraryName, AbstractLibrary?>()
 
+    // Settings class where we store all important global constants
+    val settings = Settings
     // Filename for StorageManager
     public const val path = "libraries.json"
 

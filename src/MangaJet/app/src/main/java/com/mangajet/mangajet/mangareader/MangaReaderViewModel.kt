@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
@@ -14,9 +15,6 @@ import kotlinx.coroutines.Job
 
 // Class which represents "Manga Reader" ViewModel
 class MangaReaderViewModel : ViewModel() {
-    companion object {
-        const val LOAD_REPEATS = 5      // Load repeat count (if prev load failed -> repeat)
-    }
 
     // Initialize data to work
     var isInited = false                // ViewModel initialization flag
@@ -97,7 +95,7 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will decode bitmap async
     fun loadBitmap(page : MangaPage): Bitmap? {
-        for (i in 0 until LOAD_REPEATS) {
+        for (i in 0 until Librarian.settings.LOAD_REPEATS) {
             i.hashCode()
             try {
                 page.upload(i > 0)
