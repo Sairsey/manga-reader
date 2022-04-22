@@ -5,16 +5,19 @@ import android.graphics.BitmapFactory
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.MangaJetApp
-import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.formatchangeholder.FormatChangerHandler
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import org.w3c.dom.Text
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 // Class which represents "Manga Reader" ViewModel
 @Suppress("TooManyFunctions")
@@ -78,7 +81,7 @@ class MangaReaderViewModel : ViewModel() {
         try {
             val imageFile = mangaPage.getFile() // Catch ex here
             val pageImage = BitmapFactory.decodeFile(imageFile.absolutePath)
-            if (pageImage.height.toFloat() / pageImage.width.toFloat() >
+            if (pageImage != null && pageImage.height.toFloat() / pageImage.width.toFloat() >
                 HEIGHT_WIDTH_MIN_COEF_TO_MANHWA) {
                 currentReaderFormat = READER_FORMAT_MANHWA
                 wasReaderFormat = READER_FORMAT_MANHWA
@@ -126,12 +129,26 @@ class MangaReaderViewModel : ViewModel() {
 
         jobs = arrayOfNulls(pagesCount + 2)
 
+        mangaReaderVP2.isUserInputEnabled = false
         // at this point chapter already loaded so no need to worry about getPage exception
         // upload() can only fail if we do not have storage permission
         // We have blocking dialog in this case, so it someone still
         // manges to go here, I think we should crash
         for (i in 0 until pagesCount)
             manga.chapters[manga.lastViewedChapter].getPage(i).upload()
+
+        waitUntilLoad()
+    }
+
+    private fun waitUntilLoad() {
+        viewModelScope.launch(Dispatchers.IO) {
+            var tmpPageFile : File
+            for (i in 0 until pagesCount)
+                tmpPageFile = manga.chapters[manga.lastViewedChapter].getPage(i).getFile()
+            withContext(Dispatchers.Main) {
+                mangaReaderVP2.isUserInputEnabled = true
+            }
+        }
     }
 
     // Function which will decode bitmap async
@@ -238,6 +255,7 @@ class MangaReaderViewModel : ViewModel() {
         viewPager.adapter = null
         pagerAdapter.notifyDataSetChanged()
         viewPager.adapter = pagerAdapter
+        formatChangerHandler.notifyAdaptersForPrevChapter()
 
         // determine delta
         var delta = 0

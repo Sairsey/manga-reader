@@ -21,13 +21,36 @@ import kotlinx.coroutines.withContext
 
 // Class which will create adapter for manhwa reader
 class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
+    var prevViewedChapter : Int = currentViewModelWithData.manga.lastViewedChapter
+    var prevViewedPage : Int = currentViewModelWithData.manga.chapters[prevViewedChapter].lastViewedPage
+    var currentChapter : Int = currentViewModelWithData.manga.lastViewedChapter
+    var currentPage : Int = currentViewModelWithData.manga.chapters[currentChapter].lastViewedPage
+    var wasPrevReload = false
+
     // Class for holger reverse format viewpage page
     inner class ManhwaReaderPageHolder(itemView: View) : MangaReaderBaseAdapter.MangaReaderPageHolder(
         itemView
     )  {
+
+        private fun isScrollToEnd() : Boolean {
+            if (wasPrevReload)
+                return true
+            else
+                return !(prevViewedChapter < currentChapter || (prevViewedChapter == currentChapter
+                    && prevViewedPage <= currentPage))
+        }
+
+        private fun getFocus(isNeedToScroll : Boolean, imageWidth : Int, imageHeight : Int) : PointF {
+            if (isNeedToScroll)
+                return PointF((imageWidth - 1).toFloat(), (imageHeight - 1).toFloat())
+            else
+                return PointF(0F, 0F)
+        }
+
         override fun bind(mangaPage : MangaPage, position : Int) {
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
                 .launch(Dispatchers.IO) {
+                    val needToScroolEnd = isScrollToEnd()
                     val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                     ensureActive()
                     withContext(Dispatchers.Main) {
@@ -37,7 +60,10 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                             imagePage.setImage(imageSrc)
                             val scaleCoef = (currentViewModelWithData.displayWidth /
                                         imagePage.sWidth.toFloat())
-                            imagePage.setScaleAndCenter(scaleCoef, PointF(0F, 0F))
+                            imagePage.setScaleAndCenter(scaleCoef,
+                                getFocus(needToScroolEnd, imagePage.sWidth, imagePage.sHeight))
+                            prevViewedChapter = currentChapter
+                            prevViewedPage = currentPage
                         }
                         itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                     }
@@ -140,6 +166,8 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
 
         // bind holder
         try {
+            currentChapter = chapterIndex
+            currentPage = pageIndex
             val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
             holder.bind(mangaPage, position)
         }

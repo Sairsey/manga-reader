@@ -111,4 +111,10 @@ class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
         adapterChangeHandler()
         pageChangeListenerHandler()
     }
+
+    // Function which will notify some adapters for 'doToPrevChapter'
+    fun notifyAdaptersForPrevChapter() {
+        initHandler()
+        (adapterManhwa as ManhwaReaderVPAdapter).wasPrevReload = true
+    }
 }
