@@ -1,0 +1,160 @@
+package com.mangajet.mangajet.mangareader
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
+import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+
+class MangaReaderVPAdapter(viewModel: MangaReaderViewModel) :
+    RecyclerView.Adapter<MangaReaderVPAdapter.MangaReaderPageHolder>() {
+    // We add some amount of pages in ViewPager2 for scrolling between chapters
+    companion object {
+        // reserved pages count for manga with single-chapter
+        const val REVERSED_PAGES_AMOUNT_SINGLE_CHAPTER = 0
+        // reserved pages count for first or last chapters
+        const val REVERSED_PAGES_AMOUNT_SIDE_CHAPTER   = 1
+        // reserved pages count for middle chapters
+        const val REVERSED_PAGES_AMOUNT_MIDDLE_CHAPTER = 2
+    }
+
+    // viewModel, which contains our interesting data
+    var currentViewModelWithData = viewModel
+
+    // Class which will provide access between ViewPager2 and ImageView
+    inner class MangaReaderPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // ImageView on ViewPager2 pager with our page
+        private val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
+
+        // Function which will bind pager with content
+        fun bind(mangaPage : MangaPage, position : Int) {
+            currentViewModelWithData.jobs[position] = GlobalScope.launch(Dispatchers.IO) {
+                val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+                currentViewModelWithData.jobs[position]?.ensureActive()
+                withContext(Dispatchers.Main) {
+                    if (pageFile != null)
+                        imagePage.setImage(ImageSource.bitmap(pageFile))
+                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
+                }
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MangaReaderPageHolder {
+        return MangaReaderPageHolder(
+            LayoutInflater.from(parent.context).inflate(
+                R.layout.manga_reader_pager, parent, false
+            )
+        )
+    }
+
+    @Suppress("LongMethod")
+    override fun onBindViewHolder(holder: MangaReaderPageHolder, position: Int) {
+        var pageIndex = 0
+        var chapterIndex : Int = currentViewModelWithData.manga.lastViewedChapter
+
+        // SPECIAL CASES:
+        // only one chapter
+        if (currentViewModelWithData.isSingleChapterManga())
+            pageIndex = position
+
+        // First chapter
+        else if (currentViewModelWithData.isOnFirstChapter()) {
+            if (position == itemCount - 1) {
+                pageIndex = 0
+                chapterIndex++
+            }
+            else
+                pageIndex = position
+        }
+
+        // Last chapter
+        else if (currentViewModelWithData.isOnLastChapter()) {
+            if (position == 0) {
+                chapterIndex--
+                pageIndex = -1
+            }
+            else
+                pageIndex = position - 1
+        }
+
+        // Other cases
+        else {
+            if (position == 0) {
+                chapterIndex--
+                pageIndex = -1
+            }
+            else if (position == itemCount - 1) {
+                pageIndex = 0
+                chapterIndex++
+            }
+            else
+                pageIndex = position - 1
+        }
+
+        if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
+        {
+            try {
+                currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
+                if (pageIndex == -1)
+                {
+                    pageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
+                }
+            }
+            catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to get number of pages: " + ex.message, Logger.Lvl.WARNING)
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
+        // bind holder
+        try {
+            val mangaPage = currentViewModelWithData.manga.chapters[chapterIndex].getPage(pageIndex)
+            holder.bind(mangaPage, position)
+        }
+        catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to bind holder: " + ex.message, Logger.Lvl.WARNING)
+            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun getItemCount(): Int {
+        var count : Int
+        try {
+            count = currentViewModelWithData.manga
+                .chapters[currentViewModelWithData.manga.lastViewedChapter].getPagesNum()
+        }
+        catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to get number of pages: " + ex.message, Logger.Lvl.WARNING)
+            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            count = 0
+        }
+
+        // Only one chapter
+        if (currentViewModelWithData.isSingleChapterManga())
+            return count + REVERSED_PAGES_AMOUNT_SINGLE_CHAPTER
+
+        // First or last chapter
+        else if (currentViewModelWithData.isOnSideChapter())
+            return count + REVERSED_PAGES_AMOUNT_SIDE_CHAPTER
+
+        // Middle chapter
+        else
+            return count + REVERSED_PAGES_AMOUNT_MIDDLE_CHAPTER
+    }
+}

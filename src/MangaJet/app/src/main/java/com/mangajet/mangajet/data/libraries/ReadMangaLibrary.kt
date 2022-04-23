@@ -53,7 +53,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         {
             var link = query.getJSONObject(i).getString("link")
 
-            if (link.contains("/person/") || link.contains("/tag/") || link.contains("/gournal/"))
+            if (link.contains("/person/") || link.contains("/tag/") )
                 continue
             if (index >= offset + amount)
                 break
@@ -87,7 +87,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         fun getName(text : String) : String {
             var f = text.indexOf("английское название\">") + "английское название\">".length
             if(f - "английское название\">".length == -1)
-                return getRusName(text)
+                return ""
             val s = text.indexOf("</span>", f)
             return text.subSequence(f, s).toString()
         }
@@ -108,7 +108,8 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve description
         fun getDescr(text : String) : String {
-            val f = text.indexOf("\"description\" content=") + "\"description\" content=".length + 1
+            var f = text.indexOf("itemprop=\"description\"")
+            f = text.indexOf("content=", f) + "content=".length + 1
             val s = text.indexOf("\"", f + 1)
             return text.subSequence(f, s).toString()
         }
