@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.fragment.app.DialogFragment
+import com.mangajet.mangajet.log.Logger
 
 
 // Theme picker dialog class
@@ -26,6 +27,7 @@ class ThemePickerDialog : DialogFragment() {
     private fun setAppTheme(theme : Int) {
         val sp = getDefaultSharedPreferences(context)
         val editor = sp.edit()
+        Logger.log("Theme changed to " + themesNames[theme])
         editor.putInt("THEME", theme)
         editor.commit()
         AppCompatDelegate.setDefaultNightMode(theme)
@@ -33,6 +35,7 @@ class ThemePickerDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
+            Logger.log("Choose theme in Settings opened")
             val builder = AlertDialog.Builder(it)
             builder.setTitle("Choose theme")
                 .setItems(themesNames) { dialog, which ->

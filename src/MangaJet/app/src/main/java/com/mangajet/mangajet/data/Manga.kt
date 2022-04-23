@@ -1,12 +1,15 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.log.Logger
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 // Class that represents one specific manga, stores info about it(name, author, genre...) and chapters of this manga
 class Manga {
-    val id: String               // This manga unique identifier
-    val library: AbstractLibrary // Library which this manga belongs
+    lateinit var id: String               // This manga unique identifier
+    lateinit var library: AbstractLibrary // Library which this manga belongs
 
     //manga info
     var originalName: String = ""                    // Manga's original name
@@ -23,6 +26,33 @@ class Manga {
     constructor(library: AbstractLibrary, id: String) {
         this.library = library
         this.id = id
+
+        // check if we already have this manga in local storage
+        val path = id.replace(".", "_") + ".json"
+        var isExist = false
+        try {
+            isExist = StorageManager.isExist(path, StorageManager.FileType.MangaInfo)
+        }
+        catch (ex : MangaJetException) {
+            Logger.log("Can't check if manga exist, because no permission granted:" + ex.message, Logger.Lvl.WARNING)
+            // user didn`t gave permission to us. Very bad.
+        }
+
+        // if file Exist, better to load from json
+        if (isExist){
+            try {
+                val json = JSONObject(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
+                fromJSON(json)
+            }
+            catch (ex : MangaJetException){
+                Logger.log("Could not create manga " + id + " from JSON" + ex.message, Logger.Lvl.WARNING)
+                // nothing too tragic. Just forget about it
+            }
+            catch(ex : JSONException){
+                Logger.log("Could not create manga " + id + " from JSON" + ex.message, Logger.Lvl.WARNING)
+                // nothing too tragic. Just forget about it
+            }
+        }
     }
 
     // Utility function to fill data fields of manga class from json file
@@ -46,32 +76,48 @@ class Manga {
         this.tags = list.toTypedArray()
     }
 
-    // Constructor from JSON string
+    // Fill data from JSONObject
     // MAY THROW MangaJetException
-    constructor(jsonStr: String){
-        val json = JSONObject(jsonStr)
-        this.id = json.optString("id")
+    private fun fromJSON(json: JSONObject) {
+        id = json.optString("id")
         try {
-            this.library = Librarian.getLibrary(
+            library = Librarian.getLibrary(
                 Librarian.LibraryName.from(json.optString("library"))
             )!!
         }
         catch (expected: NullPointerException) {
+            Logger.log("Unknown library: " + expected.message, Logger.Lvl.WARNING)
             throw MangaJetException("Unknown library")
         }
         this.lastViewedChapter = json.optInt("lastViewedChapter", 0)
         fillMangaFromJSON(json)
+        val chaptersJson = json.getJSONObject("chapters")
         val listTmp = arrayListOf<MangaChapter>()
-        for (i in 0 until json.getJSONObject("chapters").length()) {
-            val chapterId = json.getJSONObject("chapters").names().getString(i)
-            val pagesJSON = json.getJSONObject("chapters").getJSONArray(chapterId)
+        listTmp.ensureCapacity(chaptersJson.length())
+        for (i in 0 until chaptersJson.length()) {
+            val chapterId = chaptersJson.names().getString(i)
+            val pagesJSON = chaptersJson.getJSONArray(chapterId)
             val pagesArray = arrayListOf<String>()
+            pagesArray.ensureCapacity(pagesJSON.length())
             for (j in 0 until pagesJSON.length())
                 pagesArray.add(pagesJSON[j].toString())
             listTmp.add(MangaChapter(this, chapterId, pagesArray))
         }
         this.chapters = listTmp.toTypedArray()
-        this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
+        if (this.chapters.isNotEmpty() && this.chapters.size >= lastViewedChapter)
+            this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
+    }
+
+    // Constructor from JSON string
+    // MAY THROW MangaJetException
+    constructor(jsonStr: String){
+        try {
+            val json = JSONObject(jsonStr)
+            fromJSON(json)
+        }
+        catch (es :JSONException){
+            throw MangaJetException("Bad json " + jsonStr)
+        }
     }
 
     // Function to fill all manga info except chapters
@@ -83,11 +129,16 @@ class Manga {
     // Function to fill chapters array of manga
     // MAY THROW MangaJetException
     fun updateChapters(){
-        chapters = library.getMangaChapters(this) // Exception may be thrown here
+        var tmp = chapters
+        chapters = library.getMangaChapters(this)
+        for (i in tmp.indices) {
+            chapters[i] = tmp[i]
+        }
     }
 
     // Function dump information about manga as JSON string
-    fun toJSON() : String {
+    // MAY THROW MangaJetException
+    fun toJSON(full : Boolean = false) : String {
         val json = JSONObject()
         json.put("id", this.id)
         json.put("library", this.library.getURL())
@@ -104,10 +155,25 @@ class Manga {
         if (this.lastViewedChapter < 0 || this.lastViewedChapter >= this.chapters.size)
             this.lastViewedChapter = 0
         json.put("lastViewedChapter", this.lastViewedChapter)
-        json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        if (this.chapters.isNotEmpty())
+            json.put("lastViewedPage", this.chapters[this.lastViewedChapter].lastViewedPage)
+        else
+            json.put("lastViewedPage", 0)
         val jsonChapters = JSONObject()
+
+        if (full)
+            chapters.forEach{it.updateInfo()}
+
         chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
         json.put("chapters", jsonChapters)
         return json.toString()
+    }
+
+    // function for saving Manga to file
+    // MAY THROW MangaJetException
+    fun saveToFile(full: Boolean = false) {
+        var string = toJSON(full)
+        var path = id.replace(".", "_") + ".json"
+        StorageManager.saveString(path, string, StorageManager.FileType.MangaInfo)
     }
 }

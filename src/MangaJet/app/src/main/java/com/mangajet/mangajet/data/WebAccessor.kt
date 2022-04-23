@@ -1,12 +1,12 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.log.Logger
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Callback
 import okhttp3.Call
 import okio.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -79,6 +79,7 @@ object WebAccessor {
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 isError = IO_ERROR
+                Logger.log("OnFailure response in WebAccessor: " + e.message, Logger.Lvl.WARNING)
                 println(e.message) // for debugging purposes
                 countDownLatch.countDown()
             }
@@ -90,6 +91,7 @@ object WebAccessor {
                             str = response.body!!.string()
                         }
                         catch (expected: NullPointerException) {
+                            Logger.log("Null Pointer exception in getTextSync", Logger.Lvl.WARNING)
                             isError = BODY_NULL_ERROR
                             retCode = NOT_FOUND
                         }
@@ -133,6 +135,7 @@ object WebAccessor {
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 isError = IO_ERROR
+                Logger.log("OnFailure response in WebAccessor: " + e.message, Logger.Lvl.WARNING)
                 println(e.message) // for debugging purposes
                 countDownLatch.countDown()
             }
@@ -149,6 +152,7 @@ object WebAccessor {
                             }
                         }
                         catch (expected: NullPointerException) {
+                            Logger.log("Null Pointer exception in Promise in WebAccessor", Logger.Lvl.WARNING)
                             isError = BODY_NULL_ERROR
                             retCode = NOT_FOUND
                         }

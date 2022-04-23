@@ -9,13 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
-import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
 import com.mangajet.mangajet.ui.settings.options.StoragePathDialog
-
+import com.mangajet.mangajet.ui.settings.options.TesterButtonsActivity
+import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
 
 // Class which represents "Settings" fragment of MainActivity
 class SettingFragment : Fragment() {
@@ -27,6 +29,7 @@ class SettingFragment : Fragment() {
         const val BACKUP_ID = 3         // Backup submenu id
         const val STORAGE_PATH_ID = 4   // Storage path dialog id
         const val ABOUTAPP_ID = 5       // About app submenu id
+        const val TESTBUTTONS_ID = 6    // Test button submenu id
     }
 
     // Binding tool to get layout elements
@@ -36,6 +39,7 @@ class SettingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ) : View? {
+        Logger.log("Settings opened")
         val settingsViewModel =
             ViewModelProvider(this).get(SettingViewModel::class.java)
 
@@ -82,6 +86,12 @@ class SettingFragment : Fragment() {
                     ABOUTAPP_ID -> {
                         var intent = Intent(it, AboutAppActivity::class.java)
                         startActivity(intent)
+                    }
+                    TESTBUTTONS_ID -> {
+                        if (BuildConfig.VERSION_NAME.endsWith("dev")) {
+                            var intent = Intent(it, TesterButtonsActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
                 }
             }

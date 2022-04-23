@@ -1,18 +1,162 @@
 package com.mangajet.mangajet.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
+import com.mangajet.mangajet.MangaJetApp.Companion.context
+import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.MangaListElementContainer
+import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.databinding.SearchFragmentBinding
+import com.mangajet.mangajet.log.Logger
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // Class which represents "Search" ViewModel
 class SearchViewModel : ViewModel() {
-    class Manga(newName: String, newDescr: String) {
-        val name: String = newName
-        val descr: String = newDescr
+    companion object {
+        const val SEARCH_AMOUNT = 20        // Amount of searchable mangas
+    }
+    var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
+    var job : Job? = null                           // Async job for searching and uploading
+    var adapter : MangaListAdapter? = null          // adapter for list
+
+    // mangas info for list
+    val mangasInfos = ArrayList<MangaListElementContainer>()
+
+    // Selected resources
+    var allLibraries = arrayOf(
+        Librarian.LibraryName.Readmanga,
+        Librarian.LibraryName.Mangachan,
+        Librarian.LibraryName.Mangalib,
+        Librarian.LibraryName.Acomics
+    )
+    // flags for each resource
+    private var chosenLibraries = BooleanArray(allLibraries.size)
+
+    // init flags
+    init {
+        chosenLibraries[0] = true
+        for (i in 1 until chosenLibraries.size)
+            chosenLibraries[i] = false
     }
 
-    val mangas = listOf(Manga("FoundedManga1", "descr1"),
-        Manga("FoundedManga2", "descr2"),
-        Manga("FoundedManga3", "descr3"))
-    val mangasNames = listOf("FoundedManga1", "FoundedManga2", "FoundedManga3")
+    // Function which will upload manga into mangas array and catch exceptions
+    private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
+        try {
+            job?.ensureActive()
+            mangas[i].updateInfo()
+            job?.ensureActive()
+            withContext(Dispatchers.Main) {
+                mangasInfos.add(MangaListElementContainer(
+                    mangas[i].originalName,
+                    mangas[i].author,
+                    mangas[i].library.getURL(),
+                    mangas[i].cover,
+                    mangas[mangas.size - 1].library.getHeadersForDownload()
+                    ))
+                adapter?.notifyDataSetChanged()
+            }
+        } catch (ex : MangaJetException) {
+            // only thing which may fail here is updateInfo
+            // which will be deleted if we return false
+            Logger.log("Catch MJE in uploadMangaInto Array: " + ex.message, Logger.Lvl.WARNING)
+            return false
+        }
+        return true
+    }
+
+    // Function which will load info about each manga from "manga names"
+    private suspend fun addElementsToMangas(
+        queryString : String,
+        source : Librarian.LibraryName
+    ) {
+        try {
+            val libsMangas = Librarian.getLibrary(source)!!
+                .searchManga(queryString, SEARCH_AMOUNT, 0)
+
+            if (libsMangas.isEmpty()) {
+                return
+            }
+            
+            for (i in libsMangas.indices) {
+                mangas.add(libsMangas[i])
+                job?.ensureActive()
+                if (!uploadMangaIntoArray(mangas.size - 1)) {
+                    job?.ensureActive()
+                    mangas.removeAt(mangas.size - 1)
+                }
+            }
+
+        } catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to load info about some manga while searching"
+                    + ex.message, Logger.Lvl.WARNING)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    // Function which will update all sources flags in 'chosenLibraries', where will be searching
+    fun updateLibsSources(fragmentManager : FragmentManager?) {
+        val librariesNames = Array(allLibraries.size) { i -> allLibraries[i].resource}
+        val choseResourceDialog = SearchSetSourcesDialog(librariesNames, chosenLibraries)
+        if (fragmentManager != null) {
+            choseResourceDialog.show(fragmentManager, "Choose resource dialog")
+            if (choseResourceDialog.wasSelected) {
+                for (i in choseResourceDialog.mCheckedItems.indices)
+                    chosenLibraries[i] = choseResourceDialog.mCheckedItems[i]
+            }
+        }
+    }
+
+    // Function which will destroy and clear all fields and threads
+    private fun destroyAll() {
+        job?.cancel()
+        adapter?.clear()
+        mangas.clear()
+        mangasInfos.clear()
+    }
+
+    // Function which will async load mangas info
+    fun initMangas(adapterNew: MangaListAdapter, binding : SearchFragmentBinding, queryString : String) {
+        binding.progressBar.show()
+        binding.noResultLayout.visibility = View.INVISIBLE
+
+        adapter = adapterNew
+
+        //All libraries
+        var sources = ""
+        for(i in allLibraries.indices)
+            if(chosenLibraries[i])
+                sources += allLibraries[i].resource + " "
+        Logger.log("Search \"$queryString\" with these sources: $sources")
+
+        destroyAll()
+        job = GlobalScope.launch(Dispatchers.IO) {
+            for (i in allLibraries.indices) {
+                if (chosenLibraries[i])
+                    addElementsToMangas(queryString, allLibraries[i])
+            }
+
+            withContext(Dispatchers.Main) {
+                if (mangas.size == 0)
+                    binding.noResultLayout.visibility = View.VISIBLE
+                binding.progressBar.hide()
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        destroyAll()
+    }
 }
