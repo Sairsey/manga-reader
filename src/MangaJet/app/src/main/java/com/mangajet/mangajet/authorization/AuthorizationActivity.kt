@@ -17,6 +17,7 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.mangareader.AuthorizationViewModel
+import com.mangajet.mangajet.log.Logger
 import kotlin.system.exitProcess
 
 
@@ -104,6 +105,7 @@ class AuthorizationActivity : AppCompatActivity() {
                 finish()
             }
             catch (ex: MangaJetException) {
+                Logger.log("Catch MJE while trying to update json with library data: " + ex.message, Logger.Lvl.WARNING)
                 var builder = AlertDialog.Builder(this)
                 builder.setTitle("ERROR")
                 builder.setMessage(ex.message)

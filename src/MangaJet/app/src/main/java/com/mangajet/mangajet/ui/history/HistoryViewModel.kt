@@ -8,6 +8,7 @@ import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -31,6 +32,7 @@ class HistoryViewModel : ViewModel() {
             mangasPaths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
         }
         catch (ex: MangaJetException) {
+            Logger.log("Catch MJE while trying to load info about some manga: " + ex.message, Logger.Lvl.WARNING)
             // we do not have permission to read.
             // not a big problem, just not showing anything
         }
@@ -52,6 +54,7 @@ class HistoryViewModel : ViewModel() {
                 }
             }
             catch (ex: MangaJetException) {
+                Logger.log("Catch MJE while trying to get info about some manga: " + ex.message, Logger.Lvl.WARNING)
                 // nothing too tragic, we just haven`t permission to read or file invalid
                 // but we should continue
                 continue

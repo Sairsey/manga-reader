@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,10 +57,12 @@ class MangaListAdapter(
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
                 // we do not need to catch exceptions here
+                Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
                 continue
             }
         }
         // maybe throw exception or reload?
+        Logger.log("Return null in loadBitMap", Logger.Lvl.WARNING)
         return null
     }
 

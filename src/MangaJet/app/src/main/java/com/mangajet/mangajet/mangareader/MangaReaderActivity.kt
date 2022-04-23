@@ -15,7 +15,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
-
+import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.log.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // Class which represents "Manga Reader" Activity
 @Suppress("TooManyFunctions")
@@ -58,6 +62,7 @@ class MangaReaderActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Logger.log("Manga Reader activity started")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.manga_reader_activity)
 
@@ -78,6 +83,7 @@ class MangaReaderActivity : AppCompatActivity() {
         viewPager.setCurrentItem(mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage + delta, false)
+        Logger.log("Chapter " + (mangaReaderViewModel.manga.lastViewedChapter + 1).toString() + " opened")
 
         // init toolbar handler
         val headerToolbar = findViewById<MaterialToolbar>(R.id.headerToolbar)

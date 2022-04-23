@@ -17,6 +17,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.SearchFragmentBinding
+import com.mangajet.mangajet.log.Logger
 
 
 // Class which represents "Search" fragment of MainActivity
@@ -91,6 +92,7 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) : View {
+        Logger.log("Search opened")
         searchViewModel =
             ViewModelProvider(this).get(SearchViewModel::class.java)
 
@@ -116,6 +118,7 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        Logger.log("Search destroyed")
         super.onDestroyView()
         binding.searchView.setQuery("", false)
         searchViewModel.job?.cancel()
