@@ -13,10 +13,12 @@ import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.formatchangeholder.FormatChangerHandler
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
-import kotlinx.coroutines.Dispatchers
 import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.yield
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -39,6 +41,7 @@ class MangaReaderViewModel : ViewModel() {
     lateinit var manga: Manga           // Manga we are reading right now
     var pagesCount = 0                  // pages amount in current viewed chapter
     var jobs = arrayOf<Job?>()
+    var waitJob: Job? = null
 
     // data for mangaReader format
     var currentReaderFormat = READER_FORMAT_BOOK    // current reader format
@@ -130,6 +133,9 @@ class MangaReaderViewModel : ViewModel() {
         for (job in jobs)
             job?.cancel()
 
+        waitJob?.cancel()
+        println("Canceled wait")
+
         jobs = arrayOfNulls(pagesCount + 2)
 
         mangaReaderVP2.isUserInputEnabled = false
@@ -144,23 +150,33 @@ class MangaReaderViewModel : ViewModel() {
     }
 
     private fun waitUntilLoad() {
-        viewModelScope.launch(Dispatchers.IO) {
+        println("New wait started")
+        waitJob = viewModelScope.launch(Dispatchers.IO) {
             var tmpPageFile : File
-            for (i in 0 until pagesCount)
-                tmpPageFile = manga.chapters[manga.lastViewedChapter].getPage(i).getFile()
+            ensureActive()
+            // I think load all pages are not the best solution.
+            // It will be better if we load just 1 page and then give control
+            // Otherwise we may block user for too long.
+            tmpPageFile = manga.chapters[manga.lastViewedChapter].getPage(0).getFile()
+            ensureActive()
             withContext(Dispatchers.Main) {
+                ensureActive()
                 mangaReaderVP2.isUserInputEnabled = true
             }
         }
     }
 
     // Function which will decode bitmap async
-    fun loadBitmap(page : MangaPage): Bitmap? {
+    suspend fun loadBitmap(page : MangaPage): Bitmap? {
         for (i in 0 until LOAD_REPEATS) {
+            yield()
             i.hashCode()
             try {
+                yield()
                 page.upload(i > 0)
+                yield()
                 val imageFile = page.getFile()
+                yield()
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
                 Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
@@ -228,111 +244,114 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will load previous chapter after scroll
     fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
-        // update chapter
-        manga.lastViewedChapter--
+        synchronized(isInited)
+        {
+            // update chapter
+            manga.lastViewedChapter--
 
-        // update pages count (and load chapter)
-        try {
-            pagesCount = manga
-                .chapters[manga.lastViewedChapter].getPagesNum()
+            // update pages count (and load chapter)
+            try {
+                pagesCount = manga
+                    .chapters[manga.lastViewedChapter].getPagesNum()
+            } catch (ex: MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                viewPager.setCurrentItem(1, false)
+                manga.lastViewedChapter++
+                return
+            }
+
+            // start loading all pages
+            uploadPages()
+
+            // set correct page
+            manga.chapters[manga.lastViewedChapter].lastViewedPage = pagesCount - 1
+
+            // save manga state
+            try {
+                manga.saveToFile()
+            } catch (ex: MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
+
+            viewPager.adapter = null
+            pagerAdapter.notifyDataSetChanged()
+            viewPager.adapter = pagerAdapter
+            formatChangerHandler.notifyAdaptersForPrevChapter()
+
+            // determine delta
+            var delta = 0
+            if (manga.lastViewedChapter == 0)
+                delta = -1
+
+            if (currentReaderFormat != READER_FORMAT_MANGA)
+                viewPager.setCurrentItem(pagesCount + delta, false)
+            else
+                viewPager.setCurrentItem(1, false)
+
+            val chapter = manga.lastViewedChapter + 1
+            Toast.makeText(
+                MangaJetApp.context, "Chapter $chapter",
+                Toast.LENGTH_SHORT
+            ).show()
+            Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
         }
-        catch (ex:MangaJetException) {
-            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-            viewPager.setCurrentItem(1, false)
-            manga.lastViewedChapter++
-            return
-        }
-
-        // start loading all pages
-        uploadPages()
-
-        // set correct page
-        manga.chapters[manga.lastViewedChapter].lastViewedPage = pagesCount - 1
-
-        // save manga state
-        try {
-            manga.saveToFile()
-        }
-        catch (ex : MangaJetException) {
-            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-        }
-
-        viewPager.adapter = null
-        pagerAdapter.notifyDataSetChanged()
-        viewPager.adapter = pagerAdapter
-        formatChangerHandler.notifyAdaptersForPrevChapter()
-
-        // determine delta
-        var delta = 0
-        if (manga.lastViewedChapter == 0)
-            delta = -1
-
-        if (currentReaderFormat != READER_FORMAT_MANGA)
-            viewPager.setCurrentItem(pagesCount + delta, false)
-        else
-            viewPager.setCurrentItem(1, false)
-
-        val chapter = manga.lastViewedChapter + 1
-        Toast.makeText(
-            MangaJetApp.context, "Chapter $chapter",
-            Toast.LENGTH_SHORT).show()
-        Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
     }
 
     // Function which will load next chapter after scroll
     fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
-        // update chapter
-        manga.lastViewedChapter++;
+        synchronized(isInited) {
+            // update chapter
+            manga.lastViewedChapter++;
 
-        // update pages count (and load chapter)
-        try {
-            pagesCount = manga
-                .chapters[manga.lastViewedChapter].getPagesNum()
+            // update pages count (and load chapter)
+            try {
+                pagesCount = manga
+                    .chapters[manga.lastViewedChapter].getPagesNum()
+            } catch (ex: MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                var delta = 0
+                if (manga.lastViewedChapter == 0)
+                    delta = -1
+                viewPager.setCurrentItem(pagesCount + delta, false)
+                manga.lastViewedChapter++
+                return
+            }
+
+            // start loading all pages
+            uploadPages()
+
+            // set correct page
+            manga.chapters[manga.lastViewedChapter]
+                .lastViewedPage = 0
+
+            // save manga state
+            try {
+                manga.saveToFile()
+            } catch (ex: MangaJetException) {
+                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
+
+            viewPager.adapter = null
+            pagerAdapter.notifyDataSetChanged()
+            viewPager.adapter = pagerAdapter
+            if (currentReaderFormat != READER_FORMAT_MANGA)
+                viewPager.setCurrentItem(1, false)
+            else {
+                // determine delta
+                var delta = 0
+                if (manga.lastViewedChapter == manga.chapters.size - 1)
+                    delta = -1
+
+                viewPager.setCurrentItem(pagesCount + delta, false)
+            }
+
+            val chapter = manga.lastViewedChapter + 1
+            Toast.makeText(
+                MangaJetApp.context, "Chapter $chapter",
+                Toast.LENGTH_SHORT
+            ).show()
+            Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
         }
-        catch (ex:MangaJetException) {
-            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-            var delta = 0
-            if (manga.lastViewedChapter == 0)
-                delta = -1
-            viewPager.setCurrentItem(pagesCount + delta, false)
-            manga.lastViewedChapter++
-            return
-        }
-
-        // start loading all pages
-        uploadPages()
-
-        // set correct page
-        manga.chapters[manga.lastViewedChapter]
-            .lastViewedPage = 0
-
-        // save manga state
-        try {
-            manga.saveToFile()
-        }
-        catch (ex : MangaJetException) {
-            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-        }
-
-        viewPager.adapter = null
-        pagerAdapter.notifyDataSetChanged()
-        viewPager.adapter = pagerAdapter
-        if (currentReaderFormat != READER_FORMAT_MANGA)
-            viewPager.setCurrentItem(1, false)
-        else {
-            // determine delta
-            var delta = 0
-            if (manga.lastViewedChapter == manga.chapters.size - 1)
-                delta = -1
-
-            viewPager.setCurrentItem(pagesCount + delta, false)
-        }
-
-        val chapter = manga.lastViewedChapter + 1
-        Toast.makeText(
-            MangaJetApp.context, "Chapter $chapter",
-            Toast.LENGTH_SHORT).show()
-        Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
     }
 
     // Function which will set activity title by current opened page

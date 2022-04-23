@@ -50,6 +50,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         override fun bind(mangaPage : MangaPage, position : Int) {
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
                 .launch(Dispatchers.IO) {
+                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
                     val needToScroolEnd = isScrollToEnd()
                     val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                     ensureActive()
@@ -64,8 +65,8 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                                 getFocus(needToScroolEnd, imagePage.sWidth, imagePage.sHeight))
                             prevViewedChapter = currentChapter
                             prevViewedPage = currentPage
+                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                         }
-                        itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                     }
                 }
         }

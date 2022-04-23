@@ -25,6 +25,7 @@ class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBase
         override fun bind(mangaPage: MangaPage, position: Int) {
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
                 .launch(Dispatchers.IO) {
+                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
                     val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                     ensureActive()
                     withContext(Dispatchers.Main) {
@@ -32,8 +33,8 @@ class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBase
                             val imageSrc = ImageSource.bitmap(pageFile)
                             ensureActive()
                             imagePage.setImage(imageSrc)
+                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                         }
-                        itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
                     }
                 }
         }
