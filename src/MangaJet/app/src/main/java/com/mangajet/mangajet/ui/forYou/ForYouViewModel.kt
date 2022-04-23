@@ -6,6 +6,7 @@ import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +34,8 @@ class ForYouViewModel : ViewModel() {
                 )
             }
             catch (ex: MangaJetException) {
+                Logger.log("Catch MJE while trying to load info about manga with " + name +
+                        " name: " + ex.message, Logger.Lvl.WARNING)
                 // nothing too tragic. If manga not found we can just skip it
                 continue
             }
@@ -41,6 +44,8 @@ class ForYouViewModel : ViewModel() {
                 mangas[mangas.size - 1].updateInfo()
             }
             catch (ex: MangaJetException) {
+                Logger.log("Catch MJE while trying to update info in " + mangas.last().id +
+                    " : " + ex.message, Logger.Lvl.WARNING)
                 // This may be tragic.
                 // lets remove this manga from mangas
                 mangas.removeLast()

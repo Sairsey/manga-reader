@@ -7,6 +7,7 @@ import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.aboutmanga.mangaChaptersFragment.MangaChaptersFragment
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -25,6 +26,8 @@ class AboutMangaViewModel : ViewModel() {
     var adapter : MangaChaptersFragment.ChapterListAdapter? = null
     var progressIndicator : LinearProgressIndicator? = null
 
+    var isChaptersListReversed = false          // Flag to reverse chapters list
+
     // Function will
     fun initMangaData() {
         if (!isInited) {
@@ -32,6 +35,7 @@ class AboutMangaViewModel : ViewModel() {
                 try {
                     manga.updateChapters()
                 } catch (ex: MangaJetException) {
+                    Logger.log("Catch MJE, can't upload chapters: " + ex.message, Logger.Lvl.WARNING)
                     // chapters from json or no chapters at all.
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context,

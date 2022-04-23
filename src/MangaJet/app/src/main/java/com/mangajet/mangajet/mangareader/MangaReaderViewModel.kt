@@ -8,6 +8,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 
 
@@ -62,6 +63,7 @@ class MangaReaderViewModel : ViewModel() {
                 pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to get pages count: " + ex.message, Logger.Lvl.WARNING)
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
             }
             uploadPages()
@@ -71,6 +73,7 @@ class MangaReaderViewModel : ViewModel() {
                 manga.saveToFile()
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to save manga as json: " + ex.message, Logger.Lvl.WARNING)
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -101,10 +104,12 @@ class MangaReaderViewModel : ViewModel() {
                 val imageFile = page.getFile()
                 return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
             } catch (ex: MangaJetException) {
+                Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
                 continue
             }
         }
         // maybe throw exception or reload?
+        Logger.log("Return null in loadBitMap", Logger.Lvl.WARNING)
         return null
     }
 
@@ -117,6 +122,8 @@ class MangaReaderViewModel : ViewModel() {
                 manga.saveToFile()
             }
             catch (ex : MangaJetException) {
+                Logger.log("Catch MJE while trying to save manga " + manga.id +
+                        " as json: " + ex.message, Logger.Lvl.WARNING)
                 // nothing
             }
         }

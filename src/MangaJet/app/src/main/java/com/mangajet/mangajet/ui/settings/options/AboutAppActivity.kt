@@ -13,6 +13,8 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.BuildConfig;
+import com.mangajet.mangajet.log.Logger
+
 // Dialog with authors
 class AuthorsDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -43,6 +45,7 @@ class AboutAppActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Logger.log("About app in Settings opened")
         setTitle(R.string.setting_aboutapp)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_app)
@@ -62,12 +65,14 @@ class AboutAppActivity : AppCompatActivity() {
         aboutAppList.setOnItemClickListener{ parent, view, position, id ->
             when (id.toInt()) {
                 SUPPORT -> {
+                    Logger.log("Support clicked")
                     val browserIntent =
                         Intent(Intent.ACTION_VIEW, Uri.parse("https://i.imgflip.com/17vyv9.jpg"))
                     startActivity(browserIntent)
                 }
 
                 AUTHORS -> {
+                    Logger.log("Authors clicked")
                     val myDialogFragment = AuthorsDialog()
                     val manager = supportFragmentManager
                     myDialogFragment.show(manager, "'Author' dialog")

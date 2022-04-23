@@ -17,11 +17,35 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.mangareader.AuthorizationViewModel
+import com.mangajet.mangajet.log.Logger
 import kotlin.system.exitProcess
 
 
 // Class which represents Authorization Activity
 class AuthorizationActivity : AppCompatActivity() {
+
+    // this function will create blocking dialog with instruction
+    fun showInstruction() {
+        val builder = AlertDialog.Builder(this)
+        builder
+            .setTitle("Instruction")
+            .setMessage("To authenticate follow these simple steps:\n" +
+                    "1)Close this dialog by pressing option you like\n" +
+                    "2)In opened in-app browser authenticate like you do in on website.\n" +
+                    "3)After authentication finished press big \"Done\" button at the bottom\n")
+            .setPositiveButton("Got it!") { dialog, id ->
+            }
+            .setNegativeButton("Do not show it again"
+            ) { dialog, id ->
+                val prefs = getSharedPreferences("auth_pref", MODE_PRIVATE).edit()
+                prefs.putBoolean("dontshow", true)
+                prefs.commit()
+            }
+        val dialog = builder.create()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +53,13 @@ class AuthorizationActivity : AppCompatActivity() {
 
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.authorizationWVToolbar))
         setTitle(R.string.title_authorization)
+
+        val prefs = getSharedPreferences("auth_pref", MODE_PRIVATE)
+        val show = prefs.getBoolean("dontshow", false)
+        if (show == false)
+        {
+            showInstruction()
+        }
 
         // Call viewmodel to init all elements
         val authorizationViewmodel = ViewModelProvider(this)[AuthorizationViewModel::class.java]
@@ -74,12 +105,14 @@ class AuthorizationActivity : AppCompatActivity() {
                 finish()
             }
             catch (ex: MangaJetException) {
+                Logger.log("Catch MJE while trying to update json with library data: " + ex.message, Logger.Lvl.WARNING)
                 var builder = AlertDialog.Builder(this)
                 builder.setTitle("ERROR")
                 builder.setMessage(ex.message)
                 builder.setNeutralButton("ok") { dialog, which ->
                     exitProcess(-1)
                 }
+                builder.setCancelable(false)
                 builder.show()
             }
         }

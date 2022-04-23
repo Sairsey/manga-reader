@@ -125,6 +125,8 @@ class AcomicsLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var f = text.indexOf("about-summary")
             f = text.indexOf("</div>", f) + "</div>".length
             val s = text.indexOf("<b>Автор", f)
+            if(s == -1)
+                return ""
             val subtext = text.subSequence(f, s + 1).toString()
 
             // Remove tags
@@ -239,7 +241,7 @@ class AcomicsLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     // MAY THROW MangaJetException
     override fun getChapterInfo(mangaID: String, chapterID: String) : String {
         val url = getURL() + "/" + chapterID
-        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+        var text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
         val res = ArrayList<String>()
 
         var f = text.indexOf("contentMargin")
@@ -249,13 +251,17 @@ class AcomicsLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         var s = text.indexOf("</table>", f)
         val subtext = text.substring(f, s)
 
-        f = subtext.indexOf("img src=\"") + "img src=\"".length
-        while (f != -1 + "img src=\"".length) {
+        f = subtext.indexOf("href=\"") + "href=\"".length
+        while (f != -1 + "href=\"".length) {
             s = subtext.indexOf("\"", f)
-            val urlEnd = subtext.substring(f, s)
-            s = urlEnd.indexOf("/thumb")
-            res.add(getURL() + urlEnd.removeRange(s, s + "/thumb".length).replace(".png",".jpg"))
-            f = subtext.indexOf("img src=\"", f) + "img src=\"".length
+            val pageUrl = subtext.substring(f, s)
+            // New request
+            text = WebAccessor.getTextSync(pageUrl, headers)// Exception may be thrown here
+            var v = text.indexOf("id=\"mainImage\"")
+            v = text.indexOf("src=\"", v) + "src=\"".length
+            val w = text.indexOf("\"", v)
+            res.add(getURL() + text.substring(v, w))
+            f = subtext.indexOf("href=\"", f) + "href=\"".length
         }
         return JSONArray(res).toString()
     }

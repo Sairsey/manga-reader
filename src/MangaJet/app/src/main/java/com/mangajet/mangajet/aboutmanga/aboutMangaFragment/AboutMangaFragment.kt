@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +13,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.appbar.MaterialToolbar
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
@@ -53,14 +57,17 @@ class AboutMangaFragment : Fragment() {
             val imageFile = cover.getFile() // Catch ex here
             BitmapFactory.decodeFile(imageFile.absolutePath)
         } catch (ex: MangaJetException) {
+            Logger.log("Catch MJE while decoding bitmap of " + cover.url + " : "
+                    + ex.message, Logger.Lvl.WARNING)
             null
         }
     }
 
     override fun onStart() {
         super.onStart()
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
 
+        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        Logger.log("About " + aboutMangaViewmodel.manga.id + " fragment opened")
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())
         // this can only fail if we do not have storage permission
@@ -90,7 +97,15 @@ class AboutMangaFragment : Fragment() {
         buttonToRead.setOnClickListener{
             if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
                 val intent = Intent(activity, MangaReaderActivity::class.java)
-                startActivity(intent)
+                // check if we need authorization
+                val pagesCnt = MangaJetApp.currentManga!!
+                    .chapters[MangaJetApp.currentManga!!.lastViewedChapter].getPagesNum()
+                if (pagesCnt > 0)
+                    startActivity(intent)
+                else
+                    Toast.makeText(context,
+                        "Can't open chapter: maybe its empty or you need to authorizes on site",
+                        Toast.LENGTH_SHORT).show()
             }
             else
                 Toast.makeText(context,
@@ -114,5 +129,12 @@ class AboutMangaFragment : Fragment() {
             newTextView.setBackgroundResource(R.drawable.tag_border)
             tagsLayout.addView(newTextView)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val mToolbar = activity?.findViewById<MaterialToolbar>(R.id.aboutMangaToolbar)
+        mToolbar?.menu?.clear()
     }
 }

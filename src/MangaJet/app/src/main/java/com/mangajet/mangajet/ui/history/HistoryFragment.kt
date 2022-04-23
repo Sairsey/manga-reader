@@ -11,6 +11,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
+import com.mangajet.mangajet.log.Logger
 
 // Class which represents "History" fragment of MainActivity
 class HistoryFragment : Fragment() {
@@ -51,6 +52,7 @@ class HistoryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) : View {
+        Logger.log("History opened")
         val historyViewModel =
             ViewModelProvider(this).get(HistoryViewModel::class.java)
 
@@ -78,6 +80,7 @@ class HistoryFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        Logger.log("History destroyed")
         super.onDestroyView()
         _binding = null
     }
