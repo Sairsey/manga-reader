@@ -13,6 +13,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.appbar.MaterialToolbar
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
@@ -95,7 +97,15 @@ class AboutMangaFragment : Fragment() {
         buttonToRead.setOnClickListener{
             if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
                 val intent = Intent(activity, MangaReaderActivity::class.java)
-                startActivity(intent)
+                // check if we need authorization
+                val pagesCnt = MangaJetApp.currentManga!!
+                    .chapters[MangaJetApp.currentManga!!.lastViewedChapter].getPagesNum()
+                if (pagesCnt > 0)
+                    startActivity(intent)
+                else
+                    Toast.makeText(context,
+                        "Can't open chapter: maybe its empty or you need to authorizes on site",
+                        Toast.LENGTH_SHORT).show()
             }
             else
                 Toast.makeText(context,
@@ -119,5 +129,12 @@ class AboutMangaFragment : Fragment() {
             newTextView.setBackgroundResource(R.drawable.tag_border)
             tagsLayout.addView(newTextView)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val mToolbar = activity?.findViewById<MaterialToolbar>(R.id.aboutMangaToolbar)
+        mToolbar?.menu?.clear()
     }
 }
