@@ -104,7 +104,7 @@ class Manga {
             listTmp.add(MangaChapter(this, chapterId, pagesArray))
         }
         this.chapters = listTmp.toTypedArray()
-        if (this.chapters.isNotEmpty())
+        if (this.chapters.isNotEmpty() && this.chapters.size >= lastViewedChapter)
             this.chapters[lastViewedChapter].lastViewedPage = json.optInt("lastViewedPage", 0)
     }
 

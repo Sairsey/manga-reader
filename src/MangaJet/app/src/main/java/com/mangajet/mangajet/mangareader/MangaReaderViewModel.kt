@@ -276,6 +276,7 @@ class MangaReaderViewModel : ViewModel() {
         Toast.makeText(
             MangaJetApp.context, "Chapter $chapter",
             Toast.LENGTH_SHORT).show()
+        Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
     }
 
     // Function which will load next chapter after scroll
@@ -331,6 +332,7 @@ class MangaReaderViewModel : ViewModel() {
         Toast.makeText(
             MangaJetApp.context, "Chapter $chapter",
             Toast.LENGTH_SHORT).show()
+        Logger.log("Going to chapter $chapter", Logger.Lvl.INFO)
     }
 
     // Function which will set activity title by current opened page
