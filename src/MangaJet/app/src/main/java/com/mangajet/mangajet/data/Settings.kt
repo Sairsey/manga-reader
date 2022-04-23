@@ -87,10 +87,6 @@ object Settings {
 
     // Function to save current state of setting.json
     fun saveState(){
-        if(StorageManager.isExist(settingFileName, StorageManager.FileType.LibraryInfo))
-            StorageManager.getFile(settingFileName, StorageManager.FileType.LibraryInfo).delete()
-
-        StorageManager.saveString(settingFileName, "", StorageManager.FileType.LibraryInfo)
         val json = JSONObject()
         json.put("mangaSearchAmount", MANGA_SEARCH_AMOUNT)
         var res : String = ""
