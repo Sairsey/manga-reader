@@ -43,11 +43,21 @@ class MangaPage {
     // Function will return File instance of this image
     // MAY THROW MangaJetException
     fun getFile() : File {
-        // safe-check
+        // Safe-check
         upload() // Exception may be thrown here
 
-        // wait if not loaded
+        // Wait if not loaded
         StorageManager.await(this.localPath) // Exception may be thrown here
+
+        // Check that load successfully
+        val file = StorageManager.getFile(this.localPath)
+        val correctSize = WebAccessor.getLength(this.url, this.mangaHeaders.toMap())
+        if(correctSize != -1L && file.length() != correctSize){
+            // Try again
+            println("RELOAD")// For debug
+            upload() // Exception may be thrown here
+            StorageManager.await(this.localPath) // Exception may be thrown here
+        }
 
         // If we wanted to load it to downloaded pages, we should just move it from cached
         // Exception may be thrown here

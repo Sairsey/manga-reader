@@ -25,7 +25,46 @@ object WebAccessor {
     const val BODY_NULL_ERROR = 2
     const val RET_CODE_ERROR = 3
 
-    // Function to aquire things asyncroniously
+    // Function to retrieve length of file by url
+    fun getLength(url: String, headers: Map<String, String> = mapOf()) : Long{
+
+        // Atomic counter
+        val countDownLatch = CountDownLatch(1)
+
+        var size : Long = -1
+        // Simple Callback which will return string
+        val callback = object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Logger.log("OnFailure response in getLength in WebAcc: " + e.message, Logger.Lvl.WARNING)
+                countDownLatch.countDown()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (response.isSuccessful) {
+                        try {
+                            size = response.body!!.contentLength()
+                        }
+                        catch (expected: NullPointerException) {
+                            Logger.log("Null Pointer exception in getLength", Logger.Lvl.WARNING)
+                            // That's sad, but return -1 work as flag for us
+                        }
+                    }
+                    countDownLatch.countDown()
+                }
+            }
+        }
+
+        // Make async call
+        val call = getAsync(url, callback, headers)
+
+        // And wait for it
+        countDownLatch.await()
+
+        return size
+    }
+
+    // Function to acquire things asynchronously
     private fun getAsync(url: String, callback: Callback,
                          headers: Map<String, String> = mapOf()) : Call {
 
@@ -58,13 +97,13 @@ object WebAccessor {
         return call
     }
 
-    // Function to aquire text syncroniously
+    // Function to acquire text synchronously
     // Note: Please use it if text are less then 1Mb
     fun getTextSync(url: String, headers: Map<String, String> = mapOf()) : String {
         // We have here another android crazy stuff
         // Problem is that Android blocks sockets from main thread
-        // So to get text syncroniously we need to
-        // do asyncronious request and wait for it.
+        // So to get text synchronously we need to
+        // do asynchronous request and wait for it.
 
         // Default value
         var str = ""
@@ -79,7 +118,7 @@ object WebAccessor {
         val callback = object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 isError = IO_ERROR
-                Logger.log("OnFailure response in WebAccessor: " + e.message, Logger.Lvl.WARNING)
+                Logger.log("OnFailure response in getTextSync in WebAccessor: " + e.message, Logger.Lvl.WARNING)
                 println(e.message) // for debugging purposes
                 countDownLatch.countDown()
             }
@@ -120,7 +159,7 @@ object WebAccessor {
         return str
     }
 
-    // Xlass which represent async handler of streaming web data to some file
+    // Class which represent async handler of streaming web data to some file
     class Promise(outputStream: OutputStream) {
         // Atomic counter
         private var countDownLatch = CountDownLatch(1)
@@ -180,7 +219,7 @@ object WebAccessor {
         }
     }
 
-    // Function to aquire bytes via InputStream
+    // Function to acquire bytes via InputStream
     fun writeBytesStream(url: String, outputStream: OutputStream, headers: Map<String, String> = mapOf()) : Promise {
         // Create new promise
         val myPromise = Promise(outputStream)
