@@ -49,7 +49,7 @@ object StorageManager {
     fun isExist(path: String, type: FileType = FileType.Auto) : Boolean {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             if (type == FileType.Auto) {
                 for (typeIterator in FileType.values()) {
                     val f: File = File(storageDirectory + typeIterator.subdirectoryPath + "/" + path)
@@ -59,7 +59,7 @@ object StorageManager {
                 return false
             }
             return File(storageDirectory + type.subdirectoryPath + "/" + path).exists()
-        }
+        //}
     }
 
     // Function which asynchronously start download from Internet to file
