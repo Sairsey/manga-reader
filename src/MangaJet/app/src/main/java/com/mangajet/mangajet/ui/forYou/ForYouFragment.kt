@@ -39,7 +39,7 @@ class ForYouFragment : Fragment() {
             val adapter = MangaListAdapter(
                 requireActivity(),
                 com.mangajet.mangajet.R.layout.manga_list_element,
-                forYouFragmentViewModel.mangasInfos
+                forYouFragmentViewModel.mangas
             )
             forYouFragmentViewModel.initMangas(adapter)
 

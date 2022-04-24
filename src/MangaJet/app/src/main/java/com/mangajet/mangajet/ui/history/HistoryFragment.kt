@@ -63,7 +63,7 @@ class HistoryFragment : Fragment() {
         adapter = MangaListAdapter(
             requireActivity(),
             com.mangajet.mangajet.R.layout.manga_list_element,
-            historyViewModel.mangasInfos
+            historyViewModel.mangas
         )
 
         binding.progressBar.show()

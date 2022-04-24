@@ -3,7 +3,6 @@ package com.mangajet.mangajet.ui.history
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaListAdapter
-import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
@@ -22,9 +21,6 @@ class HistoryViewModel : ViewModel() {
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null          // adapter for list
 
-    // mangas info for list
-    val mangasInfos = ArrayList<MangaListElementContainer>()
-
     // Function which will load info about each manga from "manga names"
     private suspend fun addElementsToMangas() {
         var mangasPaths = arrayOf<String>()
@@ -39,17 +35,9 @@ class HistoryViewModel : ViewModel() {
         for (path in mangasPaths) {
             job?.ensureActive()
             try {
-                mangas.add(
-                    Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
-                )
+                var manga = Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
                 withContext (Dispatchers.Main) {
-                    mangasInfos.add(MangaListElementContainer(
-                        mangas[mangas.size - 1].originalName,
-                        mangas[mangas.size - 1].author,
-                        mangas[mangas.size - 1].library.getURL(),
-                        mangas[mangas.size - 1].cover,
-                        mangas[mangas.size - 1].library.getHeadersForDownload()
-                    ))
+                    mangas.add(manga)
                     adapter?.notifyDataSetChanged()
                 }
             }
@@ -69,7 +57,6 @@ class HistoryViewModel : ViewModel() {
         adapter = adapterNew
         job?.cancel()
         mangas.clear()
-        mangasInfos.clear()
 
         job = GlobalScope.launch(Dispatchers.Default) {
             addElementsToMangas()
@@ -87,6 +74,5 @@ class HistoryViewModel : ViewModel() {
         super.onCleared()
         job?.cancel()
         mangas.clear()
-        mangasInfos.clear()
     }
 }

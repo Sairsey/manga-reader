@@ -41,7 +41,7 @@ class SearchFragment : Fragment() {
             val adapter = MangaListAdapter(
                 frag,
                 R.layout.manga_list_element,
-                searchViewModel.mangasInfos
+                searchViewModel.mangas
             )
 
             if (p0 != null) {
