@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.data
 
+import com.mangajet.mangajet.log.Logger
 import java.io.File
 
 // Class that represents one page of manga's chapter
@@ -36,6 +37,16 @@ class MangaPage {
                 headers = mangaHeaders,
                 type = StorageManager.FileType.CachedPages)  // Exception may be thrown here
         }
+        else{
+            // Check that load successfully
+            val file = StorageManager.getFile(this.localPath)
+            val correctSize = WebAccessor.getLength(this.url, this.mangaHeaders.toMap())
+            if(correctSize != -1L && file.length() != correctSize){
+                // Try again
+                Logger.log("Trying to reload the page")
+                upload(force = true, isToDownload) // Exception may be thrown here
+            }
+        }
 
         shouldBeInDownloaded = isToDownload
     }
@@ -43,10 +54,10 @@ class MangaPage {
     // Function will return File instance of this image
     // MAY THROW MangaJetException
     fun getFile() : File {
-        // safe-check
+        // Safe-check
         upload() // Exception may be thrown here
 
-        // wait if not loaded
+        // Wait if not loaded
         StorageManager.await(this.localPath) // Exception may be thrown here
 
         // If we wanted to load it to downloaded pages, we should just move it from cached
