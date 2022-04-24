@@ -107,6 +107,8 @@ class MangaListAdapter(
 
         if (currentItem.originalName.isNotEmpty() && currentItem.originalName != "")
             viewHolder.titleView.text = currentItem.originalName
+        else if (currentItem.russianName.isNotEmpty() && currentItem.russianName != "")
+            viewHolder.titleView.text = currentItem.russianName
         else
             viewHolder.titleView.text = "Manga #$position"
 
