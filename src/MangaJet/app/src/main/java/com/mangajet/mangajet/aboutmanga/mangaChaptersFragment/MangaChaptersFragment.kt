@@ -16,7 +16,6 @@ import android.widget.ImageView
 import android.widget.Button
 import android.widget.Toast
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
@@ -236,6 +235,7 @@ class MangaChaptersFragment : Fragment() {
         super.onResume()
 
         val mToolbar = activity?.findViewById<MaterialToolbar>(R.id.aboutMangaToolbar)
+        mToolbar?.menu?.clear()
         mToolbar?.inflateMenu(R.menu.chapters_fragment_menu)
         mToolbar?.setOnMenuItemClickListener{
             onOptionsItemSelected(it)
