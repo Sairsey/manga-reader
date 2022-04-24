@@ -18,6 +18,12 @@ object WebAccessor {
         .connectTimeout(1, TimeUnit.MINUTES)
         .readTimeout(1, TimeUnit.MINUTES)
         .build()
+    private val fastClient = OkHttpClient()
+        .newBuilder()
+        .connectTimeout(2, TimeUnit.MILLISECONDS)
+        .readTimeout(2, TimeUnit.MILLISECONDS)
+        .build()
+
     const val NOT_FOUND = 404
 
     const val NO_ERROR = 0
@@ -56,7 +62,7 @@ object WebAccessor {
         }
 
         // Make async call
-        val call = getAsync(url, callback, headers)
+        val call = getAsync(url, callback, headers, fast = true)
 
         // And wait for it
         countDownLatch.await()
@@ -66,7 +72,7 @@ object WebAccessor {
 
     // Function to acquire things asynchronously
     private fun getAsync(url: String, callback: Callback,
-                         headers: Map<String, String> = mapOf()) : Call {
+                         headers: Map<String, String> = mapOf(), fast: Boolean = false ) : Call {
 
         var preRequest = Request.Builder()
             .url(url)
@@ -89,7 +95,11 @@ object WebAccessor {
 
         // Make async call
         val call: Call
-        call = client.newCall(request)
+
+        if (fast)
+            call = fastClient.newCall(request)
+        else
+            call = client.newCall(request)
 
         // Set callback
         call.enqueue(callback)
