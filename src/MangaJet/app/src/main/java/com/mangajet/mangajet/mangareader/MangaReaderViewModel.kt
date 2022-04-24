@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.MangaJetApp
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
@@ -26,8 +27,6 @@ import java.io.File
 @Suppress("TooManyFunctions")
 class MangaReaderViewModel : ViewModel() {
     companion object {
-        const val LOAD_REPEATS = 5          // Load repeat count (if prev load failed -> repeat)
-
         const val READER_FORMAT_BOOK   = 0  // Book format reader
         const val READER_FORMAT_MANHWA = 1  // Manhwa format reader
         const val READER_FORMAT_MANGA  = 2  // Reverse format reader
@@ -168,8 +167,7 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will decode bitmap async
     suspend fun loadBitmap(page : MangaPage): Bitmap? {
-        for (i in 0 until LOAD_REPEATS) {
-            yield()
+        for (i in 0 until Librarian.settings.LOAD_REPEATS) {
             i.hashCode()
             try {
                 yield()

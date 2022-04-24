@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.data.WebAccessor
@@ -28,7 +27,6 @@ class MangaJetApp : Application() {
         // so they will be initialized at known time
         context = getApplicationContext();
         WebAccessor.hashCode()
-        Librarian.hashCode()
         StorageManager.hashCode()
     }
 }

@@ -113,6 +113,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         // Set logger and UEH
         Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
         checkForCrash(UncaughtExceptionHandler().getCrashReport())
+        Librarian.hashCode()
         Logger.log("Logger initialized")
 
         // on start it is good idea to load all cookies and Authentication from Librarian
