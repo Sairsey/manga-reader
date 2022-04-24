@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.MangaListAdapter
-import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
@@ -26,32 +25,21 @@ class SearchViewModel : ViewModel() {
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null          // adapter for list
 
-    // mangas info for list
-    val mangasInfos = ArrayList<MangaListElementContainer>()
-
     // Function which will upload manga into mangas array and catch exceptions
-    private suspend fun uploadMangaIntoArray(i : Int) : Boolean {
+    private suspend fun uploadMangaIntoArray(manga : Manga) {
         try {
             job?.ensureActive()
-            mangas[i].updateInfo()
+            manga.updateInfo()
             job?.ensureActive()
             withContext(Dispatchers.Main) {
-                mangasInfos.add(MangaListElementContainer(
-                    mangas[i].originalName,
-                    mangas[i].author,
-                    mangas[i].library.getURL(),
-                    mangas[i].cover,
-                    mangas[mangas.size - 1].library.getHeadersForDownload()
-                    ))
+                mangas.add(manga)
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
             // only thing which may fail here is updateInfo
             // which will be deleted if we return false
             Logger.log("Catch MJE in uploadMangaInto Array: " + ex.message, Logger.Lvl.WARNING)
-            return false
         }
-        return true
     }
 
     // Function which will load info about each manga from "manga names"
@@ -68,12 +56,8 @@ class SearchViewModel : ViewModel() {
             }
             
             for (i in libsMangas.indices) {
-                mangas.add(libsMangas[i])
                 job?.ensureActive()
-                if (!uploadMangaIntoArray(mangas.size - 1)) {
-                    job?.ensureActive()
-                    mangas.removeAt(mangas.size - 1)
-                }
+                uploadMangaIntoArray(libsMangas[i])
             }
 
         } catch (ex : MangaJetException) {
@@ -102,9 +86,7 @@ class SearchViewModel : ViewModel() {
     // Function which will destroy and clear all fields and threads
     private fun destroyAll() {
         job?.cancel()
-        adapter?.clear()
         mangas.clear()
-        mangasInfos.clear()
     }
 
     // Function which will async load mangas info

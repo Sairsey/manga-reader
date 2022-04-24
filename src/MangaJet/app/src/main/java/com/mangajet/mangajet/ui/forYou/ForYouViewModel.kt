@@ -2,7 +2,6 @@ package com.mangajet.mangajet.ui.forYou
 
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaListAdapter
-import com.mangajet.mangajet.MangaListElementContainer
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
@@ -21,17 +20,13 @@ class ForYouViewModel : ViewModel() {
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null      // adapter for list
 
-    // mangas info for list
-    val mangasInfos = ArrayList<MangaListElementContainer>()
-
     // Function which will load info about each manga from "manga names"
     suspend fun addElementsToMangas() {
         val mangasSearchWords = listOf("Гуль", "Берсерк", "Onepunchman")
         for (name in mangasSearchWords) {
+            var manga : Manga
             try {
-                mangas.add(
-                    Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
-                )
+                manga = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
             }
             catch (ex: MangaJetException) {
                 Logger.log("Catch MJE while trying to load info about manga with " + name +
@@ -41,24 +36,18 @@ class ForYouViewModel : ViewModel() {
             }
 
             try {
-                mangas[mangas.size - 1].updateInfo()
+                manga.updateInfo()
             }
             catch (ex: MangaJetException) {
-                Logger.log("Catch MJE while trying to update info in " + mangas.last().id +
+                Logger.log("Catch MJE while trying to update info in " + manga.id +
                     " : " + ex.message, Logger.Lvl.WARNING)
-                // This may be tragic.
-                // lets remove this manga from mangas
-                mangas.removeLast()
+                // This not so tragic.
+                // just continue
+                continue
             }
 
             withContext (Dispatchers.Main) {
-                mangasInfos.add(MangaListElementContainer(
-                    mangas[mangas.size - 1].originalName,
-                    mangas[mangas.size - 1].author,
-                    mangas[mangas.size - 1].library.getURL(),
-                    mangas[mangas.size - 1].cover,
-                    mangas[mangas.size - 1].library.getHeadersForDownload()
-                ))
+                mangas.add(manga)
                 adapter?.notifyDataSetChanged()
             }
         }
