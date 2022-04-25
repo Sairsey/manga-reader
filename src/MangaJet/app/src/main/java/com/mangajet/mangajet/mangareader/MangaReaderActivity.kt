@@ -1,25 +1,20 @@
 package com.mangajet.mangajet.mangareader
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.ImageButton
-import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MangaJetApp.Companion.context
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
-import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.log.Logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 // Class which represents "Manga Reader" Activity
 @Suppress("TooManyFunctions")
@@ -61,20 +56,27 @@ class MangaReaderActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Logger.log("Manga Reader activity started")
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.manga_reader_activity)
-
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
-
-        // init viewmodel, reader format and viewpager
-        mangaReaderViewModel = ViewModelProvider(this)[MangaReaderViewModel::class.java]
-        mangaReaderViewModel.displayWidth = getScreenWidth()
+    fun initialize() {
+        // if we have some troubles
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
-        mangaReaderViewModel.mangaReaderVP2 = viewPager
-        mangaReaderViewModel.navTextView = findViewById(R.id.currentPageText)
-        mangaReaderViewModel.initMangaData()
+        if (mangaReaderViewModel.pagesCount == 0)
+        {
+            val builder = AlertDialog.Builder(this)
+            builder
+                .setTitle("Error")
+                .setMessage("We cannot access to pages of this chapter." +
+                        "This could happen if you are not authorized or chapter is invalid.")
+                .setPositiveButton("Return"
+                ) { dialog, id ->
+                    finish()
+                }
+            val dialog = builder.create()
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+            return
+        }
+
         mangaReaderViewModel.setPageTitle()
         setTitle()
 
@@ -114,15 +116,38 @@ class MangaReaderActivity : AppCompatActivity() {
                 mangaReaderViewModel.setPageTitle()
             }
         }
+        findViewById<CircularProgressIndicator>(R.id.loadIndicator2).hide()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Logger.log("Manga Reader activity started")
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.manga_reader_activity)
+
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
+
+        // init viewmodel, reader format and viewpager
+        mangaReaderViewModel = ViewModelProvider(this)[MangaReaderViewModel::class.java]
+        mangaReaderViewModel.displayWidth = getScreenWidth()
+        val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
+        mangaReaderViewModel.mangaReaderVP2 = viewPager
+        mangaReaderViewModel.navTextView = findViewById(R.id.currentPageText)
+        mangaReaderViewModel.activity = this
+        findViewById<CircularProgressIndicator>(R.id.loadIndicator2).show()
+        mangaReaderViewModel.initMangaData()
+        viewPager.setCurrentItem(1, false)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        when (event?.action) {
-            MotionEvent.ACTION_DOWN,
-            MotionEvent.ACTION_UP ->
-                toolbarHandler.touchEventDispatcher(event)
+        if (mangaReaderViewModel.isInited) {
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_UP ->
+                    toolbarHandler.touchEventDispatcher(event)
 
+            }
+            return super.dispatchTouchEvent(event)
         }
-        return super.dispatchTouchEvent(event)
+        return false
     }
 }

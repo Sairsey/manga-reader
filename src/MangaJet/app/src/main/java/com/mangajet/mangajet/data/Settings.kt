@@ -27,7 +27,10 @@ object Settings {
     val LOG_FILE_NAME : String
 
     // Stack trace file name
-    val STACK_TRACE_FILE_NAME :String
+    val STACK_TRACE_FILE_NAME : String
+
+    // Original names
+    var IS_ORIGINAL_NAMES : kotlin.Boolean
 
     // Initializer block
     init {
@@ -37,6 +40,7 @@ object Settings {
         var loadRepeats = "5".toInt()
         var logFileName = "log.txt"
         var stackTraceName = "stackTrace.txt"
+        IS_ORIGINAL_NAMES = true
 
         // Try to get settings from file
         try{
@@ -57,6 +61,8 @@ object Settings {
                     logFileName = json.getString("logFileName")
                 if(json.has("stackTraceName"))
                     stackTraceName = json.getString("stackTraceName")
+                if(json.has("originalNames"))
+                    IS_ORIGINAL_NAMES = json.getBoolean("originalNames")
             }
         }
         catch (ex : MangaJetException){

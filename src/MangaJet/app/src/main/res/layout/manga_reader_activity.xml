@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".mangareader.MangaReaderActivity">
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/loadIndicator2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
@@ -36,7 +46,7 @@
                 android:id="@+id/currentPageText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Loading" />
 
             <ImageButton
                 android:id="@+id/nextChapter"

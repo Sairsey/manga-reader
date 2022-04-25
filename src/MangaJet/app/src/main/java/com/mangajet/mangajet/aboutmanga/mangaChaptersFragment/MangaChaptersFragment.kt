@@ -22,6 +22,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
@@ -149,15 +150,27 @@ class MangaChaptersFragment : Fragment() {
             val p = getItem(pos)
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
-                val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
                 setCorrectButton(p, v!!)
-                if (p.name.isNotEmpty())
-                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (pos + 1).toString() + ": " + p.name)
-                else
-                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (pos + 1).toString())
 
+                var name = ""
+
+                if (Librarian.settings.IS_ORIGINAL_NAMES)
+                    name = if (p.fullName.isNotEmpty())
+                        p.fullName
+                    else
+                        context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString()
+                else
+                    name =
+                        if (p.name.isNotEmpty())
+                            context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString() + ": " + name
+                        else
+                            context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString()
+
+                chapter?.setText(name)
+                
                 if (!aboutMangaViewmodel.isChaptersListReversed) {
                     if (pos < lastViewedChapter)
                         icon?.setImageResource(R.drawable.ic_opened_book)
@@ -239,15 +252,7 @@ class MangaChaptersFragment : Fragment() {
                         .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
                         .lastViewedPage = 0
 
-                    // check if we need authorization
-                    val pagesCnt = MangaJetApp.currentManga!!
-                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter].getPagesNum()
-                    if (pagesCnt > 0)
-                        startActivity(intent)
-                    else
-                        Toast.makeText(it,
-                        "Can't open chapter: maybe its empty or you need to authorizes on site",
-                            Toast.LENGTH_SHORT).show()
+                    startActivity(intent)
                 }
                 else
                     Toast.makeText(it,

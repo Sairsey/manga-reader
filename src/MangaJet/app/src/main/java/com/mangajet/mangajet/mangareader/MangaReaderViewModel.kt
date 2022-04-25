@@ -42,6 +42,9 @@ class MangaReaderViewModel : ViewModel() {
     var jobs = arrayOf<Job?>()
     var waitJob: Job? = null
 
+    var activity : MangaReaderActivity? = null // local variable for activity
+    var initilizeJob : Job? = null
+
     // data for mangaReader format
     var currentReaderFormat = READER_FORMAT_BOOK    // current reader format
     var wasReaderFormat  = READER_FORMAT_BOOK       // previous reader format
@@ -77,7 +80,7 @@ class MangaReaderViewModel : ViewModel() {
     /**
      * Other functions
      */
-    private fun selectOptimizeFormat() {
+    private fun selectOptimizeFormat() : Boolean{
         val middlePage = (pagesCount - 1) / 2
         val mangaPage = manga.chapters[manga.lastViewedChapter].getPage(middlePage)
         mangaPage.upload()
@@ -88,41 +91,72 @@ class MangaReaderViewModel : ViewModel() {
                 HEIGHT_WIDTH_MIN_COEF_TO_MANHWA) {
                 currentReaderFormat = READER_FORMAT_MANHWA
                 wasReaderFormat = READER_FORMAT_MANHWA
-                mangaReaderVP2.orientation = ViewPager2.ORIENTATION_VERTICAL
+                return true
             }
         } catch (ex: MangaJetException) {
             // nothing critical
         }
+        return false
     }
 
     // Function which will init all data about manga
     fun initMangaData() {
         if (!isInited) {
-            isInited = true
-
             // Load manga and basic info about it
-            manga = MangaJetApp.currentManga!!
-            try {
-                pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
-                uploadPages()
+            if (initilizeJob == null) {
+                manga = MangaJetApp.currentManga!!
+                initilizeJob = viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        pagesCount = manga.chapters[manga.lastViewedChapter].getPagesNum()
+                        if (pagesCount == 0) {
+                            withContext(Dispatchers.Main) {
+                                activity?.initialize()
+                            }
+                            return@launch
+                        }
+                        uploadPages()
 
-                // Get recommended format
-                selectOptimizeFormat()
-                // init pager with current format
-                formatChangerHandler.updateReaderFormat()
-            }
-            catch (ex : MangaJetException) {
-                Logger.log("Catch MJE while trying to get pages count: " + ex.message, Logger.Lvl.WARNING)
-                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
-            }
+                        // Get recommended format
+                        if (selectOptimizeFormat()){
+                            withContext(Dispatchers.Main) {
+                                mangaReaderVP2.orientation = ViewPager2.ORIENTATION_VERTICAL
+                            }
+                        }
 
-            // And save its state to File
-            try {
-                manga.saveToFile()
-            }
-            catch (ex : MangaJetException) {
-                Logger.log("Catch MJE while trying to save manga as json: " + ex.message, Logger.Lvl.WARNING)
-                Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
+                        withContext(Dispatchers.Main) {
+                            // init pager with current format
+                            formatChangerHandler.updateReaderFormat()
+                        }
+                    } catch (ex: MangaJetException) {
+                        Logger.log(
+                            "Catch MJE while trying to get pages count: " + ex.message,
+                            Logger.Lvl.WARNING
+                        )
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                    // And save its state to File
+                    try {
+                        manga.saveToFile()
+                    } catch (ex: MangaJetException) {
+                        Logger.log(
+                            "Catch MJE while trying to save manga as json: " + ex.message,
+                            Logger.Lvl.WARNING
+                        )
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+
+                    // do activity prep work
+                    withContext(Dispatchers.Main) {
+                        isInited = true
+                        activity?.initialize()
+                    }
+                }
             }
         }
     }
