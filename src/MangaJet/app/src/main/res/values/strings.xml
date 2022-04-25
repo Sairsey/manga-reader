@@ -33,4 +33,5 @@
     <string name="search_hint">Write your search query here</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="search_set_sources">Set sources</string>
+    <string name="cache_size_title">Cache size: </string>
 </resources>
