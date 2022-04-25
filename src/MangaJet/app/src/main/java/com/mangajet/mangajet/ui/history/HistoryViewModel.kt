@@ -20,6 +20,7 @@ class HistoryViewModel : ViewModel() {
     var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null          // adapter for list
+    var historyMutex : Boolean = true               // Mutex for data sync  protection
 
     // Function which will load info about each manga from "manga names"
     private suspend fun addElementsToMangas() {
@@ -37,7 +38,9 @@ class HistoryViewModel : ViewModel() {
             try {
                 var manga = Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
                 withContext (Dispatchers.Main) {
-                    mangas.add(manga)
+                    synchronized(historyMutex) {
+                        mangas.add(manga)
+                    }
                 }
             }
             catch (ex: MangaJetException) {
@@ -58,7 +61,9 @@ class HistoryViewModel : ViewModel() {
         // cancel job if we need
         adapter = adapterNew
         job?.cancel()
-        mangas.clear()
+        synchronized(historyMutex) {
+            mangas.clear()
+        }
 
         job = GlobalScope.launch(Dispatchers.Default) {
             addElementsToMangas()
@@ -75,6 +80,8 @@ class HistoryViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         job?.cancel()
-        mangas.clear()
+        synchronized(historyMutex) {
+            mangas.clear()
+        }
     }
 }
