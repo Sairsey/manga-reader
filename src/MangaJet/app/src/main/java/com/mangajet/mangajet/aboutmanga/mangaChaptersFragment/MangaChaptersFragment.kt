@@ -150,6 +150,7 @@ class MangaChaptersFragment : Fragment() {
             val p = getItem(pos)
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
+                val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
                 setCorrectButton(p, v!!)
 
                 var name = ""
