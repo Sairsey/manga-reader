@@ -102,43 +102,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backupButton" />
 
-    <!--
 
-
-
-
-
-
-
-<!--<TextView
-    android:id="@+id/cacheSize"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:layout_marginTop="20dp"
-    android:layout_marginBottom="624dp"
-    android:gravity="start"
-    android:textSize="20dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.739"
-    app:layout_constraintStart_toEndOf="@+id/cacheSizeTitle"
-    app:layout_constraintTop_toBottomOf="@+id/cacheToolbar"></TextView>
-
-<TextView
-    android:id="@+id/cacheSizeTitle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="20dp"
-    android:layout_marginBottom="622dp"
-    android:text="@string/cache_size_title"
-    android:textSize="20dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/cacheToolbar" />
--->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

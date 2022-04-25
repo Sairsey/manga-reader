@@ -32,6 +32,8 @@ class ClearCacheDialog : DialogFragment() {
                 .setCancelable(true)
                 .setPositiveButton("Delete") { dialog, id ->
                     StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
+                    StorageManager.removeFilesByType(StorageManager.FileType.DownloadedPages)
+                    StorageManager.removeFilesByType(StorageManager.FileType.MangaInfo)
                     Logger.log("Delete clicked")
                 }
                 .setNegativeButton("Cancel",
@@ -67,11 +69,11 @@ class CacheSettingActivity : AppCompatActivity() {
         cacheSizeView.setText(stringToFillWith)
     }*/
 
-/*    fun buttonPressed() {
+    fun buttonPressed() {
         val myDialogFragment = ClearCacheDialog()
         val manager = supportFragmentManager
         myDialogFragment.show(manager, "'Delete cache' dialog")
-    }*/
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -98,14 +100,14 @@ class CacheSettingActivity : AppCompatActivity() {
             }
         }
     }
-
+    @Suppress("LongMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.log("Cache options in Settings opened")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
         //fillCacheSizeView()
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
-        //clearCacheButton.setOnClickListener { buttonPressed() }
+        clearCacheButton.setOnClickListener { buttonPressed() }
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val cacheSettingsList = findViewById<ListView>(R.id.cacheSettings)
@@ -133,7 +135,54 @@ class CacheSettingActivity : AppCompatActivity() {
             }
             startActivityForResult(intent, CREATE_FILE)
         }
-
+        val clearMangaInfosButton = findViewById<Button>(R.id.clearMangaInfos)
+        clearMangaInfosButton.setOnClickListener {
+            StorageManager.removeFilesByType(StorageManager.FileType.MangaInfo)
+            val adapter = ArrayAdapter<String> (
+                this,
+                android.R.layout.simple_list_item_1,
+                listOf( "Cache size: " + getStringSize(StorageManager.usedStorageSizeInBytes()),
+                    "Size of Manga Infos: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.MangaInfo)),
+                    "Size of Cached Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.CachedPages)),
+                    "Size of Downloaded Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.DownloadedPages)))
+            )
+            cacheSettingsList.adapter = adapter
+        }
+        val clearDownloadedPages = findViewById<Button>(R.id.clearDownloadedPages)
+        clearDownloadedPages.setOnClickListener {
+            StorageManager.removeFilesByType(StorageManager.FileType.DownloadedPages)
+            val adapter = ArrayAdapter<String> (
+                this,
+                android.R.layout.simple_list_item_1,
+                listOf( "Cache size: " + getStringSize(StorageManager.usedStorageSizeInBytes()),
+                    "Size of Manga Infos: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.MangaInfo)),
+                    "Size of Cached Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.CachedPages)),
+                    "Size of Downloaded Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.DownloadedPages)))
+            )
+            cacheSettingsList.adapter = adapter
+        }
+        val clearCachedPages = findViewById<Button>(R.id.clearCachedPages)
+        clearCachedPages.setOnClickListener {
+            StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
+            val adapter = ArrayAdapter<String> (
+                this,
+                android.R.layout.simple_list_item_1,
+                listOf( "Cache size: " + getStringSize(StorageManager.usedStorageSizeInBytes()),
+                    "Size of Manga Infos: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.MangaInfo)),
+                    "Size of Cached Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.CachedPages)),
+                    "Size of Downloaded Pages: " + getStringSize(StorageManager.
+                    usedStorageSizeByType(StorageManager.FileType.DownloadedPages)))
+            )
+            cacheSettingsList.adapter = adapter
+        }
         val restoreButton = findViewById<Button>(R.id.restoreButton)
         restoreButton.setOnClickListener {
 
