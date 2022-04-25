@@ -17,6 +17,7 @@ import android.widget.Button
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import androidx.core.view.isInvisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
@@ -52,9 +53,9 @@ class MangaChaptersFragment : Fragment() {
         private val mContext: Context = context
         @Suppress("LongMethod")
         private fun setCorrectButton(p : MangaChapter,v : View) {
-            val downloadButton =  v?.findViewById<Button>(R.id.downloadChapter)
-            val deleteButton =  v?.findViewById<Button>(R.id.deleteChapter)
-            val inProcessButton =  v?.findViewById<Button>(R.id.downloading)
+            val downloadButton =  v.findViewById<Button>(R.id.downloadChapter)
+            val deleteButton =  v.findViewById<Button>(R.id.deleteChapter)
+            val inProcessButton =  v.findViewById<Button>(R.id.downloading)
             downloadButton.visibility = View.INVISIBLE
             deleteButton.visibility = View.INVISIBLE
             inProcessButton.visibility = View.INVISIBLE
@@ -81,20 +82,27 @@ class MangaChaptersFragment : Fragment() {
                 inProcessButton.visibility = View.VISIBLE
                 inProcessButton.isEnabled = true
                 inProcessButton.isClickable = true
-                try {
-                    for(i in 0 until p.getPagesNum()){
-                        var page = p.getPage(i)
-                        page.upload(isToDownload = true)
-                        page.getFile()
+                lifecycleScope.launch (Dispatchers.IO) {
+                    try {
+                        for (i in 0 until p.getPagesNum()) {
+                            var page = p.getPage(i)
+                            page.upload(isToDownload = true)
+                            page.getFile()
+                        }
+                        p.manga.saveToFile()
+                        withContext (Dispatchers.Main) {
+                            Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (ex: MangaJetException) {
+                        Logger.log("Catch MJE while filling mangaChapterFragment: " + ex.message)
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                        }
                     }
-                    p.manga.saveToFile()
-                    Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                    withContext(Dispatchers.Main) {
+                        setCorrectButton(p, v)
+                    }
                 }
-                catch (ex: MangaJetException){
-                    Logger.log("Catch MJE while filling mangaChapterFragment: " + ex.message)
-                    Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
-                }
-                setCorrectButton(p, v)
             }
             deleteButton.setOnClickListener {
                 deleteButton.visibility = View.INVISIBLE
@@ -103,16 +111,26 @@ class MangaChaptersFragment : Fragment() {
                 inProcessButton.visibility = View.VISIBLE
                 inProcessButton.isEnabled = true
                 inProcessButton.isClickable = true
-                try {
-                    p.delete()
-                    p.manga.saveToFile()
-                    Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch (Dispatchers.IO) {
+                    try {
+                        p.delete()
+                        p.delete()
+                        p.delete()
+                        p.delete()
+                        p.manga.saveToFile()
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (ex: MangaJetException) {
+                        Logger.log("Catch MJE while deleting mangaChapterFragment: " + ex.message)
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    withContext(Dispatchers.Main) {
+                        setCorrectButton(p, v)
+                    }
                 }
-                catch (ex: MangaJetException){
-                    Logger.log("Catch MJE while deleting mangaChapterFragment: " + ex.message)
-                    Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
-                }
-                setCorrectButton(p, v)
             }
         }
         // Function which will fill every list element
