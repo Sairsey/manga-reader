@@ -10,10 +10,10 @@
 
     <Button
         android:id="@+id/backupButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="334dp"
+        android:layout_height="40dp"
         android:layout_marginStart="257dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:backgroundTint="@color/primary"
         android:text="Backup"
@@ -21,7 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cacheToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/restoreButton" />
 
     <com.google.android.material.appbar.MaterialToolbar
       app:title="@string/setting_cache"
@@ -37,18 +37,36 @@
         android:id="@+id/cacheSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/system_accent3_50"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="624dp"
         android:gravity="start"
-        android:textColor="@color/black"
         android:textSize="20dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.739"
+        app:layout_constraintStart_toEndOf="@+id/cacheSizeTitle"
         app:layout_constraintTop_toBottomOf="@+id/cacheToolbar"></TextView>
+
+    <TextView
+        android:id="@+id/cacheSizeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="622dp"
+        android:text="@string/cache_size_title"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cacheToolbar" />
 
     <Button
         android:id="@+id/clearCacheButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="257dp"
+        android:layout_width="334dp"
+        android:layout_height="43dp"
         android:layout_marginTop="175dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="508dp"
@@ -60,14 +78,14 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/restoreButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="334dp"
+        android:layout_height="39dp"
         android:layout_marginStart="257dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:backgroundTint="@color/primary"
         android:text="Restore"
@@ -75,6 +93,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cacheToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/clearCacheButton" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

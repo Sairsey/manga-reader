@@ -63,7 +63,7 @@ class CacheSettingActivity : AppCompatActivity() {
 
     fun fillCacheSizeView(){
         val cacheSizeView = findViewById<TextView>(R.id.cacheSize)
-        var stringToFillWith = "SIZE: " + getStringSize(StorageManager.usedStorageSizeInBytes())
+        var stringToFillWith = getStringSize(StorageManager.usedStorageSizeInBytes())
         cacheSizeView.setText(stringToFillWith)
     }
 
