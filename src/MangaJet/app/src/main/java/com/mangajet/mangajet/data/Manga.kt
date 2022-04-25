@@ -176,7 +176,7 @@ class Manga {
         if (full)
             chapters.forEach{it.updateInfo()}
 
-        chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
+        chapters.forEach { jsonChapters.put(it.id, JSONObject(it.getJSON())) }
         json.put("chapters", jsonChapters)
 
         return json.toString()
