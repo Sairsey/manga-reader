@@ -4,9 +4,9 @@
     <!-- You can use gradient with below attributes-->
     <gradient
         android:gradientRadius="150dp"
+        android:startColor="#ffffff"
         android:centerColor="#ffffff"
         android:endColor="#00000000"
-        android:startColor="#ffffff"
         android:type="radial" />
 
     <!-- Set the same value for both width and height to get a circular shape -->
