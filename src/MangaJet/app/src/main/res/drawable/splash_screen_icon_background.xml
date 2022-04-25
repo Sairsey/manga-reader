@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- You can use gradient with below attributes-->
+    <gradient
+        android:gradientRadius="150dp"
+        android:centerColor="#ffffff"
+        android:endColor="#00000000"
+        android:startColor="#ffffff"
+        android:type="radial" />
+
+    <!-- Set the same value for both width and height to get a circular shape -->
+</shape>
