@@ -16,7 +16,6 @@ import android.widget.ImageView
 import android.widget.Button
 import android.widget.Toast
 import android.widget.ArrayAdapter
-import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
