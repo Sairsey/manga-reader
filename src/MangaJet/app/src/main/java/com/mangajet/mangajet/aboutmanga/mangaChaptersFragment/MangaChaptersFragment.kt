@@ -20,6 +20,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
@@ -68,12 +69,25 @@ class MangaChaptersFragment : Fragment() {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
                 val button =  v?.findViewById<Button>(R.id.downloadChapter)
-                if (p.name.isNotEmpty())
-                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (pos + 1).toString() + ": " + p.name)
+
+                var name = ""
+
+                if (Librarian.settings.IS_ORIGINAL_NAMES)
+                    name = if (p.fullName.isNotEmpty())
+                        p.fullName
+                    else
+                        context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString()
                 else
-                    chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
-                            (pos + 1).toString())
+                    name =
+                        if (p.name.isNotEmpty())
+                            context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString() + ": " + name
+                        else
+                            context.getString(R.string.chapter_default_name) + " " +
+                                (pos + 1).toString()
+
+                chapter?.setText(name)
                 button?.setOnClickListener {
                     try {
                         for(i in 0 until p.getPagesNum()){

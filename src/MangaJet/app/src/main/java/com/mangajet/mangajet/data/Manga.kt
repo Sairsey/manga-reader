@@ -78,6 +78,7 @@ class Manga {
 
     // Fill data from JSONObject
     // MAY THROW MangaJetException
+    @Suppress("SwallowedException")
     private fun fromJSON(json: JSONObject) {
         id = json.optString("id")
         try {
@@ -107,7 +108,7 @@ class Manga {
                     pagesArray.add(pagesJSON[j].toString())
                 listTmp.add(MangaChapter(this, chapterId, pagesArray, chapterName, chapterFullName))
             }
-            catch (ex: JSONObject) { // old jsons must die
+            catch (ex: JSONException) { // old jsons must die
                 Logger.log("Invalid old json " + id)
                 this.lastViewedChapter = 0
                 continue
