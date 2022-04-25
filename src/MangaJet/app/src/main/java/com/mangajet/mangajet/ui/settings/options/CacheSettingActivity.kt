@@ -63,11 +63,6 @@ class CacheSettingActivity : AppCompatActivity() {
                              " " + units[digitGroups]
     }
 
-/*    fun fillCacheSizeView(){
-        val cacheSizeView = findViewById<TextView>(R.id.cacheSize)
-        var stringToFillWith = getStringSize(StorageManager.usedStorageSizeInBytes())
-        cacheSizeView.setText(stringToFillWith)
-    }*/
 
     fun buttonPressed() {
         val myDialogFragment = ClearCacheDialog()
@@ -105,7 +100,6 @@ class CacheSettingActivity : AppCompatActivity() {
         Logger.log("Cache options in Settings opened")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cache_setting)
-        //fillCacheSizeView()
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         clearCacheButton.setOnClickListener { buttonPressed() }
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.cacheToolbar))
