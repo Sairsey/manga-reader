@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.data.Librarian
@@ -14,7 +15,6 @@ import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,6 +25,9 @@ class SearchViewModel : ViewModel() {
     var job : Job? = null                           // Async job for searching and uploading
     var adapter : MangaListAdapter? = null          // adapter for list
 
+    // Mutex data sync protection
+    private var searchListMutex = true
+
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(manga : Manga) {
         try {
@@ -32,7 +35,9 @@ class SearchViewModel : ViewModel() {
             manga.updateInfo()
             job?.ensureActive()
             withContext(Dispatchers.Main) {
-                mangas.add(manga)
+                synchronized(searchListMutex) {
+                    mangas.add(manga)
+                }
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
@@ -86,7 +91,9 @@ class SearchViewModel : ViewModel() {
     // Function which will destroy and clear all fields and threads
     private fun destroyAll() {
         job?.cancel()
-        mangas.clear()
+        synchronized(searchListMutex) {
+            mangas.clear()
+        }
     }
 
     // Function which will async load mangas info
@@ -104,16 +111,18 @@ class SearchViewModel : ViewModel() {
         Logger.log("Search \"$queryString\" with these sources: $sources")
 
         destroyAll()
-        job = GlobalScope.launch(Dispatchers.IO) {
+        job = viewModelScope.launch(Dispatchers.IO) {
             for (i in Librarian.LibraryName.values().indices) {
                 if (Librarian.settings.CHOSEN_RESOURCES[i])
                     addElementsToMangas(queryString, Librarian.LibraryName.values()[i])
             }
 
             withContext(Dispatchers.Main) {
-                if (mangas.size == 0)
-                    binding.noResultLayout.visibility = View.VISIBLE
-                binding.progressBar.hide()
+                synchronized(searchListMutex) {
+                    if (mangas.size == 0)
+                        binding.noResultLayout.visibility = View.VISIBLE
+                    binding.progressBar.hide()
+                }
             }
         }
     }
