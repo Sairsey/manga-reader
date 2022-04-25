@@ -87,15 +87,21 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         }
 
         // Retrieve name of manga
+        @Suppress("SwallowedException")
         fun getName(text : String) : String {
             var f = text.indexOf("name_row")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
             val sLast = text.indexOf("</a>", f) - 1
             val s = text.indexOf("(", f) - 1
-            if (s == -1 || s > sLast)
-                return text.subSequence(f, sLast).toString()
-            return text.subSequence(f, s).toString()
+            try {
+                if (s == -1 || s > sLast)
+                    return text.subSequence(f, sLast).toString()
+                return text.subSequence(f, s).toString()
+            }
+            catch (ex: StringIndexOutOfBoundsException) {
+                return ""
+            }
         }
 
         // Retrieve russian name of manga
