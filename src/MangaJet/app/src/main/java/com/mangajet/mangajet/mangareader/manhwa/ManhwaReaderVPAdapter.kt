@@ -33,8 +33,10 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
     )  {
 
         private fun isScrollToEnd() : Boolean {
-            if (wasPrevReload)
+            if (wasPrevReload) {
+                wasPrevReload = false
                 return true
+            }
             else
                 return !(prevViewedChapter < currentChapter || (prevViewedChapter == currentChapter
                     && prevViewedPage <= currentPage))
@@ -52,6 +54,8 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                 .launch(Dispatchers.IO) {
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
                     val needToScroolEnd = isScrollToEnd()
+                    ensureActive()
+
                     val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
                     ensureActive()
                     withContext(Dispatchers.Main) {

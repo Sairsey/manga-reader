@@ -168,15 +168,7 @@ class MangaChaptersFragment : Fragment() {
                         .chapters[MangaJetApp.currentManga!!.lastViewedChapter]
                         .lastViewedPage = 0
 
-                    // check if we need authorization
-                    val pagesCnt = MangaJetApp.currentManga!!
-                        .chapters[MangaJetApp.currentManga!!.lastViewedChapter].getPagesNum()
-                    if (pagesCnt > 0)
-                        startActivity(intent)
-                    else
-                        Toast.makeText(it,
-                        "Can't open chapter: maybe its empty or you need to authorizes on site",
-                            Toast.LENGTH_SHORT).show()
+                    startActivity(intent)
                 }
                 else
                     Toast.makeText(it,
