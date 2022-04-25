@@ -171,6 +171,24 @@ object StorageManager {
     }
 
     // Function which will return folder size
+    fun usedStorageSizeByType(type : FileType): Long {
+        val dir = File(storageDirectory + type.subdirectoryPath)
+        if (dir.exists()) {
+            var result: Long = 0
+            val fileList = dir.listFiles()
+            for (i in fileList!!.indices) {
+                if (fileList[i].isDirectory) {
+                    result += dirSize(fileList[i])
+                } else {
+                    result += fileList[i].length()
+                }
+            }
+            return result
+        }
+        return 0
+    }
+
+    // Function which will return folder size
     fun usedStorageSizeInBytes(): Long {
         val dir = File(storageDirectory)
         if (dir.exists()) {
