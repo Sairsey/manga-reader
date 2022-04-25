@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.Button
 import android.widget.Toast
 import android.widget.ArrayAdapter
+import androidx.core.view.isInvisible
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
@@ -49,7 +50,71 @@ class MangaChaptersFragment : Fragment() {
         ArrayAdapter<MangaChapter>(context, resourceLayout, items) {
         // List context
         private val mContext: Context = context
-
+        @Suppress("LongMethod")
+        private fun setCorrectButton(p : MangaChapter,v : View) {
+            val downloadButton =  v?.findViewById<Button>(R.id.downloadChapter)
+            val deleteButton =  v?.findViewById<Button>(R.id.deleteChapter)
+            val inProcessButton =  v?.findViewById<Button>(R.id.downloading)
+            downloadButton.visibility = View.INVISIBLE
+            deleteButton.visibility = View.INVISIBLE
+            inProcessButton.visibility = View.INVISIBLE
+            downloadButton.isEnabled = false
+            deleteButton.isEnabled = false
+            inProcessButton.isEnabled = false
+            downloadButton.isClickable = false
+            deleteButton.isClickable = false
+            inProcessButton.isClickable = false
+            if(p.isLoadedInDownloads()) {
+                deleteButton.visibility = View.VISIBLE
+                deleteButton.isEnabled = true
+                deleteButton.isClickable = true
+            }
+            else{
+                downloadButton.visibility = View.VISIBLE
+                downloadButton.isEnabled = true
+                downloadButton.isClickable = true
+            }
+            downloadButton.setOnClickListener {
+                downloadButton.visibility = View.INVISIBLE
+                downloadButton.isEnabled = false
+                downloadButton.isClickable = false
+                inProcessButton.visibility = View.VISIBLE
+                inProcessButton.isEnabled = true
+                inProcessButton.isClickable = true
+                try {
+                    for(i in 0 until p.getPagesNum()){
+                        var page = p.getPage(i)
+                        page.upload(isToDownload = true)
+                        page.getFile()
+                    }
+                    p.manga.saveToFile()
+                    Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                }
+                catch (ex: MangaJetException){
+                    Logger.log("Catch MJE while filling mangaChapterFragment: " + ex.message)
+                    Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                }
+                setCorrectButton(p, v)
+            }
+            deleteButton.setOnClickListener {
+                deleteButton.visibility = View.INVISIBLE
+                deleteButton.isEnabled = false
+                deleteButton.isClickable = false
+                inProcessButton.visibility = View.VISIBLE
+                inProcessButton.isEnabled = true
+                inProcessButton.isClickable = true
+                try {
+                    p.delete()
+                    p.manga.saveToFile()
+                    Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
+                }
+                catch (ex: MangaJetException){
+                    Logger.log("Catch MJE while deleting mangaChapterFragment: " + ex.message)
+                    Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
+                }
+                setCorrectButton(p, v)
+            }
+        }
         // Function which will fill every list element
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var v: View? = convertView
@@ -67,26 +132,14 @@ class MangaChaptersFragment : Fragment() {
             if (p != null) {
                 val chapter = v?.findViewById<TextView>(R.id.chapterTitle)
                 val icon = v?.findViewById<ImageView>(R.id.viewedIcon)
-                val button =  v?.findViewById<Button>(R.id.downloadChapter)
+                setCorrectButton(p, v!!)
                 if (p.name.isNotEmpty())
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
                             (pos + 1).toString() + ": " + p.name)
                 else
                     chapter?.setText(context.getString(R.string.chapter_default_name) + " " +
                             (pos + 1).toString())
-                button?.setOnClickListener {
-                    try {
-                        for(i in 0 until p.getPagesNum()){
-                            p.getPage(i).getFile()
-                        }
-                        p.manga.saveToFile()
-                        Toast.makeText(mContext, "Done", Toast.LENGTH_SHORT).show()
-                    }
-                    catch (ex: MangaJetException){
-                        Logger.log("Catch MJE while filling mangaChapterFragment: " + ex.message)
-                        Toast.makeText(mContext, ex.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
+
                 if (!aboutMangaViewmodel.isChaptersListReversed) {
                     if (pos < lastViewedChapter)
                         icon?.setImageResource(R.drawable.ic_opened_book)

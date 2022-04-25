@@ -64,7 +64,20 @@ class MangaChapter {
     public fun getJSON() : String {
         return JSONArray(pagesURLs).toString()
     }
+    // Function which will check if chapter downloaded
+    fun isLoadedInDownloads() : Boolean {
+        updateInfo()
+        if (pagesNumber <= 0)
+            getPagesNum()
 
+        for (i in 0 until pagesURLs.size) {
+            var page = MangaPage(pagesURLs[i], manga.library.getHeadersForDownload())
+            if (!StorageManager.isExist(page.localPath, StorageManager.FileType.DownloadedPages))
+                return false
+        }
+
+        return true
+    }
     // Delete chapter from localStorage
     // MAY THROW MangaJetException
     fun delete() {
