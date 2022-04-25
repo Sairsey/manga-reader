@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/reverseList"
+        android:icon="@drawable/ic_reverse"
+        android:iconTint="?attr/android:textColorPrimary"
+        android:title="@string/manga_reader_refresh_page"
+        app:showAsAction="ifRoom" />
+</menu>

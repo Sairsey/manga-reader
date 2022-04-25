@@ -11,6 +11,7 @@ import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.ForYouFragmentBinding
+import com.mangajet.mangajet.log.Logger
 
 // Class which represents "For you" fragment of MainActivity
 class ForYouFragment : Fragment() {
@@ -26,6 +27,7 @@ class ForYouFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) : View {
+        Logger.log("For you opened")
         val forYouFragmentViewModel =
             ViewModelProvider(this).get(ForYouViewModel::class.java)
 
@@ -37,7 +39,7 @@ class ForYouFragment : Fragment() {
             val adapter = MangaListAdapter(
                 requireActivity(),
                 com.mangajet.mangajet.R.layout.manga_list_element,
-                forYouFragmentViewModel.mangasInfos
+                forYouFragmentViewModel.mangas
             )
             forYouFragmentViewModel.initMangas(adapter)
 
@@ -51,6 +53,7 @@ class ForYouFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        Logger.log("For you destroyed")
         super.onDestroyView()
         _binding = null
     }

@@ -184,9 +184,12 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var id = manga.id + "/v" + query.getJSONObject(i).getString("chapter_volume") + '/'
             id += 'c' + query.getJSONObject(i).getString("chapter_number")
             var name = query.getJSONObject(i).getString("chapter_name")
+            var volume = query.getJSONObject(i).getString("chapter_volume")
+            var number = query.getJSONObject(i).getString("chapter_number")
             if(name.equals("null"))
                 name = ""
-            chapters.add(MangaChapter(manga, id, transformFromHtml(name)))
+            chapters.add(MangaChapter(manga, id, transformFromHtml(name),
+                "Том " + volume + " Глава " + number + " - " + transformFromHtml(name)))
         }
         chapters.reverse()
 
@@ -201,7 +204,10 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val res = ArrayList<String>()
 
         // Get amount of pages
-        var f = text.indexOf("window.__pg = ") + "window.__pg = ".length
+        var f = text.indexOf("window.__pg = ")
+        if (f == -1)
+            return "[]"
+        f += "window.__pg = ".length
         var s = text.indexOf(";", f)
         var subtext = text.substring(f, s)
         val pageData = JSONArray(subtext)

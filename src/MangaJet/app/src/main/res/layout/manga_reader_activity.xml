@@ -6,16 +6,71 @@
     android:layout_height="match_parent"
     tools:context=".mangareader.MangaReaderActivity">
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/loadIndicator2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.appbar.MaterialToolbar
-        app:title="@string/app_name"
-        android:id="@+id/mangaReaderToolbar"
+        android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:translationZ="90dp"
         android:background="?attr/android:navigationBarColor"
-        app:titleTextColor="?attr/android:textColorPrimary"
         android:minHeight="?attr/actionBarSize"
-        tools:ignore="MissingConstraints"
-        app:menu="@menu/manga_reader_menu"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:titleTextColor="?attr/android:textColorPrimary">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/prevChapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_previous"
+                android:background="?attr/android:navigationBarColor"
+                app:tint="?attr/android:textColorPrimary"
+                />
+
+            <TextView
+                android:id="@+id/currentPageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading" />
+
+            <ImageButton
+                android:id="@+id/nextChapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_next"
+                android:background="?attr/android:navigationBarColor"
+                app:tint="?attr/android:textColorPrimary"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/headerToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:translationZ="90dp"
+        android:background="?attr/android:navigationBarColor"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/manga_reader_menu"
+        app:title="@string/app_name"
+        app:titleTextColor="?attr/android:textColorPrimary" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/mangaViewPager"
@@ -24,7 +79,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mangaReaderToolbar" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:descendantFocusability = "afterDescendants"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

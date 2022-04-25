@@ -7,4 +7,11 @@
         android:iconTint="?attr/android:textColorPrimary"
         android:title="@string/manga_reader_refresh_page"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/changeFormat"
+        android:icon="@drawable/ic_scroll"
+        android:iconTint="?attr/android:textColorPrimary"
+        android:title="@string/manga_reader_refresh_page"
+        app:showAsAction="ifRoom" />
 </menu>

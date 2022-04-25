@@ -87,15 +87,21 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         }
 
         // Retrieve name of manga
+        @Suppress("SwallowedException")
         fun getName(text : String) : String {
             var f = text.indexOf("name_row")
             f = text.indexOf("<a", f)
             f = text.indexOf(">", f) + 1
             val sLast = text.indexOf("</a>", f) - 1
             val s = text.indexOf("(", f) - 1
-            if (s == -1 || s > sLast)
-                return text.subSequence(f, sLast).toString()
-            return text.subSequence(f, s).toString()
+            try {
+                if (s == -1 || s > sLast)
+                    return text.subSequence(f, sLast).toString()
+                return text.subSequence(f, s).toString()
+            }
+            catch (ex: StringIndexOutOfBoundsException) {
+                return ""
+            }
         }
 
         // Retrieve russian name of manga
@@ -195,14 +201,16 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
+                var fullnameStart = table.indexOf(">", s) + 1
                 var nameStart = table.indexOf("&nbsp;&nbsp;", s) + "&nbsp;&nbsp;".length + 1
                 nameStart = table.indexOf("&nbsp;&nbsp;", nameStart) + "&nbsp;&nbsp;".length
                 if(nameStart == "&nbsp;&nbsp;".length - 1)
                     chapters.add(MangaChapter(manga, table.substring(f, s)))
-                else{
+                else {
                     var nameFinish = table.indexOf("<", nameStart)
                     chapters.add(MangaChapter(manga, table.substring(f, s),
-                        transformFromHtml(table.substring(nameStart, nameFinish))))
+                        transformFromHtml(table.substring(nameStart, nameFinish)),
+                        transformFromHtml(table.substring(fullnameStart, nameFinish))))
                     f = table.indexOf("zaliv", f)
                 }
             }

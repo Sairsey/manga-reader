@@ -30,7 +30,8 @@
 
     <!-- Strings, using in Search -->
     <string name="search_fragment_no_result_text">No result</string>
-    <string name="search_hint">Write query</string>
+    <string name="search_hint">Write your search query here</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="search_set_sources">Set sources</string>
+    <string name="cache_size_title">Cache size: </string>
 </resources>

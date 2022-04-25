@@ -2,9 +2,16 @@ package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.MangaJetApp
 import java.io.File
+import java.io.FileOutputStream
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.Arrays
-import kotlin.Comparator
-import kotlin.collections.ArrayList
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+
 
 // Singleton which will do everything about memory management
 // it also will map files from Android filesystem to ours filesystem
@@ -24,26 +31,35 @@ object StorageManager {
         }
     }
 
+    // Path to directory there we are saving all our data
     var storageDirectory =
         MangaJetApp.context!!.getExternalFilesDir("").toString() + "/MangaJet" // will be set from options I believe
+    // boolean flags for cheching our read-write Permissions
     var readPermission = false
     var writePermission = false
-    var loadPromises = mutableMapOf<String, WebAccessor.Promise>()
+    // Map which contains promises - special variables which created
+    // with threads of loading data and has the interface to "join"
+    // this threads
+    // Also this variable used for mutex-es
+    var loadPromises = mutableMapOf<String, WebAccessor.Promise?>()
+
 
     // Function which will say if path exist in local file
     // MAY THROW MangaJetException
     fun isExist(path: String, type: FileType = FileType.Auto) : Boolean {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
-        if (type == FileType.Auto) {
-            for (typeIterator in FileType.values()) {
-                val f: File = File(storageDirectory + typeIterator.subdirectoryPath + "/" + path)
-                if (f.exists())
-                    return true
+        //synchronized(loadPromises) {
+            if (type == FileType.Auto) {
+                for (typeIterator in FileType.values()) {
+                    val f: File = File(storageDirectory + typeIterator.subdirectoryPath + "/" + path)
+                    if (f.exists())
+                        return true
+                }
+                return false
             }
-            return false
-        }
-        return File(storageDirectory + type.subdirectoryPath + "/" + path).exists()
+            return File(storageDirectory + type.subdirectoryPath + "/" + path).exists()
+        //}
     }
 
     // Function which asynchronously start download from Internet to file
@@ -61,31 +77,39 @@ object StorageManager {
 
         var new_path = type.subdirectoryPath + "/" + path
 
-        // If we already loaded this file - do not do anything
-        if (loadPromises.containsKey(new_path))
-            return
+        // lock this scope with java-style mutex
+        // this means that only 1 thread can access to this block
+        // at a time
+        synchronized(loadPromises) {
+            // If we already loading this file - do not do anything
+            if (loadPromises.containsKey(new_path)) {
+                println("loading of " + new_path + " in progress")
+                return
+            }
 
-        // Create file handle
-        val file = File(storageDirectory + new_path)
+            // Create file handle
+            val file = File(storageDirectory + new_path)
 
-        // If file already already exist - delete it
-        if (file.exists()) {
+            // If file already already exist - delete it
+            if (file.exists()) {
+                file.delete()
+            }
+
+            // Create all Directories
+            file.mkdirs()
+
+            // Delete our file, which was created as directory by file.mkdirs()
             file.delete()
+
+            // Create file
+            if (!file.createNewFile())
+                throw MangaJetException(
+                    "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
+
+            println("start loading of" + new_path)
+            // Build a promise and start downloading
+            loadPromises.put(new_path, WebAccessor.writeBytesStream(url, file.outputStream(), headers))
         }
-
-        // Create all Directories
-        file.mkdirs()
-
-        // Delete our file, which was created as directory by file.mkdirs()
-        file.delete()
-
-        // Create file
-        if (!file.createNewFile())
-            throw MangaJetException(
-                "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
-
-        // Build a promise and start downloading
-        loadPromises.put(new_path, WebAccessor.writeBytesStream(url, file.outputStream(), headers))
     }
 
     // Function which will wait for specific file to load
@@ -97,11 +121,16 @@ object StorageManager {
         if (type == FileType.Auto)
             throw MangaJetException("Request is too strange")
 
-        // If we already loaded this file - do not do anything
-        if (!loadPromises.containsKey(new_path))
-            return
-        loadPromises[new_path]?.join() // Exception may be thrown here
-        loadPromises.remove(new_path)
+        // lock this scope with java-style mutex
+        // this means that only 1 thread can access to this block
+        // at a time
+        synchronized(loadPromises) {
+            // If we are not loading this file - do not do anything
+            if (!loadPromises.containsKey(new_path))
+                return
+            loadPromises[new_path]?.join() // Exception may be thrown here
+            loadPromises.remove(new_path)
+        }
     }
 
     // Function which will give File handler for specific path
@@ -109,22 +138,41 @@ object StorageManager {
     fun getFile(path: String, type: FileType= FileType.Auto) : File {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
-
-        if (type == FileType.Auto)
-        {
-            for (typeIterator in FileType.values()) {
-                val f: File = File(storageDirectory + typeIterator.subdirectoryPath + "/" + path)
-                if (f.exists())
-                    return f
+        synchronized(loadPromises) {
+            if (type == FileType.Auto) {
+                for (typeIterator in FileType.values()) {
+                    val f: File =
+                        File(storageDirectory + typeIterator.subdirectoryPath + "/" + path)
+                    if (f.exists())
+                        return f
+                }
+                throw MangaJetException("Cannot find type for " + path)
             }
-            throw MangaJetException("Cannot find type for " + path)
-        }
 
-        return File(storageDirectory + type.subdirectoryPath + "/" + path)
+            return File(storageDirectory + type.subdirectoryPath + "/" + path)
+        }
     }
 
     // Function which will find folder size recursively
     private fun dirSize(dir: File): Long {
+        if (dir.exists()) {
+            var result: Long = 0
+            val fileList = dir.listFiles()
+            for (i in fileList!!.indices) {
+                if (fileList[i].isDirectory) {
+                    result += dirSize(fileList[i])
+                } else {
+                    result += fileList[i].length()
+                }
+            }
+            return result
+        }
+        return 0
+    }
+
+    // Function which will return folder size
+    fun usedStorageSizeByType(type : FileType): Long {
+        val dir = File(storageDirectory + type.subdirectoryPath)
         if (dir.exists()) {
             var result: Long = 0
             val fileList = dir.listFiles()
@@ -210,10 +258,102 @@ object StorageManager {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
 
-        val f = getFile(path, type)
-        if (!f.exists())
-            throw MangaJetException("Cannot find file " + path)
-        return f.readText()
+        synchronized(loadPromises) {
+            val f = getFile(path, type)
+            if (!f.exists())
+                throw MangaJetException("Cannot find file " + path)
+            return f.readText()
+        }
+    }
+
+    // Function which will create ZIP archive of specific file types
+    fun createZipArchive(
+        outputStream: OutputStream,
+        fileTypes: ArrayList<FileType> =
+                             arrayListOf(
+                                 FileType.LibraryInfo,
+                                 FileType.MangaInfo)) {
+        val zos = ZipOutputStream(BufferedOutputStream(outputStream))
+        for (type in fileTypes) {
+            val inputDirectory = File(storageDirectory + type.subdirectoryPath)
+            inputDirectory.walkTopDown().forEach { file ->
+                val zipFileName = file.absolutePath.removePrefix(storageDirectory).removePrefix("/")
+                val entry = ZipEntry( "$zipFileName${(if (file.isDirectory) "/" else "" )}")
+                zos.putNextEntry(entry)
+                if (file.isFile) {
+                    file.inputStream().copyTo(zos)
+                }
+                zos.closeEntry()
+            }
+        }
+        zos.close()
+        return
+    }
+
+    // Function which will create ZIP archive of specific file types
+    fun unpackZipArchive(inputStream: InputStream) {
+        val zip = ZipInputStream(BufferedInputStream(inputStream))
+
+        var entry = zip.getNextEntry()
+
+        while (entry != null) {
+            val filePath = storageDirectory + "/" + entry.name
+
+            // if directory - create it
+            if (entry.isDirectory) {
+                val unzipFile = File(filePath)
+                if (!unzipFile.isDirectory) unzipFile.mkdirs()
+            }
+            // if file - fill it with data
+            else {
+                BufferedOutputStream(FileOutputStream(filePath)).use { fileOutputStream ->
+                    zip.copyTo(fileOutputStream)
+                }
+            }
+            entry = zip.getNextEntry()
+        }
+
+        return
+    }
+
+    // Function which will copy file from one File type to another
+    // MAY THROW MangaJetException
+    fun copyToType(path: String, inType : FileType, outType : FileType) {
+        val fileIn = File(storageDirectory + inType.subdirectoryPath + "/" + path)
+
+        if (!writePermission)
+            throw MangaJetException("Write permission not granted")
+
+        if (outType == FileType.Auto)
+            throw MangaJetException("Request is too strange")
+
+        var new_path = outType.subdirectoryPath + "/" + path
+
+        // lock this scope with java-style mutex
+        // this means that only 1 thread can access to this block
+        // at a time
+        synchronized(loadPromises) {
+            // Create file handle
+            val file = File(storageDirectory + new_path)
+
+            // If file already already exist - delete it
+            if (file.exists()) {
+                file.delete()
+            }
+
+            // Create all Directories
+            file.mkdirs()
+
+            // Delete our file, which was created as directory by file.mkdirs()
+            file.delete()
+
+            // Create file
+            if (!file.createNewFile())
+                throw MangaJetException(
+                    "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
+
+            file.writeBytes(fileIn.readBytes())
+        }
     }
 
     // Function which will return paths for all elements of specific file type in order of modification date
