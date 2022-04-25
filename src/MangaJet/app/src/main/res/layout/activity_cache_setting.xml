@@ -9,11 +9,62 @@
     tools:context=".ui.settings.options.CacheSettingActivity">
 
     <Button
+        android:id="@+id/clearMangaInfos"
+        android:layout_width="334dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="328dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Clear Manga Infos"
+        android:textColor="#F4F8FA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@id/clearCacheButton"
+        app:layout_constraintTop_toBottomOf="@+id/cacheSettings"
+        app:layout_constraintVertical_bias="0.89" />
+
+    <Button
+        android:id="@+id/clearCachedPages"
+        android:layout_width="334dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="328dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Clear cached pages"
+        android:textColor="#F4F8FA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/clearMangaInfos"
+        app:layout_constraintTop_toBottomOf="@+id/cacheSettings"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/clearDownloadedPages"
+        android:layout_width="334dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="328dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Clear downloaded pages"
+        android:textColor="#F4F8FA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/clearCachedPages"
+        app:layout_constraintTop_toBottomOf="@+id/cacheSettings"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
         android:id="@+id/backupButton"
         android:layout_width="334dp"
-        android:layout_height="43dp"
+        android:layout_height="48dp"
         android:layout_marginStart="257dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="512dp"
         android:layout_marginEnd="32dp"
         android:backgroundTint="@color/primary"
         android:text="Backup"
@@ -23,17 +74,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/restoreButton" />
 
-    <com.google.android.material.appbar.MaterialToolbar
-      app:title="@string/setting_cache"
-      android:id="@+id/cacheToolbar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="?attr/android:navigationBarColor"
-      app:titleTextColor="?attr/android:textColorPrimary"
-      android:minHeight="?attr/actionBarSize"
-      tools:ignore="MissingConstraints" />
+    <Button
+        android:id="@+id/restoreButton"
+        android:layout_width="334dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/primary"
+        android:text="Restore"
+        android:textColor="#F4F8FA"
+        app:layout_constraintBottom_toTopOf="@+id/cacheToolbar"
+        app:layout_constraintEnd_toStartOf="@+id/cacheToolbar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/cacheSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,38 +118,43 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cacheToolbar" />
+    -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/cacheToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        android:minHeight="?attr/actionBarSize"
+        app:title="@string/setting_cache"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="4dp" />
 
     <Button
         android:id="@+id/clearCacheButton"
         android:layout_width="334dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="175dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="508dp"
+        android:layout_height="48dp"
         android:backgroundTint="@android:color/holo_red_dark"
         android:text="@string/clear_cache"
         android:textColor="#F4F8FA"
+        app:layout_constraintBottom_toTopOf="@+id/cacheToolbar"
+        app:layout_constraintEnd_toStartOf="@+id/cacheToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cacheSettings" />
+
+    <ListView
+        android:id="@+id/cacheSettings"
+        android:layout_width="414dp"
+        android:layout_height="310dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@id/cacheToolbar"
+        app:layout_constraintVertical_bias="0.0">
 
-    <Button
-        android:id="@+id/restoreButton"
-        android:layout_width="334dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="257dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:backgroundTint="@color/primary"
-        android:text="Restore"
-        android:textColor="#F4F8FA"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clearCacheButton" />
 
+    </ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
