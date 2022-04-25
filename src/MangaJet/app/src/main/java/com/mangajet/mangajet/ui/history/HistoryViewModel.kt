@@ -38,7 +38,6 @@ class HistoryViewModel : ViewModel() {
                 var manga = Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
                 withContext (Dispatchers.Main) {
                     mangas.add(manga)
-                    adapter?.notifyDataSetChanged()
                 }
             }
             catch (ex: MangaJetException) {
@@ -47,6 +46,9 @@ class HistoryViewModel : ViewModel() {
                 // but we should continue
                 continue
             }
+        }
+        withContext (Dispatchers.Main) {
+            adapter?.notifyDataSetChanged()
         }
     }
 

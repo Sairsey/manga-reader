@@ -78,6 +78,7 @@ class Manga {
 
     // Fill data from JSONObject
     // MAY THROW MangaJetException
+    @Suppress("SwallowedException")
     private fun fromJSON(json: JSONObject) {
         id = json.optString("id")
         try {
@@ -96,12 +97,23 @@ class Manga {
         listTmp.ensureCapacity(chaptersJson.length())
         for (i in 0 until chaptersJson.length()) {
             val chapterId = chaptersJson.names().getString(i)
-            val pagesJSON = chaptersJson.getJSONArray(chapterId)
-            val pagesArray = arrayListOf<String>()
-            pagesArray.ensureCapacity(pagesJSON.length())
-            for (j in 0 until pagesJSON.length())
-                pagesArray.add(pagesJSON[j].toString())
-            listTmp.add(MangaChapter(this, chapterId, pagesArray))
+            try {
+                val chapterJSON = chaptersJson.getJSONObject(chapterId)
+                val chapterName = chapterJSON.getString("name")
+                val chapterFullName = chapterJSON.getString("fullname")
+                val pagesJSON = chapterJSON.getJSONArray("pages")
+                val pagesArray = arrayListOf<String>()
+                pagesArray.ensureCapacity(pagesJSON.length())
+                for (j in 0 until pagesJSON.length())
+                    pagesArray.add(pagesJSON[j].toString())
+                listTmp.add(MangaChapter(this, chapterId, pagesArray, chapterName, chapterFullName))
+            }
+            catch (ex: JSONException) { // old jsons must die
+                Logger.log("Invalid old json " + id)
+                this.lastViewedChapter = 0
+                continue
+            }
+
         }
         this.chapters = listTmp.toTypedArray()
         if (this.chapters.isNotEmpty() && this.chapters.size >= lastViewedChapter)
@@ -166,6 +178,7 @@ class Manga {
 
         chapters.forEach { jsonChapters.put(it.id, JSONArray(it.getJSON())) }
         json.put("chapters", jsonChapters)
+
         return json.toString()
     }
 
