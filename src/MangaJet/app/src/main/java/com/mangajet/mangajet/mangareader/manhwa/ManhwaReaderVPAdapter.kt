@@ -52,7 +52,9 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         override fun bind(mangaPage : MangaPage, position : Int) {
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
                 .launch(Dispatchers.IO) {
-                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
+                    withContext(Dispatchers.Main) {
+                        itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
+                    }
                     val needToScroolEnd = isScrollToEnd()
                     ensureActive()
 
