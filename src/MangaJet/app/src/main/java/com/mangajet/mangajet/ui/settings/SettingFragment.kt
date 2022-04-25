@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.ui.settings
 
-import android.R
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.mangajet.mangajet.BuildConfig
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
