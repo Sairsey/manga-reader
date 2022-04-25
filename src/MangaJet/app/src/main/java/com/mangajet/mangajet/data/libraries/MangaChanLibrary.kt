@@ -195,14 +195,16 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 f = table.indexOf("href=", f)
                 f = table.indexOf("online", f) + "online".length + 1
                 var s = table.indexOf("'", f)
+                var fullnameStart = table.indexOf(">", s) + 1
                 var nameStart = table.indexOf("&nbsp;&nbsp;", s) + "&nbsp;&nbsp;".length + 1
                 nameStart = table.indexOf("&nbsp;&nbsp;", nameStart) + "&nbsp;&nbsp;".length
                 if(nameStart == "&nbsp;&nbsp;".length - 1)
                     chapters.add(MangaChapter(manga, table.substring(f, s)))
-                else{
+                else {
                     var nameFinish = table.indexOf("<", nameStart)
                     chapters.add(MangaChapter(manga, table.substring(f, s),
-                        transformFromHtml(table.substring(nameStart, nameFinish))))
+                        transformFromHtml(table.substring(nameStart, nameFinish)),
+                        transformFromHtml(table.substring(fullnameStart, nameFinish))))
                     f = table.indexOf("zaliv", f)
                 }
             }

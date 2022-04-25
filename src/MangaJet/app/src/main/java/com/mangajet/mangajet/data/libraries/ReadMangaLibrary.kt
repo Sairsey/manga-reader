@@ -169,6 +169,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             f = text.indexOf(">", s) + 1
             s = text.indexOf("<", f)
             var name = text.substring(f, s).trim()
+            var fullname = name
             val nameSplit = name.split(' ')
             // Stupid way to get chapter title
             if(nameSplit.size == 2 && nameSplit[0].isDigitsOnly())
@@ -185,7 +186,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                     res += nameSplit[i] + " "
                 name = res
             }
-            chapters.add(MangaChapter(manga, id, transformFromHtml(name)))
+            chapters.add(MangaChapter(manga, id, transformFromHtml(name),  transformFromHtml(fullname)))
             f = text.indexOf("item-title", f)
         }
         chapters.reverse()
