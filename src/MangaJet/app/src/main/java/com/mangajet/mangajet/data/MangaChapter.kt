@@ -87,7 +87,19 @@ class MangaChapter {
 
         return true
     }
+    // Function which will check if chapter downloaded
+    fun isLoadedInDownloads() : Boolean {
+        if (pagesNumber <= 0)
+            return false
 
+        for (i in 0 until pagesURLs.size) {
+            var page = MangaPage(pagesURLs[i], manga.library.getHeadersForDownload())
+            if (!StorageManager.isExist(page.localPath, StorageManager.FileType.DownloadedPages))
+                return false
+        }
+
+        return true
+    }
     // Delete chapter from localStorage
     // MAY THROW MangaJetException
     fun delete() {

@@ -55,8 +55,7 @@ class MangaPage {
     // MAY THROW MangaJetException
     fun getFile() : File {
         // Safe-check
-        upload() // Exception may be thrown here
-
+        upload(isToDownload = shouldBeInDownloaded) // Exception may be thrown here
         // Wait if not loaded
         StorageManager.await(this.localPath) // Exception may be thrown here
 

@@ -43,15 +43,53 @@
             android:layout_height="37dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
+            android:backgroundTint="#689F38"
             android:drawableLeft="@drawable/file_download_black_24dp"
             android:drawablePadding="2dip"
             android:paddingLeft="7dip"
             android:paddingRight="30dip"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0"
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+        <Button
+            android:id="@+id/deleteChapter"
+            android:layout_width="38dp"
+            android:layout_height="37dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="#D32F2F"
+            android:drawableLeft="@drawable/delete_chapter_icon"
+            android:drawablePadding="2dip"
+            android:paddingLeft="7dip"
+            android:paddingRight="30dip"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+        <Button
+            android:id="@+id/downloading"
+            android:layout_width="38dp"
+            android:layout_height="37dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:drawableLeft="@drawable/updating_chapter"
+            android:drawablePadding="2dip"
+            android:paddingLeft="7dip"
+            android:paddingRight="30dip"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
