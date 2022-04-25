@@ -85,7 +85,7 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             val s = text.indexOf("\"", f)
             return text.subSequence(f, s).toString()
         }
-        
+
         // Retrieve name of manga
         @Suppress("SwallowedException")
         fun getName(text : String) : String {

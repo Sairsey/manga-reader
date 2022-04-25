@@ -2,6 +2,7 @@ package com.mangajet.mangajet.ui.history
 
 import android.view.View
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
@@ -12,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 // Class which represents "History" View Model
@@ -65,7 +65,7 @@ class HistoryViewModel : ViewModel() {
             mangas.clear()
         }
 
-        job = GlobalScope.launch(Dispatchers.Default) {
+        job = viewModelScope.launch(Dispatchers.Default) {
             addElementsToMangas()
 
             withContext(Dispatchers.Main) {
