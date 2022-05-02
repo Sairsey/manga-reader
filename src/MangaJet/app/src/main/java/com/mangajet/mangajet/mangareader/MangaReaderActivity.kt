@@ -15,6 +15,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import com.mangajet.mangajet.log.Logger
+import com.mangajet.mangajet.mangareader.formatchangeholder.FormatChangerHandler
 
 // Class which represents "Manga Reader" Activity
 @Suppress("TooManyFunctions")
@@ -56,10 +57,12 @@ class MangaReaderActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    // initialization all UI manga data
     fun initialize() {
-        // if we have some troubles
+        // get viewpager reference
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
-        if (mangaReaderViewModel.pagesCount == 0)
+        // if everything is bad
+        if (mangaReaderViewModel.isInitializationSuccessed == false)
         {
             val builder = AlertDialog.Builder(this)
             builder
@@ -77,22 +80,28 @@ class MangaReaderActivity : AppCompatActivity() {
             return
         }
 
-        mangaReaderViewModel.setPageTitle()
+        // set manga name in activity action bar
         setTitle()
+        // set current chapter and page in bottom bar
+        mangaReaderViewModel.setPageTitle()
 
-        // init start position
+        // set adapter
+        mangaReaderViewModel.formatChangerHandler.updateReaderFormat()
+
+        // set valid page position
         var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
         viewPager.setCurrentItem(mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage + delta, false)
+
         Logger.log("Chapter " + (mangaReaderViewModel.manga.lastViewedChapter + 1).toString() + " opened")
 
-        // init toolbar handler
+        // init toolbar handler (which will be shown and hidden by tap)
         val headerToolbar = findViewById<MaterialToolbar>(R.id.headerToolbar)
         val bottomToolbar = findViewById<MaterialToolbar>(R.id.bottomToolbar)
         toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
 
-        // init menu handler
+        // init menu handler (reload + format buttons)
         menuHandler = MangaReaderMenuHandler(mangaReaderViewModel, viewPager,
             supportFragmentManager)
 
@@ -101,6 +110,7 @@ class MangaReaderActivity : AppCompatActivity() {
         val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
         val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
 
+        // bind prev button
         prevChapterButton.setOnClickListener {
             if (!mangaReaderViewModel.isOnFirstChapter()) {
                 mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
@@ -110,12 +120,15 @@ class MangaReaderActivity : AppCompatActivity() {
             }
         }
 
+        // bind next button
         nextChapterButton.setOnClickListener {
             if (!mangaReaderViewModel.isOnLastChapter()) {
                 mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
                 mangaReaderViewModel.setPageTitle()
             }
         }
+
+        // hide onLoad circle
         findViewById<CircularProgressIndicator>(R.id.loadIndicator2).hide()
     }
 
@@ -123,31 +136,35 @@ class MangaReaderActivity : AppCompatActivity() {
         Logger.log("Manga Reader activity started")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.manga_reader_activity)
-
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
 
-        // init viewmodel, reader format and viewpager
+        // get viewmodel
         mangaReaderViewModel = ViewModelProvider(this)[MangaReaderViewModel::class.java]
+        // get screen width for auto-manhwa
         mangaReaderViewModel.displayWidth = getScreenWidth()
+        // create viewpager
         val viewPager = findViewById<ViewPager2>(R.id.mangaViewPager)
         mangaReaderViewModel.mangaReaderVP2 = viewPager
-        mangaReaderViewModel.navTextView = findViewById(R.id.currentPageText)
-        mangaReaderViewModel.activity = this
-        findViewById<CircularProgressIndicator>(R.id.loadIndicator2).show()
-        mangaReaderViewModel.initMangaData()
+        // put 1st page as default because on 0 page we scroll to previous chapter
         viewPager.setCurrentItem(1, false)
+        // get reference for bottom text (chapter %i %i/%i)
+        mangaReaderViewModel.navTextView = findViewById(R.id.currentPageText)
+        // get reference for activity
+        mangaReaderViewModel.activity = this
+        // show Circle load indicator
+        findViewById<CircularProgressIndicator>(R.id.loadIndicator2).show()
+        // init all important manga data
+        mangaReaderViewModel.initMangaData()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        if (mangaReaderViewModel.isInited) {
-            when (event?.action) {
-                MotionEvent.ACTION_DOWN,
-                MotionEvent.ACTION_UP ->
-                    toolbarHandler.touchEventDispatcher(event)
-
-            }
-            return super.dispatchTouchEvent(event)
+        // for showing and removing menu
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_UP ->
+                toolbarHandler.touchEventDispatcher(event)
         }
-        return false
+        // standart Touch event
+        return super.dispatchTouchEvent(event)
     }
 }

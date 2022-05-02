@@ -23,21 +23,26 @@ class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseA
     // Class for holger reverse format viewpage page
     inner class ReverseReaderPageHolder(itemView: View) : MangaReaderPageHolder(itemView) {
         override fun bind(mangaPage: MangaPage, position: Int) {
-            currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
-                .launch(Dispatchers.IO) {
-                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
-                    val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
-                    ensureActive()
-                    withContext(Dispatchers.Main) {
-                        if (pageFile != null) {
-                            val imageSrc = ImageSource.bitmap(pageFile)
-                            ensureActive()
-                            imagePage.setImage(imageSrc)
-                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
-                        }
-                    }
-                }
+            position.hashCode()
         }
+
+            /*
+                    currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
+                        .launch(Dispatchers.IO) {
+                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
+                            val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+                            ensureActive()
+                            withContext(Dispatchers.Main) {
+                                if (pageFile != null) {
+                                    val imageSrc = ImageSource.bitmap(pageFile)
+                                    ensureActive()
+                                    imagePage.setImage(imageSrc)
+                                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
+                                }
+                            }
+                        }
+                }
+                */
     }
 
     // Function which will get page index
@@ -130,7 +135,7 @@ class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseA
         if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
         {
             try {
-                pageIndex = updateSomePages(pageIndex, chapterIndex)
+                pageIndex = getFixedPageIndex(pageIndex, chapterIndex)
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()

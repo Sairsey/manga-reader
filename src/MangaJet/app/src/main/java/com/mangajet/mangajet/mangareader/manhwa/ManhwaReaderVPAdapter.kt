@@ -31,7 +31,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
     inner class ManhwaReaderPageHolder(itemView: View) : MangaReaderBaseAdapter.MangaReaderPageHolder(
         itemView
     )  {
-
+/*
         private fun isScrollToEnd() : Boolean {
             if (wasPrevReload) {
                 wasPrevReload = false
@@ -48,8 +48,9 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
             else
                 return PointF(0F, 0F)
         }
-
+*/
         override fun bind(mangaPage : MangaPage, position : Int) {
+            /*
             currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
                 .launch(Dispatchers.IO) {
                     itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
@@ -73,6 +74,8 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                         }
                     }
                 }
+
+             */
         }
     }
 
@@ -161,7 +164,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
         {
             try {
-                pageIndex = updateSomePages(pageIndex, chapterIndex)
+                pageIndex = getFixedPageIndex(pageIndex, chapterIndex)
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
