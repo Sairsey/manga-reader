@@ -57,6 +57,22 @@ class MangaReaderActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    fun goToNextChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        if (!mangaReaderViewModel.isOnLastChapter()) {
+            mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
+            mangaReaderViewModel.setPageTitle()
+        }
+    }
+
+    fun goToPrevChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        if (!mangaReaderViewModel.isOnFirstChapter()) {
+            mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
+            val startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
+            viewPager.setCurrentItem(startPage, false)
+            mangaReaderViewModel.setPageTitle()
+        }
+    }
+
     // initialization all UI manga data
     fun initialize() {
         // get viewpager reference
@@ -112,22 +128,24 @@ class MangaReaderActivity : AppCompatActivity() {
 
         // bind prev button
         prevChapterButton.setOnClickListener {
-            if (!mangaReaderViewModel.isOnFirstChapter()) {
-                mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-                val startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-                viewPager.setCurrentItem(startPage, false)
-                mangaReaderViewModel.setPageTitle()
+            if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
+                goToPrevChapter(viewPager, pagerAdapter)
+            }
+            else {
+                goToNextChapter(viewPager, pagerAdapter)
             }
         }
 
         // bind next button
         nextChapterButton.setOnClickListener {
-            if (!mangaReaderViewModel.isOnLastChapter()) {
-                mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-                mangaReaderViewModel.setPageTitle()
+            if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
+                goToNextChapter(viewPager, pagerAdapter)
+            }
+            else {
+                goToPrevChapter(viewPager, pagerAdapter)
             }
         }
-
+        
         // hide onLoad circle
         findViewById<CircularProgressIndicator>(R.id.loadIndicator2).hide()
     }
