@@ -22,6 +22,25 @@ class AcomicsLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         private const val PAGESPERCHAPTER = 20
     }
 
+    // Map to transform tags to numbers for url
+    private val tagsMap = mapOf(
+        "Животные" to "1",
+        "Драма" to "2",
+        "Фэнтези" to "3",
+        "Игры" to "4",
+        "Юмор" to "5",
+        "Журнал" to "6",
+        "Паранормальное" to "7",
+        "Конец света" to "8",
+        "Романтика" to "9",
+        "Фантастика" to "10",
+        "Бытовое" to "11",
+        "Стимпанк" to "12",
+        "Супергерои" to "13",
+        "Детектив" to "14",
+        "Историческое" to "15"
+    )
+
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
         return Manga(this, id)
@@ -56,6 +75,40 @@ class AcomicsLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         var index = 0
         while (f != -1) {
             f = text.indexOf(basicURL, f) + basicURL.length + 1
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("list-loadable", f)
+            index++
+        }
+
+        return res.toTypedArray()
+    }
+
+    // Function to get array of Manga classes by tags, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun searchMangaByTags(tags: Array<String>, amount: Int, offset: Int) : Array<Manga>{
+        val basicURL = getURL()
+        var search = ""
+        for (i in 0 until tags.size - 1)
+            search += tagsMap.getOrDefault(tags[i], "0") + ","
+        search += tagsMap.getOrDefault(tags[tags.size - 1], "0")
+        val url = basicURL + "/comics?categories=" + search
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+        var f = text.indexOf("list-loadable")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf(basicURL, f)
+            if(f == -1)
+                break
+            f += basicURL.length + 1
             val s = text.indexOf("\"", f)
             if (index >= offset + amount)
                 break

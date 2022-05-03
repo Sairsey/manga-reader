@@ -67,6 +67,39 @@ class MangaChanLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return res.toTypedArray()
     }
 
+    // Function to get array of Manga classes by tags, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun searchMangaByTags(tags: Array<String>, amount: Int, offset: Int) : Array<Manga>{
+        var search = ""
+        for (i in 0 until tags.size - 1)
+            search += tags[i] + "+"
+        search += tags[tags.size - 1]
+        val url = getURL() + "/tags/" + search
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+
+        var f = text.indexOf("class=\"content_row\"")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("h2", f)
+            f = text.indexOf("<a", f)
+            f = text.indexOf("manga/", f) + "manga".length + 1
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("class=\"content_row\"", f)
+            index++
+        }
+
+        return res.toTypedArray()
+    }
+
     // Helper function to delete weird Html symbols
     private fun transformFromHtml(text : String) : String{
         return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
