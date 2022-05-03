@@ -67,7 +67,12 @@ class MangaReaderActivity : AppCompatActivity() {
     fun goToPrevChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
         if (!mangaReaderViewModel.isOnFirstChapter()) {
             mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-            val startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
+            var startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
+
+            if (mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA) {
+                startPage = viewPager.adapter!!.itemCount - startPage - 1
+            }
+
             viewPager.setCurrentItem(startPage, false)
             mangaReaderViewModel.setPageTitle()
         }
@@ -122,12 +127,12 @@ class MangaReaderActivity : AppCompatActivity() {
             supportFragmentManager)
 
         // init toolbars buttons
-        val pagerAdapter = viewPager.adapter as MangaReaderBaseAdapter
         val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
         val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
 
         // bind prev button
         prevChapterButton.setOnClickListener {
+            val pagerAdapter = viewPager.adapter as MangaReaderBaseAdapter
             if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
                 goToPrevChapter(viewPager, pagerAdapter)
             }
@@ -138,6 +143,7 @@ class MangaReaderActivity : AppCompatActivity() {
 
         // bind next button
         nextChapterButton.setOnClickListener {
+            val pagerAdapter = viewPager.adapter as MangaReaderBaseAdapter
             if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
                 goToNextChapter(viewPager, pagerAdapter)
             }
@@ -145,7 +151,7 @@ class MangaReaderActivity : AppCompatActivity() {
                 goToPrevChapter(viewPager, pagerAdapter)
             }
         }
-        
+
         // hide onLoad circle
         findViewById<CircularProgressIndicator>(R.id.loadIndicator2).hide()
     }

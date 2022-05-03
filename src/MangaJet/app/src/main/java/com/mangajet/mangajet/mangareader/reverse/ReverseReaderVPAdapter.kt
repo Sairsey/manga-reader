@@ -6,43 +6,63 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.davemorrissey.labs.subscaleview.ImageSource
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 // Class which will create adapter for reverse (manga) format reader
 class ReverseReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
     // Class for holger reverse format viewpage page
     inner class ReverseReaderPageHolder(itemView: View) : MangaReaderPageHolder(itemView) {
+        var job : Job? = null
         override fun bind(mangaPage: MangaPage, position: Int) {
-            position.hashCode()
-        }
+            // check if our page is loading or loaded
+            while (!currentViewModelWithData.mutablePagesLoaderMap.containsKey(mangaPage.url)) {
+                Logger.log("Trying to get page which are not loaded/loading")
+                Thread.sleep(2)
+            }
 
-            /*
-                    currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
-                        .launch(Dispatchers.IO) {
-                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
-                            val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
-                            ensureActive()
-                            withContext(Dispatchers.Main) {
-                                if (pageFile != null) {
-                                    val imageSrc = ImageSource.bitmap(pageFile)
-                                    ensureActive()
-                                    imagePage.setImage(imageSrc)
-                                    itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
-                                }
-                            }
-                        }
+            // cancel job
+            job?.cancel()
+
+            // if it is loaded
+            if (currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync
+                    .await(1, TimeUnit.MILLISECONDS)) {
+                println("Start showing page " + mangaPage.url)
+
+                val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                imagePage.setImage(imageSrc)
+                imagePage.setOnImageEventListener(CustomImageEventListener())
+            }
+            // otherwise
+            else {
+                job = currentViewModelWithData.viewModelScope.launch(Dispatchers.IO) {
+                    // wait until loading finishes
+                    currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync.await()
+                    ensureActive()
+                    // and set image same as in if
+                    withContext(Dispatchers.Main) {
+                        ensureActive()
+                        println("Start showing page " + mangaPage.url)
+
+                        // TODO May FALL here
+                        val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                        imagePage.setImage(imageSrc)
+                        imagePage.setOnImageEventListener(CustomImageEventListener())
+                    }
                 }
-                */
+            }
+        }
     }
 
     // Function which will get page index

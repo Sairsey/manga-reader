@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
@@ -43,7 +44,7 @@ class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBase
 
                 val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
                 imagePage.setImage(imageSrc)
-                loadingView.hide()
+                imagePage.setOnImageEventListener(CustomImageEventListener())
             }
             // otherwise
             else {
@@ -59,7 +60,7 @@ class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBase
                         // TODO May FALL here
                         val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
                         imagePage.setImage(imageSrc)
-                        loadingView.hide()
+                        imagePage.setOnImageEventListener(CustomImageEventListener())
                     }
                 }
             }

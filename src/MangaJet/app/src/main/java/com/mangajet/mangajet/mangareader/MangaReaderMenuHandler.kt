@@ -30,8 +30,7 @@ class MangaReaderMenuHandler(mangaReaderVM : MangaReaderViewModel,
         // recreate AsyncLoadPage
         mangaReaderViewModel.mutablePagesLoaderMap[page.url] = AsyncLoadPage(page)
 
-        var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-        var position = chapter.lastViewedPage + delta
+        var position = viewPager.currentItem
 
         val pagerAdapter = viewPager.adapter
         viewPager.adapter = null

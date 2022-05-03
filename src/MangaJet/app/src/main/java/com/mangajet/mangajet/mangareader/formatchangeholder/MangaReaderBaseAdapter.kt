@@ -40,6 +40,13 @@ abstract class MangaReaderBaseAdapter(viewModel: MangaReaderViewModel) :
         val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
         val loadingView = itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator)
 
+        inner class CustomImageEventListener : SubsamplingScaleImageView.DefaultOnImageEventListener() {
+            override fun onImageLoaded() {
+                loadingView.hide()
+                super.onImageLoaded()
+            }
+        }
+
         // Function which will bind pager with content
         abstract fun bind(mangaPage : MangaPage, position : Int)
     }

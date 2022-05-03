@@ -84,12 +84,4 @@ class FormatChangerHandler(
         initHandler()
         adapterChangeHandler()
     }
-
-    /*
-    // Function which will notify some adapters for 'doToPrevChapter'
-    fun notifyAdaptersForPrevChapter() {
-        initHandler()
-        (adapterManhwa as ManhwaReaderVPAdapter).wasPrevReload = true
-    }
-     */
 }
