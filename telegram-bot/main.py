@@ -4,22 +4,26 @@ from telegram.constants import MAX_MESSAGE_LENGTH
 from telegram.constants import PARSEMODE_HTML
 from mailClient import mailClient
 import threading
-from mail import mail
 
 # One mutex to rule them all
 bot_mutex = threading.Lock()
 subscribers_mutex = threading.Lock()
 
+# check mail interval
+check_mail_interval = 60
+# when to notify(23 hours, 59 minutes)
+boat_life_in_seconds = 86340
+
 # Some reports may be to big => need to split into few messages
 def handle_large_text(text):
     while text:
-        if len(text) < MAX_MESSAGE_LENGTH:
+        if len(text) < MAX_MESSAGE_LENGTH - 50:
             yield text
             text = None
         else:
-            out = text[:MAX_MESSAGE_LENGTH]
-            yield out
-            text = text.lstrip(out)
+            out = text[:MAX_MESSAGE_LENGTH - 50]
+            yield out + "</pre>"
+            text = '<pre language="c++">' + text.lstrip(out)
 
 # Response on start command
 def start_command(update, context):
@@ -58,9 +62,9 @@ def subscribe_command(update, context):
         subscribers_mutex.release()
         return
     subscribers.append(update.message.chat.id)
-    print(subscribers)
     update.message.reply_text("Subscribed!")
     print("New subscriber: " + str(update.message.chat.id))
+    print("All subscribers: " + str(subscribers))
     subscribers_mutex.release()
 
 # Main cycle where we get emails
@@ -71,8 +75,7 @@ def bot_main_cycle(context):
     try:
         client = mailClient(bot_login, bot_password)
     except Exception:
-        send_to_all_subscribers(context, """Sorry, there are some problems with logging into our bot account\n
-                                     Please tell Vanya about it""")
+        print("Could not check mail")
         bot_mutex.release()
         return
     new_inbox_amount = client.get_mails_count()
@@ -85,15 +88,25 @@ def bot_main_cycle(context):
             send_to_all_subscribers(context, text)
     bot_mutex.release()
 
-# Main cycle where we get emails
-def send_to_all_subscribers(context, text):
-    print("Try send to all")
+# Notify about restart
+def notify_about_restart(context):
+    print("Restart message send")
+    text = "In a few minutes I'm going to restart\n"\
+           "Don't forget to re/subscribe" 
     subscribers_mutex.acquire()
     for subscriber in subscribers:
         context.bot.send_message(chat_id = subscriber,
                                 text=text, parse_mode=PARSEMODE_HTML)
     subscribers_mutex.release()
 
+# Main cycle where we get emails
+def send_to_all_subscribers(context, text):
+    print("Mail send to all subscribers")
+    subscribers_mutex.acquire()
+    for subscriber in subscribers:
+        context.bot.send_message(chat_id = subscriber,
+                                text=text, parse_mode=PARSEMODE_HTML)
+    subscribers_mutex.release()
 
 # To log errors
 def error(update, context):
@@ -114,7 +127,6 @@ def main():
         return
 
     # Get login and password
-    bot_mutex.acquire()
     try:
         file = open("loginInfo.json", "r") 
         info = json.loads(file.read())
@@ -122,7 +134,6 @@ def main():
         bot_password = info["password"]
     except Exception:
         print("Could not find login or password in json")
-        bot_mutex.release()
         return
     print('Got login and password from json')
 
@@ -130,11 +141,9 @@ def main():
         client = mailClient(bot_login, bot_password)
     except Exception:
         print("Error in logging into bot mail")
-        bot_mutex.release()
         return
     bot_inbox_amount = client.get_mails_count()
     print("Got amount of mails in bot mail")
-    bot_mutex.release()
 
     # Create eventHandler with bot token
     updater = Updater(token, use_context = True)
@@ -152,7 +161,8 @@ def main():
     dp.add_error_handler(error)
 
     # Start bot
-    updater.job_queue.run_repeating(bot_main_cycle, interval = 10, first = 0.0)
+    updater.job_queue.run_repeating(bot_main_cycle, interval = check_mail_interval)
+    updater.job_queue.run_once(notify_about_restart, when = boat_life_in_seconds)
     updater.start_polling()
     updater.idle()
 
