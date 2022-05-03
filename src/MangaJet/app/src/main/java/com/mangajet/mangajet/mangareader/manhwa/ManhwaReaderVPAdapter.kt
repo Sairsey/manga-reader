@@ -10,6 +10,7 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.log.Logger
@@ -42,6 +43,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                         imagePage.sWidth.toFloat())
                 imagePage.setScaleAndCenter(scaleCoef,
                     getFocus(needToScroolEnd, imagePage.sWidth, imagePage.sHeight))
+                imagePage.maxScale = Librarian.settings.MAX_SCALE
                 loadingView.hide()
                 super.onImageLoaded()
             }

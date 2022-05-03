@@ -32,6 +32,9 @@ object Settings {
     // Original names
     var IS_ORIGINAL_NAMES : kotlin.Boolean
 
+    // Maximum scale of image
+    var MAX_SCALE : kotlin.Float
+
     // Initializer block
     init {
         var mangaSearchAmount = "20".toInt()
@@ -41,6 +44,7 @@ object Settings {
         var logFileName = "log.txt"
         var stackTraceName = "stackTrace.txt"
         IS_ORIGINAL_NAMES = true
+        MAX_SCALE = "5".toFloat()
 
         // Try to get settings from file
         try{
@@ -63,6 +67,8 @@ object Settings {
                     stackTraceName = json.getString("stackTraceName")
                 if(json.has("originalNames"))
                     IS_ORIGINAL_NAMES = json.getBoolean("originalNames")
+                if(json.has("max_scale"))
+                    MAX_SCALE = json.getDouble("max_scale").toFloat()
             }
         }
         catch (ex : MangaJetException){

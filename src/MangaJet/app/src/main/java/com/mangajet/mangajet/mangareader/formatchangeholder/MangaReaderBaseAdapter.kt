@@ -7,6 +7,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
@@ -43,6 +44,7 @@ abstract class MangaReaderBaseAdapter(viewModel: MangaReaderViewModel) :
         inner class CustomImageEventListener : SubsamplingScaleImageView.DefaultOnImageEventListener() {
             override fun onImageLoaded() {
                 loadingView.hide()
+                imagePage.maxScale = Librarian.settings.MAX_SCALE
                 super.onImageLoaded()
             }
         }
