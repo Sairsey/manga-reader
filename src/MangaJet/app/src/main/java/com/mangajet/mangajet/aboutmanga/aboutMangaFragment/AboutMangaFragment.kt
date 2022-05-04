@@ -5,17 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
@@ -25,11 +24,10 @@ import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 // "About manga" fragment with main information
 class AboutMangaFragment : Fragment() {
@@ -62,6 +60,23 @@ class AboutMangaFragment : Fragment() {
                     + ex.message, Logger.Lvl.WARNING)
             null
         }
+    }
+
+    private fun createNewTag(tagsLayout : FlexboxLayout, tagName : String) {
+        val newTextView = TextView(activity)
+        newTextView.text = tagName
+        newTextView.setPadding(
+            AboutMangaActivity.PADDING_HORZ,
+            AboutMangaActivity.PADDING_VERT,
+            AboutMangaActivity.PADDING_HORZ,
+            AboutMangaActivity.PADDING_VERT
+        )
+
+        // make tags clickable
+        newTextView.isClickable = true
+        newTextView.setTextColor(resources.getColor(R.color.primary))
+        newTextView.setBackgroundResource(R.drawable.tag_border)
+        tagsLayout.addView(newTextView)
     }
 
     override fun onStart() {
@@ -123,17 +138,7 @@ class AboutMangaFragment : Fragment() {
         val tagsLayout = binding.tagsLayout
         tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
-            val newTextView = TextView(activity)
-            newTextView.text = it
-            newTextView.setPadding(
-                AboutMangaActivity.PADDING_HORZ,
-                AboutMangaActivity.PADDING_VERT,
-                AboutMangaActivity.PADDING_HORZ,
-                AboutMangaActivity.PADDING_VERT
-            )
-            newTextView.setTextColor(resources.getColor(R.color.primary))
-            newTextView.setBackgroundResource(R.drawable.tag_border)
-            tagsLayout.addView(newTextView)
+            createNewTag(tagsLayout, it)
         }
     }
 

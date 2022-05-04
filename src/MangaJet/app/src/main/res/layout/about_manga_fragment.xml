@@ -219,6 +219,7 @@
             app:layout_constraintTop_toBottomOf="@id/tagsText"
             app:showDivider="middle"
             app:dividerDrawable="@drawable/divider">
+
         </com.google.android.flexbox.FlexboxLayout>
 
         <TextView
