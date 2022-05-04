@@ -3,6 +3,7 @@ package com.mangajet.mangajet.aboutmanga.aboutMangaFragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -75,14 +76,26 @@ class AboutMangaFragment : Fragment() {
         // manges to go here, I think we should crash
         cover.upload()
 
+        // set manga title
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
                 aboutMangaViewmodel.manga.russianName + ")")
+        // set author
         binding.authorText.setText(aboutMangaViewmodel.manga.author)
+        // set description
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
+        // set source URI
+        binding.source.isClickable = true
         binding.source.setText(aboutMangaViewmodel.manga.library.getURL())
+        binding.source.setOnClickListener {
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(binding.source.text.toString()))
+            startActivity(browserIntent)
+        }
+        // set manga rating
         if (aboutMangaViewmodel.manga.rating != 0.0) {
             binding.ratingNum.setText(aboutMangaViewmodel.manga.rating.toString())
         }
+        // load manga cover
         job = GlobalScope.launch(Dispatchers.IO) {
             // POTENTIAL EXCEPTION and ERROR
             // Cover isn't downloaded but we try to draw it => terminate
@@ -93,6 +106,7 @@ class AboutMangaFragment : Fragment() {
             }
         }
 
+        // set button "Read manga"
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
             if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
