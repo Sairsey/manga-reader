@@ -1,7 +1,5 @@
 package com.mangajet.mangajet.data.libraries
 
-import android.os.Build
-import android.text.Html
 import androidx.core.text.isDigitsOnly
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
@@ -98,7 +96,7 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
             if (link.contains("/person/") || link.contains("/tag/") || link.contains("/gournal/"))
                 continue
-            if(link.contains("/year/") || link.contains("/librebook/") || link.contains("/mose.live/"))
+            if(link.contains("/year/") || link.contains("/librebook/") || link.contains("live/"))
                 continue
             if (index >= offset + amount)
                 break
@@ -137,12 +135,30 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return res.toTypedArray()
     }
 
-    // Helper function to delete weird Html symbols
-    private fun transformFromHtml(text : String) : String{
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
-        else
-            Html.fromHtml(text).toString()
+    // Function to get array of Manga classes by popularity, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun getPopularManga(amount: Int, offset: Int) : Array<Manga>{
+        val url = getURL() + "/list?sortType=rate"
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+        var f = text.indexOf("tile col-md-6")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("a href=\"", f) + "a href=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("tile col-md-6", f)
+            index++
+        }
+
+        return res.toTypedArray()
     }
 
     // Helper class for some functions

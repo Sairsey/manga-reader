@@ -1,7 +1,5 @@
 package com.mangajet.mangajet.data.libraries
 
-import android.os.Build
-import android.text.Html
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.WebAccessor
@@ -259,12 +257,31 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return res.toTypedArray()
     }
 
-    // Helper function to delete weird Html symbols
-    private fun transformFromHtml(text : String) : String{
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
-        else
-            Html.fromHtml(text).toString()
+    // Function to get array of Manga classes by popularity, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun getPopularManga(amount: Int, offset: Int) : Array<Manga>{
+        val url = getURL() + "/manga-list?sort=rate"
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+
+        var f = text.indexOf("media-card-wrap")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("slug=\"", f) + "slug=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("media-card-wrap", f)
+            index++
+        }
+
+        return res.toTypedArray()
     }
 
     // Helper class for some functions
