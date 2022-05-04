@@ -12,17 +12,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.log.UncaughtExceptionHandler
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 
@@ -155,7 +162,22 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if(report.isEmpty())
             return
         val email = "mangajetmailbot@gmail.com"
+        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+        val tmpFileName = "backup" + sdf.format(Date()) + ".zip"
+        //create zip file
+        var file : File? = null
+        try {
+            if(StorageManager.isExist(tmpFileName))
+                StorageManager.getFile(tmpFileName).delete()
+            StorageManager.saveString(tmpFileName, "")
+            file = StorageManager.getFile(tmpFileName)
+            StorageManager.createZipArchive(FileOutputStream(file))
 
+        }
+        catch (e : MangaJetException){
+            Logger.log("Could not create backup for crash report: " + e.message, Logger.Lvl.WARNING)
+            e.hashCode()
+        }
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Ooopsie..")
             .setMessage("App crashed. Can you send info about it via email?")
@@ -163,10 +185,16 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                     dialog, id ->
                 val sendIntent = Intent(Intent.ACTION_SEND)
                 val subject = "Error report"
+                sendIntent.type = "application/zip"
                 sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
                 sendIntent.putExtra(Intent.EXTRA_TEXT, report)
+                if(file != null) {
+                    val uri = context?.let {
+                        FileProvider.getUriForFile(it, context!!.applicationContext.packageName + ".provider", file)
+                    }
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                }
                 sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-                sendIntent.type = "message/rfc822"
                 this.startActivity(Intent.createChooser(sendIntent, "Title:"))
             }
             .setNegativeButton("Cancel") {
@@ -176,6 +204,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val alert = builder.create()
         alert.show()
         alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        //file?.delete()// Don't know how to delete properly
         
     }
 }
