@@ -21,9 +21,6 @@ class ReversePageChangeListener(
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
 
-        if (mangaReaderViewModel.isInited == false)
-            return
-
         mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage = mangaReaderViewModel.manga
