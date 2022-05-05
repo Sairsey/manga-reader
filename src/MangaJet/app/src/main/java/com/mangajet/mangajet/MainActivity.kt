@@ -28,7 +28,6 @@ import kotlin.system.exitProcess
 
 // Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boolean>> {
-
     private lateinit var binding: ActivityMainBinding
 
     // Permission request
@@ -103,8 +102,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted

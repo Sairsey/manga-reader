@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.ForYouFragmentBinding
 import com.mangajet.mangajet.log.Logger
@@ -21,6 +23,22 @@ class ForYouFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            MangaJetApp.ABOUT_MANGA_CALLBACK -> {
+                if (MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened) {
+                    val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
+                    val view: View = navigationBar!!.findViewById(
+                        MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.mainFragmentId
+                    )
+                    view.performClick()
+                }
+            }
+            else ->
+                super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +65,7 @@ class ForYouFragment : Fragment() {
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
                 MangaJetApp.currentManga = forYouFragmentViewModel.mangas[id.toInt()]
-                startActivity(intent)}
+                startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
         }
         return root
     }
