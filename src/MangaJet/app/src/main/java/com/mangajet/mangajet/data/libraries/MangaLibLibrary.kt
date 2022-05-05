@@ -1,7 +1,5 @@
 package com.mangajet.mangajet.data.libraries
 
-import android.os.Build
-import android.text.Html
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
 import com.mangajet.mangajet.data.WebAccessor
@@ -15,6 +13,167 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
         "Accept" to "*/*",
         "Referer" to getURL() + "/")
+
+    // Map to transform genres for url
+    private val genreMap = mapOf(
+        "арт" to "32",
+        "безумие" to "91",
+        "боевик" to "34",
+        "боевые искусства" to "35",
+        "вампиры" to "36",
+        "военное" to "89",
+        "гарем" to "37",
+        "гендерная интрига" to "38",
+        "героическое фэнтези" to "39",
+        "демоны" to "81",
+        "детектив" to "40",
+        "детское" to "88",
+        "дзёсэй" to "41",
+        "драма" to "43",
+        "игра" to "44",
+        "исекай" to "79",
+        "история" to "45",
+        "киберпанк" to "46",
+        "кодомо" to "76",
+        "комедия" to "47",
+        "космос" to "83",
+        "магия" to "85",
+        "махо-сёдзё" to "48",
+        "машины" to "90",
+        "меха" to "49",
+        "мистика" to "50",
+        "музыка" to "80",
+        "научная фантастика" to "51",
+        "пародия" to "86",
+        "повседневность" to "52",
+        "полиция" to "82",
+        "постапокалиптика" to "53",
+        "приключения" to "54",
+        "психология" to "55",
+        "романтика" to "56",
+        "самурайский боевик" to "57",
+        "сверхъестественное" to "58",
+        "сёдзё" to "59",
+        "сёдзё-ай" to "60",
+        "сёнэн" to "61",
+        "спорт" to "63",
+        "супер сила" to "87",
+        "сэйнэн" to "64",
+        "трагедия" to "65",
+        "триллер" to "66",
+        "ужасы" to "67",
+        "фантастика" to "68",
+        "фэнтези" to "69",
+        "школа" to "70",
+        "эротика" to "71",
+        "этти" to "72",
+        "юри" to "73"
+    )
+
+    // Map to transform tags for url
+    private val tagMap = mapOf(
+        "Азартные игры" to "304",
+        "Алхимия" to "225",
+        "Амнезия / Потеря памяти" to "347",
+        "Ангелы" to "226",
+        "Антигерои" to "175",
+        "Антиутопия" to "227",
+        "Апокалипсис" to "228",
+        "Армия" to "229",
+        "Артефакты" to "230",
+        "Боги" to "215",
+        "Бои на мечах" to "231",
+        "Борьба за власть" to "232",
+        "Брат и сестра" to "41",
+        "Будущее" to "234",
+        "Ведьма" to "338",
+        "Вестерн" to "235",
+        "Видеоигры" to "185",
+        "Виртуальная реальность" to "195",
+        "Владыка демонов" to "236",
+        "Военные" to "179",
+        "Война" to "237",
+        "Волшебники / маги" to "281",
+        "Волшебные существа" to "239",
+        "Воспоминания из другого мира" to "240",
+        "Выживание" to "193",
+        "ГГ женщина" to "243",
+        "ГГ имба" to "291",
+        "ГГ мужчина" to "244",
+        "Геймеры" to "241",
+        "Гильдии" to "242",
+        "Глупый ГГ" to "297",
+        "Гоблины" to "245",
+        "Горничные" to "169",
+        "Гяру" to "178",
+        "Демоны" to "151",
+        "Драконы" to "246",
+        "Дружба" to "247",
+        "Жестокий мир" to "249",
+        "Животные компаньоны" to "250",
+        "Завоевание мира" to "251",
+        "Зверолюди" to "162",
+        "Злые духи" to "252",
+        "Зомби" to "149",
+        "Игровые элементы" to "253",
+        "Империи" to "254",
+        "Квесты" to "255",
+        "Космос" to "256",
+        "Кулинария" to "152",
+        "Культивация" to "160",
+        "ЛГБТ" to "342",
+        "Легендарное оружие" to "257",
+        "Лоли" to "187",
+        "Магическая академия" to "258",
+        "Магия" to "168",
+        "Мафия" to "172",
+        "Медицина" to "153",
+        "Месть" to "259",
+        "Монстродевушки" to "188",
+        "Монстры" to "189",
+        "Музыка" to "357",
+        "Навыки / способности" to "260",
+        "Насилие / жестокость" to "262",
+        "Наёмники" to "261",
+        "Нежить" to "263",
+        "Ниндзя" to "180",
+        "Обмен телами" to "346",
+        "Обратный Гарем" to "191",
+        "Огнестрельное оружие" to "264",
+        "Офисные Работники" to "181",
+        "Пародия" to "265",
+        "Пираты" to "340",
+        "Подземелья" to "266",
+        "Политика" to "267",
+        "Полиция" to "182",
+        "Преступники / Криминал" to "186",
+        "Призраки / Духи" to "177",
+        "Путешествие во времени" to "194",
+        "Рабы" to "354",
+        "Разумные расы" to "268",
+        "Ранги силы" to "248",
+        "Реинкарнация" to "148",
+        "Роботы" to "269",
+        "Рыцари" to "270",
+        "Самураи" to "183",
+        "Система" to "271",
+        "Скрытие личности" to "273",
+        "Спасение мира" to "274",
+        "Спортивное тело" to "334",
+        "Средневековье" to "173",
+        "Стимпанк" to "272",
+        "Супергерои" to "275",
+        "Традиционные игры" to "184",
+        "Умный ГГ" to "302",
+        "Учитель / ученик" to "276",
+        "Философия" to "277",
+        "Хикикомори" to "166",
+        "Холодное оружие" to "278",
+        "Шантаж" to "279",
+        "Эльфы" to "216",
+        "Якудза" to "164",
+        "Япония" to "280"
+    )
 
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
@@ -64,12 +223,65 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
     }
 
-    // Helper function to delete weird Html symbols
-    private fun transformFromHtml(text : String) : String{
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
-        else
-            Html.fromHtml(text).toString()
+    // Function to get array of Manga classes by tags, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun searchMangaByTags(tags: Array<String>, amount: Int, offset: Int) : Array<Manga>{
+        var search = ""
+        for (i in 0 until tags.size) {
+            if(genreMap.containsKey(tags[i]))
+                search += "genres[include][]=" + genreMap[tags[i]] + "&"
+            else if(tagMap.containsKey(tags[i]))
+                search += "tags[include][]=" + tagMap[tags[i]] + "&"
+        }
+        val url = getURL() + "/manga-list?" + search
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+
+        var f = text.indexOf("media-card-wrap")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("slug=\"", f) + "slug=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("media-card-wrap", f)
+            index++
+        }
+
+        return res.toTypedArray()
+    }
+
+    // Function to get array of Manga classes by popularity, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun getPopularManga(amount: Int, offset: Int) : Array<Manga>{
+        val url = getURL() + "/manga-list?sort=rate"
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+
+        var f = text.indexOf("media-card-wrap")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("slug=\"", f) + "slug=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("media-card-wrap", f)
+            index++
+        }
+
+        return res.toTypedArray()
     }
 
     // Helper class for some functions
@@ -180,14 +392,22 @@ class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         val json = JSONObject(JSONObject(subtext)["chapters"].toString())
         val query = json.getJSONArray("list")
+        var branchID = "null"
+        if(query.length() != 0)
+            branchID = query.getJSONObject(0).getString("branch_id")
         for (i in 0 until query.length()) {
+            if (branchID != query.getJSONObject(i).getString("branch_id"))
+                continue
             var id = manga.id + "/v" + query.getJSONObject(i).getString("chapter_volume") + '/'
             id += 'c' + query.getJSONObject(i).getString("chapter_number")
+            if(branchID != "null")
+                id += "?bid=" + branchID
             var name = query.getJSONObject(i).getString("chapter_name")
             var volume = query.getJSONObject(i).getString("chapter_volume")
             var number = query.getJSONObject(i).getString("chapter_number")
             if(name.equals("null"))
                 name = ""
+            println(id)
             chapters.add(MangaChapter(manga, id, transformFromHtml(name),
                 "Том " + volume + " Глава " + number + " - " + transformFromHtml(name)))
         }
