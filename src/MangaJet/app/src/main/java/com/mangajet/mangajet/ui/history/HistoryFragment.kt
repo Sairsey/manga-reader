@@ -51,22 +51,14 @@ class HistoryFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            MangaJetApp.SEARCH_BY_TAG -> {
-                if (data == null) {
-                    super.onActivityResult(requestCode, resultCode, data)
-                    return
+            MangaJetApp.ABOUT_MANGA_CALLBACK -> {
+                if (MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened) {
+                    val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
+                    val view: View = navigationBar!!.findViewById(
+                        MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.mainFragmentId
+                    )
+                    view.performClick()
                 }
-                // send info for search
-
-                // collect info for search
-                val tag = data!!.getCharSequenceExtra("tag").toString()
-                val src = data!!.getCharSequenceExtra("src").toString()
-
-                MangaJetApp.isNeedToTagSearch = true
-                MangaJetApp.tagSearchInfo = Pair(tag, src)
-                val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
-                val view: View = navigationBar!!.findViewById(R.id.navigation_search)
-                view.performClick()
             }
             else ->
                 super.onActivityResult(requestCode, resultCode, data)
@@ -100,7 +92,7 @@ class HistoryFragment : Fragment() {
         listView.setOnItemClickListener{ parent, view, position, id ->
             val intent = Intent(requireActivity(), AboutMangaActivity::class.java)
             MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
-            startActivityForResult(intent, MangaJetApp.SEARCH_BY_TAG)}
+            startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
 
         return root
     }

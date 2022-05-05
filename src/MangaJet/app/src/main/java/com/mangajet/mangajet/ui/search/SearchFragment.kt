@@ -54,7 +54,7 @@ class SearchFragment : Fragment() {
             binding.searchViewList.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(frag, AboutMangaActivity::class.java)
                 MangaJetApp.currentManga = searchViewModel.mangas[id.toInt()]
-                startActivityForResult(intent, MangaJetApp.SEARCH_BY_TAG)}
+                startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
 
             return true
         }
@@ -84,22 +84,14 @@ class SearchFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            MangaJetApp.SEARCH_BY_TAG -> {
-                if (data == null) {
-                    super.onActivityResult(requestCode, resultCode, data)
-                    return
+            MangaJetApp.ABOUT_MANGA_CALLBACK -> {
+                if (MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened) {
+                    val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
+                    val view: View = navigationBar!!.findViewById(
+                        MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.mainFragmentId
+                    )
+                    view.performClick()
                 }
-                // send info for search
-
-                // collect info for search
-                val tag = data!!.getCharSequenceExtra("tag").toString()
-                val src = data!!.getCharSequenceExtra("src").toString()
-
-                MangaJetApp.isNeedToTagSearch = true
-                MangaJetApp.tagSearchInfo = Pair(tag, src)
-                val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
-                val view: View = navigationBar!!.findViewById(R.id.navigation_search)
-                view.performClick()
             }
             else ->
                 super.onActivityResult(requestCode, resultCode, data)
@@ -150,9 +142,10 @@ class SearchFragment : Fragment() {
 
         // init mangas (tag search if we need this)
         activity?.let {
-            if (MangaJetApp.isNeedToTagSearch) {
-                MangaJetApp.isNeedToTagSearch = false
-                binding.searchView.setQuery("tag := " + MangaJetApp.tagSearchInfo!!.first,
+            if (MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened) {
+                MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened = false
+                binding.searchView.setQuery(resources.getString(R.string.tag_search)
+                        + " " + MangaJetApp.tagSearchInfo!!.first,
                     false)
                 searchViewModel.mangas = arrayListOf()
                 val adapter = MangaListAdapter(
@@ -167,8 +160,12 @@ class SearchFragment : Fragment() {
                 binding.searchViewList.setOnItemClickListener { parent, view, position, id ->
                     val intent = Intent(it, AboutMangaActivity::class.java)
                     MangaJetApp.currentManga = searchViewModel.mangas[id.toInt()]
-                    startActivityForResult(intent, MangaJetApp.SEARCH_BY_TAG)
+                    startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)
                 }
+            }
+            else {
+                // clear query text
+                binding.searchView.setQuery("",false)
             }
         }
     }

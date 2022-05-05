@@ -12,6 +12,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Manga
 
 // Class which represents "About Manga" Activity
 class AboutMangaActivity : AppCompatActivity() {
@@ -61,10 +62,9 @@ class AboutMangaActivity : AppCompatActivity() {
 
         supportFragmentManager.setFragmentResultListener("TAG_TAPPED", this ) { requestKey, bundle ->
             val tag = bundle.getString("tag")
-            val intentWithData = Intent()
-            intentWithData.putExtra("src", aboutMangaViewmodel.manga.library.getURL())
-            intentWithData.putExtra("tag", tag)
-            setResult(RESULT_OK, intentWithData)
+            MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened = true
+            MangaJetApp.tagSearchInfo = Pair(tag!!, aboutMangaViewmodel.manga.library.getURL())
+            setResult(RESULT_OK)
             finish()
         }
     }

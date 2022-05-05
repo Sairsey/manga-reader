@@ -175,8 +175,6 @@ class SearchViewModel : ViewModel() {
     }
 
     fun initSearchListView(adapterNew: MangaListAdapter, binding : SearchFragmentBinding) {
-        MangaJetApp.isNeedToTagSearch = false
-
         // show load process
         binding.progressBar.show()
         binding.noResultLayout.visibility = View.INVISIBLE
