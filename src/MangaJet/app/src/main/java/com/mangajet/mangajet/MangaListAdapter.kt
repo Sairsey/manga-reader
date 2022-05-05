@@ -25,6 +25,11 @@ class MangaListAdapter(
     resourceLayout: Int,
     items: ArrayList<Manga>
 ) : BaseAdapter() {
+    companion object {
+        const val MIN_ALPHA_COVER_VALUE =   0
+        const val MAX_ALPHA_COVER_VALUE = 255
+    }
+
     // List context
     private val mContext: Context = context
     private val mItems : ArrayList<Manga> = items
@@ -93,13 +98,16 @@ class MangaListAdapter(
             var coverPage = MangaPage(currentItem.cover, currentItem.library.getHeadersForDownload())
             coverPage.upload()
 
+            viewHolder.coverView.imageAlpha = MIN_ALPHA_COVER_VALUE
             GlobalScope.launch(Dispatchers.Default) {
                 // POTENTIAL EXCEPTION and ERROR
                 // Cover isn't downloaded but we try to draw it => terminate
                 val bitmap = loadBitmap(coverPage)
                 withContext(Dispatchers.Main) {
-                    if (bitmap != null)
+                    if (bitmap != null) {
                         viewHolder.coverView.setImageBitmap(bitmap)
+                        viewHolder.coverView.imageAlpha = MAX_ALPHA_COVER_VALUE
+                    }
                 }
             }
 
