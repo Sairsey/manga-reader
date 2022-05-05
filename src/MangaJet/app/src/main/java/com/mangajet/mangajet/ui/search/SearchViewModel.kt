@@ -153,8 +153,7 @@ class SearchViewModel : ViewModel() {
 
         destroyAll()
 
-        if (job?.isActive == true)
-            job?.cancel()
+        job?.cancel()
 
         job = viewModelScope.launch(Dispatchers.IO) {
             for (i in Librarian.LibraryName.values().indices) {
@@ -186,8 +185,7 @@ class SearchViewModel : ViewModel() {
         val source = Librarian.LibraryName.from(MangaJetApp.tagSearchInfo!!.second)
         val tag = arrayOf<String>(MangaJetApp.tagSearchInfo!!.first)
 
-        if (job?.isActive == true)
-            job?.cancel()
+        job?.cancel()
 
         job = viewModelScope.launch(Dispatchers.IO) {
             val mangas = searchMangasByTags(tag, source)
