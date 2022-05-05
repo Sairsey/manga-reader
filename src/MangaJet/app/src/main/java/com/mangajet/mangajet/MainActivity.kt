@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,7 +29,6 @@ import kotlin.system.exitProcess
 
 // Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boolean>> {
-
     private lateinit var binding: ActivityMainBinding
 
     // Permission request
@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             dialog.setCanceledOnTouchOutside(false)
             dialog.show()
         }
+
     }
 
     // Function to check permission.
@@ -103,8 +104,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted

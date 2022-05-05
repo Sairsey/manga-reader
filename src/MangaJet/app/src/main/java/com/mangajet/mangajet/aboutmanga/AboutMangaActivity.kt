@@ -1,8 +1,10 @@
 package com.mangajet.mangajet.aboutmanga
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
@@ -56,6 +58,15 @@ class AboutMangaActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+
+        supportFragmentManager.setFragmentResultListener("TAG_TAPPED", this ) { requestKey, bundle ->
+            val tag = bundle.getString("tag")
+            val intentWithData = Intent()
+            intentWithData.putExtra("src", aboutMangaViewmodel.manga.library.getURL())
+            intentWithData.putExtra("tag", tag)
+            setResult(RESULT_OK, intentWithData)
+            finish()
+        }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) finish()

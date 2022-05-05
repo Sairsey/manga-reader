@@ -2,11 +2,14 @@ package com.mangajet.mangajet.ui.search
 
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
@@ -47,15 +50,53 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    // Function which will load info about each manga from "manga names"
-    private suspend fun addElementsToMangas(
+    // Function which will find mangas by query
+    private suspend fun searchMangasByQuery(
         queryString : String,
         source : Librarian.LibraryName
-    ) {
+    ) : Array<Manga> {
         try {
             val libsMangas = Librarian.getLibrary(source)!!
                 .searchManga(queryString, Librarian.settings.MANGA_SEARCH_AMOUNT, 0)
 
+            return libsMangas
+        } catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to load info about some manga while searching"
+                    + ex.message, Logger.Lvl.WARNING)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        return arrayOf()
+    }
+
+    // Function which will find mangas by Tags
+    private suspend fun searchMangasByTags(
+        tags : Array<String>,
+        source : Librarian.LibraryName
+    ) : Array<Manga> {
+        try {
+            val libsMangas = Librarian.getLibrary(source)!!
+                .searchMangaByTags(tags, Librarian.settings.MANGA_SEARCH_AMOUNT, 0)
+
+            return libsMangas
+        } catch (ex : MangaJetException) {
+            Logger.log("Catch MJE while trying to load info about some manga while searching"
+                    + ex.message, Logger.Lvl.WARNING)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        return arrayOf()
+    }
+
+    // Function which will load info about each manga from "manga names"
+    private suspend fun addElementsToMangas(
+        libsMangas : Array<Manga>
+    ) {
+        try {
             if (libsMangas.isEmpty()) {
                 return
             }
@@ -66,7 +107,7 @@ class SearchViewModel : ViewModel() {
             }
 
         } catch (ex : MangaJetException) {
-            Logger.log("Catch MJE while trying to load info about some manga while searching"
+            Logger.log("Catch MJE while trying to load info about some manga while adding to adapter"
                     + ex.message, Logger.Lvl.WARNING)
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, ex.message, Toast.LENGTH_LONG).show()
@@ -111,15 +152,52 @@ class SearchViewModel : ViewModel() {
         Logger.log("Search \"$queryString\" with these sources: $sources")
 
         destroyAll()
+
+        if (job?.isActive == true)
+            job?.cancel()
+
         job = viewModelScope.launch(Dispatchers.IO) {
             for (i in Librarian.LibraryName.values().indices) {
-                if (Librarian.settings.CHOSEN_RESOURCES[i])
-                    addElementsToMangas(queryString, Librarian.LibraryName.values()[i])
+                if (Librarian.settings.CHOSEN_RESOURCES[i]) {
+                    val mangas = searchMangasByQuery(queryString, Librarian.LibraryName.values()[i])
+                    addElementsToMangas(mangas)
+                }
             }
 
             withContext(Dispatchers.Main) {
                 synchronized(searchListMutex) {
                     if (mangas.size == 0)
+                        binding.noResultLayout.visibility = View.VISIBLE
+                    binding.progressBar.hide()
+                }
+            }
+        }
+    }
+
+    fun initSearchListView(adapterNew: MangaListAdapter, binding : SearchFragmentBinding) {
+        MangaJetApp.isNeedToTagSearch = false
+
+        // show load process
+        binding.progressBar.show()
+        binding.noResultLayout.visibility = View.INVISIBLE
+
+        // init adapter
+        adapter =  adapterNew
+
+        // init info for search
+        val source = Librarian.LibraryName.from(MangaJetApp.tagSearchInfo!!.second)
+        val tag = arrayOf<String>(MangaJetApp.tagSearchInfo!!.first)
+
+        if (job?.isActive == true)
+            job?.cancel()
+
+        job = viewModelScope.launch(Dispatchers.IO) {
+            val mangas = searchMangasByTags(tag, source)
+            addElementsToMangas(mangas)
+
+            withContext(Dispatchers.Main) {
+                synchronized(searchListMutex) {
+                    if (mangas.isEmpty())
                         binding.noResultLayout.visibility = View.VISIBLE
                     binding.progressBar.hide()
                 }

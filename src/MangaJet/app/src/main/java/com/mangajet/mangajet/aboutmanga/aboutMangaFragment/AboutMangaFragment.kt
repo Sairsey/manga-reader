@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.aboutmanga.aboutMangaFragment
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -39,6 +41,9 @@ class AboutMangaFragment : Fragment() {
 
     // Async job for loading bitmap
     var job : Job? = null
+
+    // Viewmodel with data
+    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,13 +81,20 @@ class AboutMangaFragment : Fragment() {
         newTextView.isClickable = true
         newTextView.setTextColor(resources.getColor(R.color.primary))
         newTextView.setBackgroundResource(R.drawable.tag_border)
+
+        // make action on click (return result for tag-search)
+        newTextView.setOnClickListener {
+            val bundleSignal = Bundle()
+            bundleSignal.putCharSequence("tag", newTextView.text)
+            setFragmentResult("TAG_TAPPED", bundleSignal)
+        }
         tagsLayout.addView(newTextView)
     }
 
     override fun onStart() {
         super.onStart()
 
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
         Logger.log("About " + aboutMangaViewmodel.manga.id + " fragment opened")
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())

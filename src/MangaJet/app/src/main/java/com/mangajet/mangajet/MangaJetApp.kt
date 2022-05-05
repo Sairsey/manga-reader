@@ -14,6 +14,11 @@ class MangaJetApp : Application() {
     {
         var context: Context? = null
         var currentManga : Manga? = null // used for fast sending data between activities without json
+
+        // Fields which provide tags search
+        const val SEARCH_BY_TAG = 1
+        var isNeedToTagSearch = false
+        var tagSearchInfo : Pair<String, String>? = null
     }
 
     override fun onCreate() {

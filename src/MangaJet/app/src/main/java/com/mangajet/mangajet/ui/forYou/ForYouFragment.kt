@@ -6,12 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.ForYouFragmentBinding
 import com.mangajet.mangajet.log.Logger
+import com.mangajet.mangajet.ui.history.HistoryFragment
 
 // Class which represents "For you" fragment of MainActivity
 class ForYouFragment : Fragment() {
@@ -21,6 +25,30 @@ class ForYouFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            MangaJetApp.SEARCH_BY_TAG -> {
+                if (data == null) {
+                    super.onActivityResult(requestCode, resultCode, data)
+                    return
+                }
+                // send info for search
+
+                // collect info for search
+                val tag = data!!.getCharSequenceExtra("tag").toString()
+                val src = data!!.getCharSequenceExtra("src").toString()
+
+                MangaJetApp.isNeedToTagSearch = true
+                MangaJetApp.tagSearchInfo = Pair(tag, src)
+                val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
+                val view: View = navigationBar!!.findViewById(R.id.navigation_search)
+                view.performClick()
+            }
+            else ->
+                super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +75,7 @@ class ForYouFragment : Fragment() {
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
                 MangaJetApp.currentManga = forYouFragmentViewModel.mangas[id.toInt()]
-                startActivity(intent)}
+                startActivityForResult(intent, MangaJetApp.SEARCH_BY_TAG)}
         }
         return root
     }
