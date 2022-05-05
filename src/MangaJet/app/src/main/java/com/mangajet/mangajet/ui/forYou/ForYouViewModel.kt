@@ -59,7 +59,16 @@ class ForYouViewModel : ViewModel() {
             isInited = true
             adapter = adapterNew
             job = GlobalScope.launch(Dispatchers.IO) {
-                addElementsToMangas()
+                var recomMangas = Librarian.getRecommendedMangas()
+                for (manga in recomMangas) {
+                    manga.updateInfo()
+                    withContext(Dispatchers.Main) {
+                        mangas.add(manga)
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    adapter?.notifyDataSetChanged()
+                }
             }
         }
     }
