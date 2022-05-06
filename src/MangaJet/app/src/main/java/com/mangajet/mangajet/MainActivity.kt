@@ -159,18 +159,19 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     // Functions that checks report for crash => sends it to email
     private fun checkForCrash(report : String){
 
-        if(report.isEmpty())
-            return
         val email = "mangajetmailbot@gmail.com"
-        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-        val tmpFileName = "backup" + sdf.format(Date()) + ".zip"
+        val tmpFileName = "backupToMail.zip"
+
         //create zip file
         var file : File? = null
         try {
-            if(StorageManager.isExist(tmpFileName))
-                StorageManager.getFile(tmpFileName).delete()
-            StorageManager.saveString(tmpFileName, "")
-            file = StorageManager.getFile(tmpFileName)
+            // To Download pages, because it won't be in archive
+            if(StorageManager.isExist(tmpFileName, StorageManager.FileType.DownloadedPages))
+                StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages).delete()
+            if(report.isEmpty()) // Ask me about this later, Vova
+                return           // Maybe we can find a better solution
+            StorageManager.saveString(tmpFileName, "", StorageManager.FileType.DownloadedPages)
+            file = StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages)
             StorageManager.createZipArchive(FileOutputStream(file))
 
         }
@@ -178,6 +179,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             Logger.log("Could not create backup for crash report: " + e.message, Logger.Lvl.WARNING)
             e.hashCode()
         }
+        // Create dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Ooopsie..")
             .setMessage("App crashed. Can you send info about it via email?")
@@ -185,7 +187,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
                     dialog, id ->
                 val sendIntent = Intent(Intent.ACTION_SEND)
                 val subject = "Error report"
-                sendIntent.type = "application/zip"
+                sendIntent.type = "message/rfc822"
                 sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
                 sendIntent.putExtra(Intent.EXTRA_TEXT, report)
                 if(file != null) {
@@ -204,7 +206,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val alert = builder.create()
         alert.show()
         alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        //file?.delete()// Don't know how to delete properly
         
     }
 }

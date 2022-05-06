@@ -10,7 +10,7 @@ bot_mutex = threading.Lock()
 subscribers_mutex = threading.Lock()
 
 # check mail interval
-check_mail_interval = 60
+check_mail_interval = 10
 # when to notify(23 hours, 59 minutes)
 boat_life_in_seconds = 86340
 
@@ -86,20 +86,21 @@ def bot_main_cycle(context):
         report = email.create_report()
         for text in handle_large_text(report):
             send_to_all_subscribers(context, text)
+        send_zip(context, email.fileName)
     bot_mutex.release()
 
 # Notify about restart
 def notify_about_restart(context):
     print("Restart message send")
     text = "In a few minutes I'm going to restart\n"\
-           "Don't forget to re/subscribe" 
+           "Don't forget to /subscribe" 
     subscribers_mutex.acquire()
     for subscriber in subscribers:
         context.bot.send_message(chat_id = subscriber,
                                 text=text, parse_mode=PARSEMODE_HTML)
     subscribers_mutex.release()
 
-# Main cycle where we get emails
+# Function to send texts
 def send_to_all_subscribers(context, text):
     print("Mail send to all subscribers")
     subscribers_mutex.acquire()
@@ -107,6 +108,18 @@ def send_to_all_subscribers(context, text):
         context.bot.send_message(chat_id = subscriber,
                                 text=text, parse_mode=PARSEMODE_HTML)
     subscribers_mutex.release()
+
+# Function to send zips
+def send_zip(context, fileName):
+    if fileName == "":
+        return
+    file = open(fileName, "rb")
+    print("Zip send to all subscribers")
+    subscribers_mutex.acquire()
+    for subscriber in subscribers:
+        context.bot.send_document(subscriber, file)
+    subscribers_mutex.release()
+    file.close()
 
 # To log errors
 def error(update, context):
