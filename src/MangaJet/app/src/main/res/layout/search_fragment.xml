@@ -64,7 +64,7 @@
             android:id="@+id/noResultImage"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:src="@drawable/ic_glass_loupe_magnifying_svgrepo_com"
+            android:src="@drawable/ic_search_off"
             android:tint="?android:attr/colorPrimaryDark"
 
             app:layout_constraintBottom_toBottomOf="parent"

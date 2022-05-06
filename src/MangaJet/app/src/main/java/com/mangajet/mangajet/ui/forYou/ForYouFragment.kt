@@ -52,14 +52,18 @@ class ForYouFragment : Fragment() {
         _binding = ForYouFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        binding.loadRecommendationsIndicator.visibility = View.INVISIBLE
+        binding.noResultLayout.visibility = View.INVISIBLE
+
+
         var listView = binding.forYouListView
         activity?.let {
             val adapter = MangaListAdapter(
                 requireActivity(),
-                com.mangajet.mangajet.R.layout.manga_list_element,
+                R.layout.manga_list_element,
                 forYouFragmentViewModel.mangas
             )
-            forYouFragmentViewModel.initMangas(adapter)
+            forYouFragmentViewModel.initMangas(adapter, binding)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->

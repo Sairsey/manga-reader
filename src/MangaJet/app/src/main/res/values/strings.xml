@@ -29,10 +29,15 @@
     <string name="manga_reader_refresh_page">Reload page</string>
 
     <!-- Strings, using in Search -->
-    <string name="search_fragment_no_result_text">No result</string>
+    <string name="search_fragment_no_result_text">No result :(</string>
     <string name="search_hint">Write your search query here</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="search_set_sources">Set sources</string>
     <string name="cache_size_title">Cache size: </string>
     <string name="tag_search">Tag := </string>
+
+    <!-- Strings, using in For you -->
+    <string name="recommendations_fragment_no_recommendations">
+        There are no mangas which we can recommend to you :(
+    </string>
 </resources>
