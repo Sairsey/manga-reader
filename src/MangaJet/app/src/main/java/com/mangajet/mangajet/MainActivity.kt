@@ -27,8 +27,6 @@ import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.log.UncaughtExceptionHandler
 import java.io.File
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
