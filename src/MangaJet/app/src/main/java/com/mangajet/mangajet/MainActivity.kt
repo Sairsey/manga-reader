@@ -160,21 +160,16 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val email = "mangajetmailbot@gmail.com"
         val tmpFileName = "backupToMail.zip"
 
-        //create zip file
-        var file : File? = null
+        // Check zip file
         try {
             // To Download pages, because it won't be in archive
             if(StorageManager.isExist(tmpFileName, StorageManager.FileType.DownloadedPages))
                 StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages).delete()
-            if(report.isEmpty()) // Ask me about this later, Vova
-                return           // Maybe we can find a better solution
-            StorageManager.saveString(tmpFileName, "", StorageManager.FileType.DownloadedPages)
-            file = StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages)
-            StorageManager.createZipArchive(FileOutputStream(file))
-
+            if(report.isEmpty())
+                return
         }
         catch (e : MangaJetException){
-            Logger.log("Could not create backup for crash report: " + e.message, Logger.Lvl.WARNING)
+            Logger.log("Failed to delete backup to mail from last crash: " + e.message, Logger.Lvl.WARNING)
             e.hashCode()
         }
         // Create dialog
@@ -183,6 +178,18 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
             .setMessage("App crashed. Can you send info about it via email?")
             .setPositiveButton("Send") {
                     dialog, id ->
+                var file : File? = null
+                try {
+                    // To Download pages, because it won't be in archive
+                    StorageManager.saveString(tmpFileName, "", StorageManager.FileType.DownloadedPages)
+                    file = StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages)
+                    StorageManager.createZipArchive(FileOutputStream(file))
+
+                }
+                catch (e : MangaJetException){
+                    Logger.log("Could not create backup for crash report: " + e.message, Logger.Lvl.WARNING)
+                    e.hashCode()
+                }
                 val sendIntent = Intent(Intent.ACTION_SEND)
                 val subject = "Error report"
                 sendIntent.type = "message/rfc822"

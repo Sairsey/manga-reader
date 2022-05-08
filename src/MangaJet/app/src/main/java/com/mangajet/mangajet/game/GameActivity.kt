@@ -1,8 +1,8 @@
 package com.mangajet.mangajet.game
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -11,6 +11,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.StorageManager
+import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.data.WebAccessor
+import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.log.Logger
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -20,7 +24,8 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     enum class GameStates{
         AWAIT,
-        PLAYING
+        PLAYING,
+        FINISH
     }
 
     private val tilesNum = "8".toInt()
@@ -32,6 +37,10 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var tiles : IntArray
     private lateinit var posMatrix : Array<IntArray>
     private lateinit var bitmaps: ArrayList<Bitmap>
+    val headers = mutableMapOf(
+        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+        "accept" to "*/*")
 
     // Function for splitting bitmap
     private fun splitBitmap(bitmap: Bitmap, xCount: Int, yCount: Int): ArrayList<Bitmap> {
@@ -45,6 +54,36 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         return bitmaps
     }
 
+    // Function to try get bitmap from Konachan
+    private fun getFromKonachan() : Bitmap{
+        val urlKonachan = "https://konachan.net/post?tags=order%3Arandom"
+        // Get image url
+        val text = WebAccessor.getTextSync(urlKonachan, headers)
+        var f = text.indexOf("directlink")
+        f = text.indexOf("href=\"", f) + "href=\"".length
+        val s = text.indexOf("\"", f)
+        val imageUrl = text.subSequence(f, s).toString()
+        // Get bitmap
+        val image = MangaPage(imageUrl, headers.toMap())
+        image.upload(true)
+        val bitmap = BitmapFactory.decodeFile(image.getFile().absolutePath)
+        StorageManager.removeDirectory("cached/net")
+        return bitmap
+    }
+
+    // Function to get bitmap from resources or use local
+    private fun getBitmap() : Bitmap{
+        // Firstly try to get bitmap from konachan
+        try {
+            return getFromKonachan()
+        } catch (e: MangaJetException) {
+            Logger.log("Failed to download bitmap from konachan: " + e.message, Logger.Lvl.WARNING)
+            e.hashCode()
+        }
+        // Maybe something else here later
+        // Lastly use local
+        return  resources.getDrawable(R.drawable.anime_girl).toBitmap()
+    }
     // Function to shuffle board
     private fun shuffle(){
         var n = tilesNum
@@ -125,8 +164,7 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
             tiles[i] = i + 1
 
         // Picture to 9 parts and to buttons
-        val bitmap = resources.getDrawable(R.drawable.anime_girl).toBitmap()
-        bitmaps = splitBitmap(bitmap, emptyX + 1, emptyY + 1)
+        bitmaps = splitBitmap(getBitmap(), emptyX + 1, emptyY + 1)
         var bitmapCount = 0
         for(i in buttons.indices)
             for(j in 0 until buttons[i].size){
@@ -138,44 +176,47 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        // Game starts after touch
-        if(gameState == GameStates.PLAYING)
-            return true
-        shuffle()
-        setBoard()
-        gameState = GameStates.PLAYING
-        return true
-    }
-
     override fun onClick(view : View) {
-        if(gameState == GameStates.AWAIT){
-            shuffle()
-            setBoard()
-            gameState = GameStates.PLAYING
-        }
-        else if(gameState == GameStates.PLAYING) {
-            val button = view as ImageButton
-            val x = button.tag.toString()[0] - '0'
-            val y = button.tag.toString()[1] - '0'
+        when (gameState) {
+            GameStates.AWAIT -> {
+                shuffle()
+                setBoard()
+                gameState = GameStates.PLAYING
+            }
+            GameStates.PLAYING -> {
+                val button = view as ImageButton
+                val x = button.tag.toString()[0] - '0'
+                val y = button.tag.toString()[1] - '0'
 
-            @Suppress("ComplexCondition")
-            if((abs(emptyX - x) == 1 && emptyY == y) || (abs(emptyY - y) == 1 && emptyX == x)) {
-                buttons[emptyX][emptyY]?.setImageBitmap(button.drawable.toBitmap())
-                buttons[emptyX][emptyY]?.alpha = "255".toFloat()
-                button.alpha = 0F
-                val tmp = posMatrix[emptyX][emptyY]
-                posMatrix[emptyX][emptyY] = posMatrix[x][y]
-                posMatrix[x][y] = tmp
-                emptyX = x
-                emptyY = y
-                if(checkWin()){
-                    buttons[emptyX][emptyY]?.setImageBitmap(bitmaps[bitmaps.size - 1])
-                    buttons[emptyX][emptyY]?.scaleType = ImageView.ScaleType.FIT_XY
+                @Suppress("ComplexCondition")
+                if((abs(emptyX - x) == 1 && emptyY == y) || (abs(emptyY - y) == 1 && emptyX == x)) {
+                    buttons[emptyX][emptyY]?.setImageBitmap(button.drawable.toBitmap())
                     buttons[emptyX][emptyY]?.alpha = "255".toFloat()
-                    Toast.makeText(this, "Congratulations!", Toast.LENGTH_SHORT).show()
-                    gameState = GameStates.AWAIT
+                    button.alpha = 0F
+                    val tmp = posMatrix[emptyX][emptyY]
+                    posMatrix[emptyX][emptyY] = posMatrix[x][y]
+                    posMatrix[x][y] = tmp
+                    emptyX = x
+                    emptyY = y
+                    if(checkWin()){
+                        buttons[emptyX][emptyY]?.setImageBitmap(bitmaps[bitmaps.size - 1])
+                        buttons[emptyX][emptyY]?.scaleType = ImageView.ScaleType.FIT_XY
+                        buttons[emptyX][emptyY]?.alpha = "255".toFloat()
+                        Toast.makeText(this, "Congratulations!", Toast.LENGTH_SHORT).show()
+                        gameState = GameStates.FINISH
+                    }
                 }
+            }
+            GameStates.FINISH -> {
+                bitmaps = splitBitmap(getBitmap(), emptyX + 1, emptyY + 1)
+                var bitmapCount = 0
+                for(i in buttons.indices)
+                    for(j in 0 until buttons[i].size) {
+                        buttons[i][j]?.setImageBitmap(bitmaps[bitmapCount++])
+                        buttons[i][j]?.scaleType = ImageView.ScaleType.FIT_XY
+                    }
+                Toast.makeText(this, "New puzzle loaded", Toast.LENGTH_SHORT).show()
+                gameState = GameStates.AWAIT
             }
         }
 
