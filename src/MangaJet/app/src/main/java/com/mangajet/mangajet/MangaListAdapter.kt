@@ -3,6 +3,7 @@ package com.mangajet.mangajet
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,29 @@ class MangaListAdapter(
     companion object {
         const val MIN_ALPHA_COVER_VALUE =   0
         const val MAX_ALPHA_COVER_VALUE = 255
+        const val KILO = 1024
+        const val PART_FROM_MAX_MEMORY = 8
+
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        private val maxMemory = (Runtime.getRuntime().maxMemory() / KILO).toInt()
+        // Use 1/8th of the available memory for this memory cache.
+        private val cacheSize = maxMemory / PART_FROM_MAX_MEMORY
+
+        // Cache in which we will store all bitmaps
+        // One for all adapters because
+        private var memoryCache: LruCache<String, Bitmap>
+
+        init {
+            memoryCache = object : LruCache<String, Bitmap>(cacheSize) {
+                override fun sizeOf(key: String, bitmap: Bitmap): Int {
+                    // The cache size will be measured in kilobytes rather than
+                    // number of items.
+                    return bitmap.byteCount / KILO
+                }
+            }
+        }
     }
 
     // List context
@@ -41,7 +65,15 @@ class MangaListAdapter(
             try {
                 page.upload(i > 0)
                 val imageFile = page.getFile()
-                return BitmapFactory.decodeFile(imageFile.absolutePath) ?: continue
+                val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                if (bitmap == null)
+                    continue
+                else {
+                    synchronized(memoryCache) {
+                        memoryCache.put(page.url, bitmap)
+                    }
+                    return bitmap
+                }
             } catch (ex: MangaJetException) {
                 // we do not need to catch exceptions here
                 Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
@@ -98,15 +130,30 @@ class MangaListAdapter(
             var coverPage = MangaPage(currentItem.cover, currentItem.library.getHeadersForDownload())
             coverPage.upload()
 
-            viewHolder.coverView.imageAlpha = MIN_ALPHA_COVER_VALUE
-            GlobalScope.launch(Dispatchers.Default) {
-                // POTENTIAL EXCEPTION and ERROR
-                // Cover isn't downloaded but we try to draw it => terminate
-                val bitmap = loadBitmap(coverPage)
-                withContext(Dispatchers.Main) {
-                    if (bitmap != null) {
-                        viewHolder.coverView.setImageBitmap(bitmap)
-                        viewHolder.coverView.imageAlpha = MAX_ALPHA_COVER_VALUE
+            var cacheBitmap : Bitmap? = null
+            // at first - try to load bitmap from cache
+            synchronized(memoryCache) {
+                if (memoryCache.get(coverPage.url) != null)
+                    cacheBitmap = memoryCache.get(coverPage.url)
+            }
+
+            if (cacheBitmap != null) {
+                viewHolder.coverView.setImageBitmap(cacheBitmap)
+                viewHolder.coverView.imageAlpha = MAX_ALPHA_COVER_VALUE
+            }
+            else {
+                // if not found - load from Storage Manager
+                viewHolder.coverView.imageAlpha = MIN_ALPHA_COVER_VALUE
+
+                GlobalScope.launch(Dispatchers.Default) {
+                    // POTENTIAL EXCEPTION and ERROR
+                    // Cover isn't downloaded but we try to draw it => terminate
+                    val bitmap = loadBitmap(coverPage)
+                    withContext(Dispatchers.Main) {
+                        if (bitmap != null) {
+                            viewHolder.coverView.setImageBitmap(bitmap)
+                            viewHolder.coverView.imageAlpha = MAX_ALPHA_COVER_VALUE
+                        }
                     }
                 }
             }
