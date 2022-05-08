@@ -1,10 +1,13 @@
 package com.mangajet.mangajet.ui.forYou
 
+import android.view.View
 import androidx.lifecycle.ViewModel
 import com.mangajet.mangajet.MangaListAdapter
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.databinding.ForYouFragmentBinding
+import com.mangajet.mangajet.databinding.MangaChaptersFragmentBinding
 import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
@@ -54,13 +57,37 @@ class ForYouViewModel : ViewModel() {
     }
 
     // Function which will async load mangas info
-    fun initMangas(adapterNew: MangaListAdapter) {
+    fun initMangas(adapterNew: MangaListAdapter, binding: ForYouFragmentBinding) {
         if (!isInited) {
+            binding.loadRecommendationsIndicator.visibility = View.VISIBLE
+            binding.noResultLayout.visibility = View.INVISIBLE
+
             isInited = true
             adapter = adapterNew
             job = GlobalScope.launch(Dispatchers.IO) {
-                addElementsToMangas()
+                var recomMangas = Librarian.getRecommendedMangas()
+                for (manga in recomMangas) {
+                    try {
+                        manga.updateInfo()
+                        withContext(Dispatchers.Main) {
+                            mangas.add(manga)
+                        }
+                    }
+                    catch (ex : MangaJetException) {
+                        Logger.log(ex.message.toString())
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    adapter?.notifyDataSetChanged()
+                    binding.loadRecommendationsIndicator.visibility = View.INVISIBLE
+                    if (adapter?.isEmpty == true)
+                        binding.noResultLayout.visibility = View.VISIBLE
+                }
             }
+        }
+        else {
+            if (adapter?.isEmpty == true)
+                binding.noResultLayout.visibility = View.VISIBLE
         }
     }
 

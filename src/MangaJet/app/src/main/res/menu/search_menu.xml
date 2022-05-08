@@ -4,5 +4,6 @@
     <item
         android:id="@+id/chooseLibs"
         android:title="@string/search_set_sources"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom" />
 </menu>
