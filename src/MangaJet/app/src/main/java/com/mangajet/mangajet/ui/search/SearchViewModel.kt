@@ -24,9 +24,6 @@ import kotlinx.coroutines.withContext
 // Class which represents "Search" ViewModel
 @Suppress("TooManyFunctions")
 class SearchViewModel : ViewModel() {
-    companion object {
-        const val  RANDOM_POPULAR_MANGA_COUNT = 5
-    }
 
     var mangas : ArrayList<Manga> = arrayListOf()           // mangas for "AboutManga" activity
     var job : Job? = null                                   // Async job for searching and uploading
@@ -190,12 +187,12 @@ class SearchViewModel : ViewModel() {
             for (i in Librarian.LibraryName.values().indices)
                 if (Librarian.settings.CHOSEN_RESOURCES[i])
                     arrayOfResources.add(i)
-            val randomResource = (arrayOfResources.indices).random()
+            val randomResource = /*(arrayOfResources.indices).random()*/ 0
 
             // choose random manga
             val popularMangas =
                 Librarian.getLibrary(Librarian.LibraryName.values()[randomResource])!!.
-                getPopularManga(RANDOM_POPULAR_MANGA_COUNT)
+                getPopularManga(1 + 1 + 1 + 1 + 1)
             val randomManga = popularMangas[(popularMangas.indices).random()]
             randomManga.updateInfo()
             val hint = if (popularMangas[(popularMangas.indices).random()].originalName != "")

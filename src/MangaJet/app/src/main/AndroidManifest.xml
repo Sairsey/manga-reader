@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MangaJet"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".game.GameActivity"
             android:exported="false" />
