@@ -35,4 +35,5 @@
     <string name="search_set_sources">Set sources</string>
     <string name="cache_size_title">Cache size: </string>
     <string name="tag_search">Tag := </string>
+    <string name="for_example">For example: </string>
 </resources>

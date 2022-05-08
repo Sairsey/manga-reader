@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MangaJet"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".ui.settings.options.TesterButtonsActivity"
             android:exported="false" />
