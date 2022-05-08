@@ -1,8 +1,8 @@
 package com.mangajet.mangajet.ui.search
 
+import android.database.Cursor
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,14 +22,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // Class which represents "Search" ViewModel
+@Suppress("TooManyFunctions")
 class SearchViewModel : ViewModel() {
+    companion object {
+        const val RANDOM_POPULAR_MANGA_COUNT = 5
+    }
 
-    var mangas : ArrayList<Manga> = arrayListOf()   // mangas for "AboutManga" activity
-    var job : Job? = null                           // Async job for searching and uploading
-    var adapter : MangaListAdapter? = null          // adapter for list
+    var mangas : ArrayList<Manga> = arrayListOf()           // mangas for "AboutManga" activity
+    var job : Job? = null                                   // Async job for searching and uploading
+    var adapter : MangaListAdapter? = null                  // adapter for list
+    var hintJob : Job? = null                               // job for hint loading
 
     // Mutex data sync protection
     private var searchListMutex = true
+
+    // Data for suggestions list in search view
+    var searchSuggestionsCursor : Cursor? = null
+    var suggestionsStrings : Array<String>? = null
 
     // Function which will upload manga into mangas array and catch exceptions
     private suspend fun uploadMangaIntoArray(manga : Manga) {
@@ -171,6 +180,39 @@ class SearchViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun setSomeRandomPopularHint(binding: SearchFragmentBinding)  {
+        hintJob?.cancel()
+        hintJob = viewModelScope.launch(Dispatchers.IO) {
+            // choose random resource
+            var arrayOfResources = arrayListOf<Int>()
+            for (i in Librarian.LibraryName.values().indices)
+                if (Librarian.settings.CHOSEN_RESOURCES[i])
+                    arrayOfResources.add(i)
+            val randomResource = (arrayOfResources.indices).random()
+
+            // choose random manga
+            val popularMangas =
+                Librarian.getLibrary(Librarian.LibraryName.values()[randomResource])!!.
+                getPopularManga(RANDOM_POPULAR_MANGA_COUNT)
+            val randomManga = popularMangas[(popularMangas.indices).random()]
+            randomManga.updateInfo()
+            val hint = if (popularMangas[(popularMangas.indices).random()].originalName != "")
+                randomManga.originalName
+            else
+                randomManga.russianName
+
+            withContext(Dispatchers.Main) {
+                binding.searchView.queryHint = context!!.resources!!.
+                    getString(R.string.for_example) + " " + hint
+            }
+        }
+    }
+
+    fun initSuggestionData() {
+        // tmp data filler
+        suggestionsStrings = arrayOf()
     }
 
     fun initSearchListView(adapterNew: MangaListAdapter, binding : SearchFragmentBinding) {
