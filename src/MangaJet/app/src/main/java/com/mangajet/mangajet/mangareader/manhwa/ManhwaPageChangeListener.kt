@@ -56,6 +56,7 @@ class ManhwaPageChangeListener(
                 mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
         }
 
+        mangaReaderViewModel.navPanelHandler.updateSeekBar()
         mangaReaderViewModel.setPageTitle()
     }
 }

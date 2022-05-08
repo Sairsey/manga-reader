@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".mangareader.MangaReaderActivity">
 
+    <!-- Process bar -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/loadIndicator2"
         android:layout_width="wrap_content"
@@ -16,6 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Bottom toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
@@ -28,36 +30,60 @@
         app:layout_constraintStart_toStartOf="parent"
         app:titleTextColor="?attr/android:textColorPrimary">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
 
-            <ImageButton
-                android:id="@+id/prevChapter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_previous"
-                android:background="?attr/android:navigationBarColor"
-                app:tint="?attr/android:textColorPrimary"
-                />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
             <TextView
+                android:layout_gravity="center"
                 android:id="@+id/currentPageText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Loading" />
+                android:text="Loading..." />
 
-            <ImageButton
-                android:id="@+id/nextChapter"
-                android:layout_width="wrap_content"
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/reader_navigation_panel"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                android:background="?attr/android:navigationBarColor"
-                app:tint="?attr/android:textColorPrimary"/>
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/half_inner_horizontal_margin"
+                android:weightSum="1">
+
+                <ImageButton
+                    android:id="@+id/prevChapter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_previous"
+                    android:background="?attr/android:navigationBarColor"
+                    app:tint="?attr/android:textColorPrimary"
+                    android:layout_weight="0.12"/>
+
+                <SeekBar
+                    android:id="@+id/reader_page_seek"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="10"
+                    android:layout_weight="0.76"
+                    android:progress="3" />
+
+                <ImageButton
+                    android:id="@+id/nextChapter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    android:background="?attr/android:navigationBarColor"
+                    app:tint="?attr/android:textColorPrimary"
+                    android:layout_weight="0.12"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </com.google.android.material.appbar.MaterialToolbar>
 
+    <!-- Top toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/headerToolbar"
         android:layout_width="match_parent"
@@ -72,6 +98,7 @@
         app:title="@string/app_name"
         app:titleTextColor="?attr/android:textColorPrimary" />
 
+    <!-- Pager with manga pages -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/mangaViewPager"
         android:layout_width="match_parent"

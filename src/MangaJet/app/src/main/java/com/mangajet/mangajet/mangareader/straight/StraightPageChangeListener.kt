@@ -49,6 +49,7 @@ class StraightPageChangeListener(
                 mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
         }
 
+        mangaReaderViewModel.navPanelHandler.updateSeekBar()
         mangaReaderViewModel.setPageTitle()
     }
 }

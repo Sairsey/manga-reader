@@ -78,6 +78,13 @@ class MangaReaderViewModel : ViewModel() {
     var activity : MangaReaderActivity? = null // local variable for activity
     var initilizeJob : Job? = null
 
+    // handler, which will provide behavior with toolbars
+    lateinit var toolbarHandler : MangaReaderToolbarHandler
+    // handler, which will provide behavior with menu on toolbars
+    lateinit var menuHandler : MangaReaderMenuHandler
+    // handler, which will provide behavior with page navigation panel
+    lateinit var navPanelHandler : MangaReaderNavPanelHandler
+
     // data for mangaReader format
     var currentReaderFormat = READER_FORMAT_BOOK    // current reader format
     var wasReaderFormat  = READER_FORMAT_BOOK       // previous reader format
