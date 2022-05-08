@@ -17,6 +17,8 @@ class MangaReaderNavPanelHandler(
     }
 
     // lock seekbar callbacks if we changed seekbar progress by scrolling pages
+    //    - This flag needs to block any 'Seek bar' callback actions, if we made them in
+    //      'updateSeekBar()' method by changing some params like 'seekBar.progress' ot 'seekBar.max'
     private var someKindOfMutexToLockCallback = false
 
     private fun goToNextChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
