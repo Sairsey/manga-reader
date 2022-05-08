@@ -45,7 +45,8 @@ class TesterButtonsActivity : AppCompatActivity() {
     // Function for crashing app
     // Maybe I came up with something more interesting later
     private fun crashApp() {
-        throw NullPointerException("BOOOOOOOOOOOOOOOOOOM!")
+        val arr = arrayOf("")
+        arr[-1]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
