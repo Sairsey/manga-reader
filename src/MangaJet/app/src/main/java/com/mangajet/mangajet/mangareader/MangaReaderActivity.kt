@@ -6,6 +6,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -13,19 +15,15 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.R
-import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import com.mangajet.mangajet.log.Logger
-import com.mangajet.mangajet.mangareader.formatchangeholder.FormatChangerHandler
+import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
+
 
 // Class which represents "Manga Reader" Activity
 @Suppress("TooManyFunctions")
 class MangaReaderActivity : AppCompatActivity() {
     // Manga reader activity ViewModel variable
     lateinit var mangaReaderViewModel : MangaReaderViewModel
-    // handler, which will provide behavior with toolbars
-    lateinit var toolbarHandler : MangaReaderToolbarHandler
-    // handler, which will provide behavior with menu on toolbars
-    lateinit var menuHandler : MangaReaderMenuHandler
 
     // Function which will set title in Action bar
     fun setTitle () {
@@ -51,31 +49,10 @@ class MangaReaderActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.reloadPage -> menuHandler.reloadCurrentPage()
-            R.id.changeFormat -> menuHandler.callChangeFormatDialog()
+            R.id.reloadPage -> mangaReaderViewModel.menuHandler.reloadCurrentPage()
+            R.id.changeFormat -> mangaReaderViewModel.menuHandler.callChangeFormatDialog()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    fun goToNextChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
-        if (!mangaReaderViewModel.isOnLastChapter()) {
-            mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
-            mangaReaderViewModel.setPageTitle()
-        }
-    }
-
-    fun goToPrevChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
-        if (!mangaReaderViewModel.isOnFirstChapter()) {
-            mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
-            var startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-
-            if (mangaReaderViewModel.currentReaderFormat == MangaReaderViewModel.READER_FORMAT_MANGA) {
-                startPage = viewPager.adapter!!.itemCount - startPage - 1
-            }
-
-            viewPager.setCurrentItem(startPage, false)
-            mangaReaderViewModel.setPageTitle()
-        }
     }
 
     // initialization all UI manga data
@@ -106,6 +83,21 @@ class MangaReaderActivity : AppCompatActivity() {
         // set current chapter and page in bottom bar
         mangaReaderViewModel.setPageTitle()
 
+        // init navigation panel handler
+        val navigationPanel = findViewById<androidx.appcompat.widget.LinearLayoutCompat>(
+            R.id.reader_navigation_panel)
+        val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
+        val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
+        val seekBar = findViewById<SeekBar>(R.id.reader_page_seek)
+        mangaReaderViewModel.navPanelHandler = MangaReaderNavPanelHandler(
+            mangaReaderViewModel,
+            navigationPanel,
+            nextChapterButton,
+            prevChapterButton,
+            seekBar
+        )
+        mangaReaderViewModel.navPanelHandler.initialize()
+
         // set adapter
         mangaReaderViewModel.formatChangerHandler.updateReaderFormat()
 
@@ -120,37 +112,11 @@ class MangaReaderActivity : AppCompatActivity() {
         // init toolbar handler (which will be shown and hidden by tap)
         val headerToolbar = findViewById<MaterialToolbar>(R.id.headerToolbar)
         val bottomToolbar = findViewById<MaterialToolbar>(R.id.bottomToolbar)
-        toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
+        mangaReaderViewModel.toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
 
         // init menu handler (reload + format buttons)
-        menuHandler = MangaReaderMenuHandler(mangaReaderViewModel, viewPager,
+        mangaReaderViewModel.menuHandler = MangaReaderMenuHandler(mangaReaderViewModel, viewPager,
             supportFragmentManager)
-
-        // init toolbars buttons
-        val prevChapterButton = findViewById<ImageButton>(R.id.prevChapter)
-        val nextChapterButton = findViewById<ImageButton>(R.id.nextChapter)
-
-        // bind prev button
-        prevChapterButton.setOnClickListener {
-            val pagerAdapter = viewPager.adapter as MangaReaderBaseAdapter
-            if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
-                goToPrevChapter(viewPager, pagerAdapter)
-            }
-            else {
-                goToNextChapter(viewPager, pagerAdapter)
-            }
-        }
-
-        // bind next button
-        nextChapterButton.setOnClickListener {
-            val pagerAdapter = viewPager.adapter as MangaReaderBaseAdapter
-            if (mangaReaderViewModel.currentReaderFormat != MangaReaderViewModel.READER_FORMAT_MANGA) {
-                goToNextChapter(viewPager, pagerAdapter)
-            }
-            else {
-                goToPrevChapter(viewPager, pagerAdapter)
-            }
-        }
 
         // hide onLoad circle
         findViewById<CircularProgressIndicator>(R.id.loadIndicator2).hide()
@@ -186,9 +152,9 @@ class MangaReaderActivity : AppCompatActivity() {
         when (event?.action) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_UP ->
-                toolbarHandler.touchEventDispatcher(event)
+                mangaReaderViewModel.toolbarHandler.touchEventDispatcher(event)
         }
-        // standart Touch event
+        // standard Touch event
         return super.dispatchTouchEvent(event)
     }
 }
