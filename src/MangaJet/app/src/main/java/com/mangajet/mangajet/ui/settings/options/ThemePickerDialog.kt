@@ -21,13 +21,13 @@ class ThemePickerDialog : DialogFragment() {
     }
 
     // Theme names for dialog list
-    private val themesNames = arrayOf("Day", "Night", "Automaticly")
+    private val themesNames = arrayOf("Day", "Night", "Auto")
 
     // Function will set chosen theme in shared preferences
-    private fun setAppTheme(theme : Int) {
+    private fun setAppTheme(theme : Int, dialogListElementId : Int) {
         val sp = getDefaultSharedPreferences(context)
         val editor = sp.edit()
-        Logger.log("Theme changed to " + themesNames[theme])
+        Logger.log("Theme changed to " + themesNames[dialogListElementId])
         editor.putInt("THEME", theme)
         editor.commit()
         AppCompatDelegate.setDefaultNightMode(theme)
@@ -40,9 +40,9 @@ class ThemePickerDialog : DialogFragment() {
             builder.setTitle("Choose theme")
                 .setItems(themesNames) { dialog, which ->
                     when(which) {
-                        DAY -> setAppTheme(MODE_NIGHT_NO)
-                        NIGHT -> setAppTheme(MODE_NIGHT_YES)
-                        SYSTEM_THEME -> setAppTheme(MODE_NIGHT_FOLLOW_SYSTEM)
+                        DAY -> setAppTheme(MODE_NIGHT_NO, DAY)
+                        NIGHT -> setAppTheme(MODE_NIGHT_YES, NIGHT)
+                        SYSTEM_THEME -> setAppTheme(MODE_NIGHT_FOLLOW_SYSTEM, SYSTEM_THEME)
                     }
                     dialog.cancel()
                 }

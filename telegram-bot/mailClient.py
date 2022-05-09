@@ -11,7 +11,6 @@ class mailClient:
         # Get pop_3 server with specific mail
         pop3_server = 'pop.' + login.split('@')[-1]
         self.server = poplib.POP3_SSL(pop3_server)
-        print(self.server.getwelcome().decode('utf8'))
         self.server.user(self.login)
         self.server.pass_(self.password)
 

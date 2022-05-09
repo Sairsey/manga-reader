@@ -99,6 +99,8 @@
                     android:gravity="center_vertical"
                     android:text="TextView"
                     android:textSize="16sp"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/sourceImage"
@@ -217,6 +219,7 @@
             app:layout_constraintTop_toBottomOf="@id/tagsText"
             app:showDivider="middle"
             app:dividerDrawable="@drawable/divider">
+
         </com.google.android.flexbox.FlexboxLayout>
 
         <TextView

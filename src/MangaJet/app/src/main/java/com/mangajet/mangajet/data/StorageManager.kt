@@ -86,6 +86,7 @@ object StorageManager {
                 println("loading of " + new_path + " in progress")
                 return
             }
+        }
 
             // Create file handle
             val file = File(storageDirectory + new_path)
@@ -107,8 +108,19 @@ object StorageManager {
                     "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
 
             println("start loading of" + new_path)
+
+        synchronized(loadPromises) {
+            // If we already loading this file - do not do anything
+            if (loadPromises.containsKey(new_path)) {
+                println("loading of " + new_path + " in progress")
+                return
+            }
+
             // Build a promise and start downloading
-            loadPromises.put(new_path, WebAccessor.writeBytesStream(url, file.outputStream(), headers))
+            loadPromises.put(
+                new_path,
+                WebAccessor.writeBytesStream(url, file.outputStream(), headers)
+            )
         }
     }
 

@@ -6,39 +6,64 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
+import java.util.concurrent.TimeUnit
 
 // Class which will create adapter for straight (book) format reader
 class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
     // Class for holger reverse format viewpage page
     inner class StraightReaderPageHolder(itemView: View) : MangaReaderPageHolder(itemView) {
+        var job : Job? = null
         override fun bind(mangaPage: MangaPage, position: Int) {
-            currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
-                .launch(Dispatchers.IO) {
-                    withContext(Dispatchers.Main) {
-                        itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
-                    }
-                    val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+            // check if our page is loading or loaded
+            while (!currentViewModelWithData.mutablePagesLoaderMap.containsKey(mangaPage.url)) {
+                Logger.log("Trying to get page which are not loaded/loading")
+                Thread.sleep(2)
+            }
+
+            // cancel job
+            job?.cancel()
+
+            // if it is loaded
+            if (currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync
+                    .await(1, TimeUnit.MILLISECONDS)) {
+                println("Start showing page " + mangaPage.url)
+
+                val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                imagePage.setImage(imageSrc)
+                imagePage.setOnImageEventListener(CustomImageEventListener())
+            }
+            // otherwise
+            else {
+                job = currentViewModelWithData.viewModelScope.launch(Dispatchers.IO) {
+                    // wait until loading finishes
+                    currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync.await()
                     ensureActive()
+                    // and set image same as in if
                     withContext(Dispatchers.Main) {
-                        if (pageFile != null) {
-                            val imageSrc = ImageSource.bitmap(pageFile)
-                            ensureActive()
-                            imagePage.setImage(imageSrc)
-                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
-                        }
+                        ensureActive()
+                        println("Start showing page " + mangaPage.url)
+
+                        // TODO May FALL here
+                        val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                        imagePage.setImage(imageSrc)
+                        imagePage.setOnImageEventListener(CustomImageEventListener())
                     }
                 }
+            }
         }
     }
 
@@ -123,10 +148,11 @@ class StraightReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBase
         var pageIndex : Int = getPageIndex(position)
         var chapterIndex : Int = getChapterIndex(position)
 
-        if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
-        {
+        holder.loadingView.show()
+
+        if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter) {
             try {
-                pageIndex = updateSomePages(pageIndex, chapterIndex)
+                pageIndex = getFixedPageIndex(pageIndex, chapterIndex)
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()
