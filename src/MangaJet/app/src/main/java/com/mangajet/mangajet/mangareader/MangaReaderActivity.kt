@@ -152,7 +152,8 @@ class MangaReaderActivity : AppCompatActivity() {
         when (event?.action) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_UP ->
-                mangaReaderViewModel.toolbarHandler.touchEventDispatcher(event)
+                if (mangaReaderViewModel.initilizeJob == null)
+                    mangaReaderViewModel.toolbarHandler.touchEventDispatcher(event)
         }
         // standard Touch event
         return super.dispatchTouchEvent(event)
