@@ -112,7 +112,7 @@ class MangaReaderNavPanelHandler(
                     1
                 else
                     0
-                val pageToScroll = mangaReaderViewModel.pagesCount + delta - p1
+                val pageToScroll = delta + p1
                 mangaReaderViewModel.mangaReaderVP2.setCurrentItem(pageToScroll, true)
             }
 
