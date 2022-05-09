@@ -56,7 +56,7 @@
         android:textColor="#F4F8FA"
         android:textSize="10dp"
         app:layout_constraintStart_toEndOf="@+id/cacheSettings"
-        app:layout_constraintTop_toBottomOf="@+id/clearMangaInfos" />
+        app:layout_constraintTop_toBottomOf="@+id/clearCachedPages" />
 
     <Button
         android:id="@+id/clearMangaInfos"
@@ -80,7 +80,7 @@
         android:textColor="#F4F8FA"
         android:textSize="10dp"
         app:layout_constraintStart_toEndOf="@+id/cacheSettings"
-        app:layout_constraintTop_toBottomOf="@+id/clearDownloadedPages" />
+        app:layout_constraintTop_toBottomOf="@+id/clearMangaInfos" />
 
     <Button
         android:id="@+id/restoreButton"
@@ -91,7 +91,7 @@
         android:text="Restore"
         android:textColor="#F4F8FA"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.194"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backupButton" />
 
@@ -103,7 +103,7 @@
         android:text="Backup"
         android:textColor="#F4F8FA"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.194"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cacheSettings" />
 
@@ -111,7 +111,7 @@
         android:id="@+id/info1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="100dp"
         android:text="* 'Manga Infos' is the information about manga in your 'History'"
         android:textSize="14dp"
@@ -122,7 +122,7 @@
         android:id="@+id/info2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:text="* 'Dowloaded pages' are the pages from chapters that you have been downloaded via a button '"
         android:textSize="14dp"
@@ -133,7 +133,7 @@
         android:id="@+id/info3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:text="* 'Cached pages' are the pages that have been cached after you opened it"
         android:textSize="14dp"
