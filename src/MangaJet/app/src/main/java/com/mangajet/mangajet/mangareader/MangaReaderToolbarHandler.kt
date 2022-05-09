@@ -27,7 +27,7 @@ class MangaReaderToolbarHandler(headerToolbar: MaterialToolbar, bottomToolbar: M
     // reference to bottom toolbar
     private val bottomMenu = bottomToolbar
 
-    // touch down coords
+    // touch down coordinates
     private var xTouch : Float = 0.0F
     private var yTouch : Float = 0.0F
     // is menu hidden right now

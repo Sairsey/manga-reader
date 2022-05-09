@@ -10,111 +10,78 @@ import com.mangajet.mangajet.mangareader.straight.StraightPageChangeListener
 import com.mangajet.mangajet.mangareader.straight.StraightReaderVPAdapter
 
 // Class which will handle changes in viewPager2 when changes reader format
-class FormatChangerHandler(mangaReaderViewModel : MangaReaderViewModel) {
+class FormatChangerHandler(
     // mangaReader viewModel reference with data
-    private val mMangaReaderViewModel = mangaReaderViewModel
-    private var isInited = false            // Flag : if was inited = true, else = false
-
+    private val mangaReaderViewModel: MangaReaderViewModel
+) {
     // reference to viewPager2 (which we will change)
-    private lateinit var mMangaReaderViewPager : ViewPager2
+    private lateinit var mangaReaderViewPager : ViewPager2
 
-    // adapter for 'Manhwa' reader format
-    private lateinit var  adapterManhwa : MangaReaderBaseAdapter
-    // adapter for 'Manga (reverse)' reader format
-    private lateinit var  adapterReverse : MangaReaderBaseAdapter
-    // adapter for 'Book (straight)' reader format
-    private lateinit var  adapterStraight : MangaReaderBaseAdapter
+    // adapter for current reader format
+    private lateinit var  currentAdapter : MangaReaderBaseAdapter
 
-    // page change listener for 'Manhwa' reader format
-    private lateinit var  manhwaPageChangeListener : ViewPager2.OnPageChangeCallback
-    // page change listener for 'Manga (reverse)' reader format
-    private lateinit var  reversePageChangeListener : ViewPager2.OnPageChangeCallback
-    // page change listener for 'Book (straight)' reader format
-    private lateinit var  straightPageChangeListener : ViewPager2.OnPageChangeCallback
+    // page change listener for current reader format
+    private var currentPageChangeListener : ViewPager2.OnPageChangeCallback? = null
 
     // Function which will init all 'lateinit' variables
     private fun initHandler() {
-        if (!isInited) {
-            mMangaReaderViewPager = mMangaReaderViewModel.mangaReaderVP2
+        mangaReaderViewPager = mangaReaderViewModel.mangaReaderVP2
 
-            adapterManhwa   = ManhwaReaderVPAdapter(mMangaReaderViewModel)
-            adapterReverse  = ReverseReaderVPAdapter(mMangaReaderViewModel)
-            adapterStraight = StraightReaderVPAdapter(mMangaReaderViewModel)
+        if (currentPageChangeListener != null)
+            mangaReaderViewPager.unregisterOnPageChangeCallback(currentPageChangeListener!!)
 
-            manhwaPageChangeListener =   ManhwaPageChangeListener(mMangaReaderViewModel,
-                mMangaReaderViewPager)
-            reversePageChangeListener =  ReversePageChangeListener(mMangaReaderViewModel,
-                mMangaReaderViewPager)
-            straightPageChangeListener = StraightPageChangeListener(mMangaReaderViewModel,
-                mMangaReaderViewPager)
-
-            isInited = true
+        when (mangaReaderViewModel.currentReaderFormat) {
+            MangaReaderViewModel.READER_FORMAT_BOOK -> {
+                currentAdapter = StraightReaderVPAdapter(mangaReaderViewModel)
+                currentPageChangeListener = StraightPageChangeListener(mangaReaderViewModel,
+                    mangaReaderViewPager)
+            }
+            MangaReaderViewModel.READER_FORMAT_MANGA -> {
+                currentAdapter = ReverseReaderVPAdapter(mangaReaderViewModel)
+                currentPageChangeListener = ReversePageChangeListener(mangaReaderViewModel,
+                    mangaReaderViewPager)
+            }
+            MangaReaderViewModel.READER_FORMAT_MANHWA -> {
+                currentAdapter = ManhwaReaderVPAdapter(mangaReaderViewModel)
+                currentPageChangeListener = ManhwaPageChangeListener(mangaReaderViewModel,
+                    mangaReaderViewPager)
+            }
         }
     }
 
     // Function which will change adapter
     private fun adapterChangeHandler() {
-        var newAdapter = when(mMangaReaderViewModel.currentReaderFormat) {
-            MangaReaderViewModel.READER_FORMAT_BOOK -> {
-                adapterStraight
-            }
-            MangaReaderViewModel.READER_FORMAT_MANHWA -> {
-                adapterManhwa
-            }
-            MangaReaderViewModel.READER_FORMAT_MANGA -> {
-                adapterReverse
-            }
-            else ->
-                mMangaReaderViewPager.adapter
-        }
-
-        mMangaReaderViewPager.adapter = null
-        newAdapter?.notifyDataSetChanged()
-        mMangaReaderViewPager.adapter = newAdapter
-        mMangaReaderViewPager.orientation = when(mMangaReaderViewModel.currentReaderFormat) {
+        currentAdapter?.notifyDataSetChanged()
+        mangaReaderViewPager.adapter = currentAdapter
+        mangaReaderViewPager.orientation = when(mangaReaderViewModel.currentReaderFormat) {
             MangaReaderViewModel.READER_FORMAT_MANHWA -> {
                 ViewPager2.ORIENTATION_VERTICAL
             }
             else ->
                 ViewPager2.ORIENTATION_HORIZONTAL
         }
-    }
 
-    // Function which will change page change listener
-    private fun pageChangeListenerHandler() {
-        mMangaReaderViewPager.unregisterOnPageChangeCallback(straightPageChangeListener)
-        mMangaReaderViewPager.unregisterOnPageChangeCallback(manhwaPageChangeListener)
-        mMangaReaderViewPager.unregisterOnPageChangeCallback(reversePageChangeListener)
-
-        when(mMangaReaderViewModel.currentReaderFormat) {
+        when(mangaReaderViewModel.currentReaderFormat) {
             MangaReaderViewModel.READER_FORMAT_BOOK -> {
-                (straightPageChangeListener as StraightPageChangeListener).pagerAdapter =
-                    mMangaReaderViewPager.adapter as MangaReaderBaseAdapter
-                mMangaReaderViewPager.registerOnPageChangeCallback(straightPageChangeListener)
+                (currentPageChangeListener as StraightPageChangeListener).pagerAdapter =
+                    mangaReaderViewPager.adapter as MangaReaderBaseAdapter
             }
             MangaReaderViewModel.READER_FORMAT_MANHWA -> {
-                (manhwaPageChangeListener as ManhwaPageChangeListener).pagerAdapter =
-                    mMangaReaderViewPager.adapter as MangaReaderBaseAdapter
-                mMangaReaderViewPager.registerOnPageChangeCallback(manhwaPageChangeListener)
+                (currentPageChangeListener as ManhwaPageChangeListener).pagerAdapter =
+                    mangaReaderViewPager.adapter as MangaReaderBaseAdapter
             }
             MangaReaderViewModel.READER_FORMAT_MANGA -> {
-                (reversePageChangeListener as ReversePageChangeListener).pagerAdapter =
-                    mMangaReaderViewPager.adapter as MangaReaderBaseAdapter
-                mMangaReaderViewPager.registerOnPageChangeCallback(reversePageChangeListener)
+                (currentPageChangeListener as ReversePageChangeListener).pagerAdapter =
+                    mangaReaderViewPager.adapter as MangaReaderBaseAdapter
             }
         }
+
+        mangaReaderViewPager.registerOnPageChangeCallback(currentPageChangeListener!!)
     }
 
     // Function which will update viewPager2
     fun updateReaderFormat() {
         initHandler()
         adapterChangeHandler()
-        pageChangeListenerHandler()
-    }
-
-    // Function which will notify some adapters for 'doToPrevChapter'
-    fun notifyAdaptersForPrevChapter() {
-        initHandler()
-        (adapterManhwa as ManhwaReaderVPAdapter).wasPrevReload = true
     }
 }

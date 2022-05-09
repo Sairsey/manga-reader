@@ -1,20 +1,22 @@
 package com.mangajet.mangajet.aboutmanga.aboutMangaFragment
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.aboutmanga.AboutMangaViewModel
@@ -24,11 +26,10 @@ import com.mangajet.mangajet.databinding.AboutMangaFragmentBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.MangaReaderActivity
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 // "About manga" fragment with main information
 class AboutMangaFragment : Fragment() {
@@ -40,6 +41,9 @@ class AboutMangaFragment : Fragment() {
 
     // Async job for loading bitmap
     var job : Job? = null
+
+    // Viewmodel with data
+    private lateinit var aboutMangaViewmodel : AboutMangaViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,10 +67,34 @@ class AboutMangaFragment : Fragment() {
         }
     }
 
+    private fun createNewTag(tagsLayout : FlexboxLayout, tagName : String) {
+        val newTextView = TextView(activity)
+        newTextView.text = tagName
+        newTextView.setPadding(
+            AboutMangaActivity.PADDING_HORZ,
+            AboutMangaActivity.PADDING_VERT,
+            AboutMangaActivity.PADDING_HORZ,
+            AboutMangaActivity.PADDING_VERT
+        )
+
+        // make tags clickable
+        newTextView.isClickable = true
+        newTextView.setTextColor(resources.getColor(R.color.primary))
+        newTextView.setBackgroundResource(R.drawable.tag_border)
+
+        // make action on click (return result for tag-search)
+        newTextView.setOnClickListener {
+            val bundleSignal = Bundle()
+            bundleSignal.putCharSequence("tag", newTextView.text)
+            setFragmentResult("TAG_TAPPED", bundleSignal)
+        }
+        tagsLayout.addView(newTextView)
+    }
+
     override fun onStart() {
         super.onStart()
 
-        val aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
+        aboutMangaViewmodel = ViewModelProvider(requireActivity()).get(AboutMangaViewModel::class.java)
         Logger.log("About " + aboutMangaViewmodel.manga.id + " fragment opened")
         val cover = MangaPage(aboutMangaViewmodel.manga.cover,
             aboutMangaViewmodel.manga.library.getHeadersForDownload())
@@ -75,14 +103,26 @@ class AboutMangaFragment : Fragment() {
         // manges to go here, I think we should crash
         cover.upload()
 
+        // set manga title
         binding.titleText.setText( aboutMangaViewmodel.manga.originalName + " (" +
                 aboutMangaViewmodel.manga.russianName + ")")
+        // set author
         binding.authorText.setText(aboutMangaViewmodel.manga.author)
+        // set description
         binding.fullDescriptionText.setText(aboutMangaViewmodel.manga.description)
+        // set source URI
+        binding.source.isClickable = true
         binding.source.setText(aboutMangaViewmodel.manga.library.getURL())
+        binding.source.setOnClickListener {
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(binding.source.text.toString()))
+            startActivity(browserIntent)
+        }
+        // set manga rating
         if (aboutMangaViewmodel.manga.rating != 0.0) {
             binding.ratingNum.setText(aboutMangaViewmodel.manga.rating.toString())
         }
+        // load manga cover
         job = GlobalScope.launch(Dispatchers.IO) {
             // POTENTIAL EXCEPTION and ERROR
             // Cover isn't downloaded but we try to draw it => terminate
@@ -93,6 +133,7 @@ class AboutMangaFragment : Fragment() {
             }
         }
 
+        // set button "Read manga"
         val buttonToRead = binding.readMangaButton
         buttonToRead.setOnClickListener{
             if (aboutMangaViewmodel.isInited && aboutMangaViewmodel.manga.chapters.isNotEmpty()) {
@@ -109,17 +150,7 @@ class AboutMangaFragment : Fragment() {
         val tagsLayout = binding.tagsLayout
         tagsLayout.removeAllViews()
         aboutMangaViewmodel.manga.tags.forEach {
-            val newTextView = TextView(activity)
-            newTextView.text = it
-            newTextView.setPadding(
-                AboutMangaActivity.PADDING_HORZ,
-                AboutMangaActivity.PADDING_VERT,
-                AboutMangaActivity.PADDING_HORZ,
-                AboutMangaActivity.PADDING_VERT
-            )
-            newTextView.setTextColor(resources.getColor(R.color.primary))
-            newTextView.setBackgroundResource(R.drawable.tag_border)
-            tagsLayout.addView(newTextView)
+            createNewTag(tagsLayout, it)
         }
     }
 

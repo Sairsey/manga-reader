@@ -32,6 +32,15 @@ object Settings {
     // Original names
     var IS_ORIGINAL_NAMES : kotlin.Boolean
 
+    // Maximum scale of image
+    var MAX_SCALE : kotlin.Float
+
+    // Amount of tags used for recommendations
+    var AMOUNT_OF_TAGS_IN_RECOMMENDATIONS : kotlin.Int
+
+    // Amount of mangas for recommendations
+    var AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS : kotlin.Int
+
     // Initializer block
     init {
         var mangaSearchAmount = "20".toInt()
@@ -41,6 +50,9 @@ object Settings {
         var logFileName = "log.txt"
         var stackTraceName = "stackTrace.txt"
         IS_ORIGINAL_NAMES = true
+        MAX_SCALE = "5".toFloat()
+        AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = "5".toInt()
+        AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = "10".toInt()
 
         // Try to get settings from file
         try{
@@ -63,6 +75,12 @@ object Settings {
                     stackTraceName = json.getString("stackTraceName")
                 if(json.has("originalNames"))
                     IS_ORIGINAL_NAMES = json.getBoolean("originalNames")
+                if(json.has("max_scale"))
+                    MAX_SCALE = json.getDouble("max_scale").toFloat()
+                if(json.has("amount_of_tags_in_recommend"))
+                    AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = json.getInt("amount_of_tags_in_recommend")
+                if(json.has("amount_of_manga_in_recommend"))
+                    AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = json.getInt("amount_of_mangas_in_recommend")
             }
         }
         catch (ex : MangaJetException){

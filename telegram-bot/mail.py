@@ -1,7 +1,6 @@
 import email
 import email.parser
 import email.policy
-import base64
 
 # Utility method to decode headers
 def decode_header(header):
@@ -41,8 +40,15 @@ class mail:
            self.sender = self.sender[f:len(self.sender) - 1]
        self.date = parsed_email['Date']
        self.text = None
+       self.fileName = ""
 
        for part in parsed_email.walk():
+           ctype = part.get_content_type()
+           if ctype == 'application/zip':
+               file = open(part.get_filename(), 'wb')
+               file.write(part.get_payload(decode=True))
+               self.fileName = part.get_filename()
+               file.close()
            if part.is_multipart():
                continue
            elif part.get_content_maintype() == 'text':

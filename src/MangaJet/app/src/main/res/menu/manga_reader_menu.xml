@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/reloadPage"
-        android:icon="@drawable/ic_icons8_refresh_60"
+        android:icon="@drawable/ic_page_reaload"
         android:iconTint="?attr/android:textColorPrimary"
         android:title="@string/manga_reader_refresh_page"
         app:showAsAction="ifRoom" />

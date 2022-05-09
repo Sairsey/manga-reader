@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.MangaListAdapter
+import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.ForYouFragmentBinding
 import com.mangajet.mangajet.log.Logger
@@ -22,6 +24,22 @@ class ForYouFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            MangaJetApp.ABOUT_MANGA_CALLBACK -> {
+                if (MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.needToBeOpened) {
+                    val navigationBar = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
+                    val view: View = navigationBar!!.findViewById(
+                        MangaJetApp.OverrideFragmentInMainActivity.FragmentSearch.mainFragmentId
+                    )
+                    view.performClick()
+                }
+            }
+            else ->
+                super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,20 +52,24 @@ class ForYouFragment : Fragment() {
         _binding = ForYouFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        binding.loadRecommendationsIndicator.visibility = View.INVISIBLE
+        binding.noResultLayout.visibility = View.INVISIBLE
+
+
         var listView = binding.forYouListView
         activity?.let {
             val adapter = MangaListAdapter(
                 requireActivity(),
-                com.mangajet.mangajet.R.layout.manga_list_element,
+                R.layout.manga_list_element,
                 forYouFragmentViewModel.mangas
             )
-            forYouFragmentViewModel.initMangas(adapter)
+            forYouFragmentViewModel.initMangas(adapter, binding)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
                 val intent = Intent(it, AboutMangaActivity::class.java)
                 MangaJetApp.currentManga = forYouFragmentViewModel.mangas[id.toInt()]
-                startActivity(intent)}
+                startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
         }
         return root
     }

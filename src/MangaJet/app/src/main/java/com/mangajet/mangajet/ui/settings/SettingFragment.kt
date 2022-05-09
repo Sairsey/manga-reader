@@ -1,16 +1,18 @@
 package com.mangajet.mangajet.ui.settings
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
@@ -19,8 +21,9 @@ import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
 import com.mangajet.mangajet.ui.settings.options.StoragePathDialog
-import com.mangajet.mangajet.ui.settings.options.TesterButtonsActivity
 import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
+import com.mangajet.mangajet.ui.settings.options.TesterButtonsActivity
+
 
 // Class which represents "Settings" fragment of MainActivity
 class SettingFragment : Fragment() {
@@ -58,7 +61,15 @@ class SettingFragment : Fragment() {
                 val menuIcon = v?.findViewById<ImageView>(R.id.menuIcon)
                 val menuTitle = v?.findViewById<TextView>(R.id.menuName)
 
+
+                val typedValue = TypedValue()
+                (context as Activity).theme.resolveAttribute(
+                    android.R.attr.colorPrimary,
+                    typedValue,
+                    true
+                )
                 menuIcon?.setImageResource(p.mIcon)
+                menuIcon?.setColorFilter(typedValue.data)
                 menuTitle?.text = p.mName
             }
             return v!!

@@ -7,17 +7,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.davemorrissey.labs.subscaleview.ImageSource
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapter
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 // Class which will create adapter for manhwa reader
 class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAdapter(viewModel) {
@@ -32,6 +36,19 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         itemView
     )  {
 
+        inner class ManhwaImageEventListener : SubsamplingScaleImageView.DefaultOnImageEventListener() {
+            override fun onImageLoaded() {
+                val needToScroolEnd = isScrollToEnd()
+                val scaleCoef = (currentViewModelWithData.displayWidth /
+                        imagePage.sWidth.toFloat())
+                imagePage.setScaleAndCenter(scaleCoef,
+                    getFocus(needToScroolEnd, imagePage.sWidth, imagePage.sHeight))
+                imagePage.maxScale = Librarian.settings.MAX_SCALE
+                loadingView.hide()
+                super.onImageLoaded()
+            }
+        }
+
         private fun isScrollToEnd() : Boolean {
             if (wasPrevReload) {
                 wasPrevReload = false
@@ -42,39 +59,58 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
                     && prevViewedPage <= currentPage))
         }
 
-        private fun getFocus(isNeedToScroll : Boolean, imageWidth : Int, imageHeight : Int) : PointF {
-            if (isNeedToScroll)
+
+        // Get point in ScalableImage to zoom into
+        private fun getFocus(isNeedToScrollToEnd : Boolean, imageWidth : Int, imageHeight : Int) : PointF {
+            if (isNeedToScrollToEnd)
                 return PointF((imageWidth - 1).toFloat(), (imageHeight - 1).toFloat())
             else
                 return PointF(0F, 0F)
         }
 
-        override fun bind(mangaPage : MangaPage, position : Int) {
-            currentViewModelWithData.jobs[position] = currentViewModelWithData.viewModelScope
-                .launch(Dispatchers.IO) {
-                    withContext(Dispatchers.Main) {
-                        itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).show()
-                    }
-                    val needToScroolEnd = isScrollToEnd()
-                    ensureActive()
+        var job : Job? = null
 
-                    val pageFile = currentViewModelWithData.loadBitmap(mangaPage)
+        override fun bind(mangaPage : MangaPage, position : Int) {
+            // check if our page is loading or loaded
+            while (!currentViewModelWithData.mutablePagesLoaderMap.containsKey(mangaPage.url)) {
+                Logger.log("Trying to get page which are not loaded/loading")
+                Thread.sleep(2)
+            }
+
+            // cancel job
+            job?.cancel()
+
+            // if it is loaded
+            if (currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync
+                    .await(1, TimeUnit.MILLISECONDS)) {
+                println("Start showing page " + mangaPage.url)
+
+                val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                imagePage.setImage(imageSrc)
+                imagePage.setOnImageEventListener(ManhwaImageEventListener())
+                prevViewedChapter = currentChapter
+                prevViewedPage = currentPage
+            }
+            // otherwise
+            else {
+                job = currentViewModelWithData.viewModelScope.launch(Dispatchers.IO) {
+                    // wait until loading finishes
+                    currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync.await()
                     ensureActive()
+                    // and set image same as in if
                     withContext(Dispatchers.Main) {
-                        if (pageFile != null) {
-                            val imageSrc = ImageSource.bitmap(pageFile)
-                            ensureActive()
-                            imagePage.setImage(imageSrc)
-                            val scaleCoef = (currentViewModelWithData.displayWidth /
-                                        imagePage.sWidth.toFloat())
-                            imagePage.setScaleAndCenter(scaleCoef,
-                                getFocus(needToScroolEnd, imagePage.sWidth, imagePage.sHeight))
-                            prevViewedChapter = currentChapter
-                            prevViewedPage = currentPage
-                            itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator).hide()
-                        }
+                        ensureActive()
+                        println("Start showing page " + mangaPage.url)
+
+                        // TODO May FALL here
+                        val imageSrc = ImageSource.uri(mangaPage.getFile().absolutePath)
+                        imagePage.setImage(imageSrc)
+                        imagePage.setOnImageEventListener(ManhwaImageEventListener())
+                        prevViewedChapter = currentChapter
+                        prevViewedPage = currentPage
                     }
                 }
+            }
         }
     }
 
@@ -163,7 +199,7 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
         if (chapterIndex != currentViewModelWithData.manga.lastViewedChapter)
         {
             try {
-                pageIndex = updateSomePages(pageIndex, chapterIndex)
+                pageIndex = getFixedPageIndex(pageIndex, chapterIndex)
             }
             catch (ex : MangaJetException) {
                 Toast.makeText(MangaJetApp.context, ex.message, Toast.LENGTH_SHORT).show()

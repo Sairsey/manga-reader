@@ -16,7 +16,7 @@
         android:layout_marginBottom="@dimen/half_inner_horizontal_margin"
         android:layout_marginStart="@dimen/half_inner_horizontal_margin"
         android:layout_marginHorizontal="@dimen/chapter_half_margin"
-        tools:srcCompat="@tools:sample/avatars"
+        android:background="@drawable/background_logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

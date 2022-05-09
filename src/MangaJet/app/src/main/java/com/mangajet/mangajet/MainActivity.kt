@@ -12,23 +12,27 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mangajet.mangajet.MangaJetApp.Companion.context
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.StorageManager
 import com.mangajet.mangajet.databinding.ActivityMainBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.log.UncaughtExceptionHandler
+import java.io.File
+import java.io.FileOutputStream
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 
 // Class which represents Main Activity which user will see then he opens application
 class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boolean>> {
-
     private lateinit var binding: ActivityMainBinding
 
     // Permission request
@@ -104,8 +108,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
@@ -152,21 +154,51 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
     // Functions that checks report for crash => sends it to email
     private fun checkForCrash(report : String){
 
-        if(report.isEmpty())
-            return
         val email = "mangajetmailbot@gmail.com"
+        val tmpFileName = "backupToMail.zip"
 
+        // Check zip file
+        try {
+            // To Download pages, because it won't be in archive
+            if(StorageManager.isExist(tmpFileName, StorageManager.FileType.DownloadedPages))
+                StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages).delete()
+            if(report.isEmpty())
+                return
+        }
+        catch (e : MangaJetException){
+            Logger.log("Failed to delete backup to mail from last crash: " + e.message, Logger.Lvl.WARNING)
+            e.hashCode()
+        }
+        // Create dialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Ooopsie..")
             .setMessage("App crashed. Can you send info about it via email?")
             .setPositiveButton("Send") {
                     dialog, id ->
+                var file : File? = null
+                try {
+                    // To Download pages, because it won't be in archive
+                    StorageManager.saveString(tmpFileName, "", StorageManager.FileType.DownloadedPages)
+                    file = StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages)
+                    StorageManager.createZipArchive(FileOutputStream(file))
+
+                }
+                catch (e : MangaJetException){
+                    Logger.log("Could not create backup for crash report: " + e.message, Logger.Lvl.WARNING)
+                    e.hashCode()
+                }
                 val sendIntent = Intent(Intent.ACTION_SEND)
                 val subject = "Error report"
+                sendIntent.type = "message/rfc822"
                 sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
                 sendIntent.putExtra(Intent.EXTRA_TEXT, report)
+                if(file != null) {
+                    val uri = context?.let {
+                        FileProvider.getUriForFile(it, context!!.applicationContext.packageName + ".provider", file)
+                    }
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                }
                 sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-                sendIntent.type = "message/rfc822"
                 this.startActivity(Intent.createChooser(sendIntent, "Title:"))
             }
             .setNegativeButton("Cancel") {
