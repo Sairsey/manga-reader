@@ -1,0 +1,6 @@
+.end
+/node_modules
+__pycache__/mailClient.cpython-37.pyc
+__pycache__/mail.cpython-37.pyc
+.idea/*
+venv/*

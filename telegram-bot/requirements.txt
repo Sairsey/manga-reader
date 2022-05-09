@@ -9,3 +9,4 @@ telegram==0.0.1
 tornado==6.1
 tzdata==2022.1
 tzlocal==4.2
+hmtai

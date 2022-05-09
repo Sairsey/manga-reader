@@ -1,18 +1,43 @@
 import json
+import os
+import hmtai
+import datetime
+import time
 from telegram.ext import*
 from telegram.constants import MAX_MESSAGE_LENGTH
 from telegram.constants import PARSEMODE_HTML
 from mailClient import mailClient
 import threading
+import random
 
 # One mutex to rule them all
 bot_mutex = threading.Lock()
-subscribers_mutex = threading.Lock()
 
 # check mail interval
-check_mail_interval = 10
-# when to notify(23 hours, 59 minutes)
-boat_life_in_seconds = 86340
+check_mail_interval = 60
+
+#pidor time
+prev_pidor_time = datetime.date(2007, 1, 1)
+today_pidor = ""
+
+#global subsribers and names
+global_subscribers = []
+global_names = {}
+
+
+def get_subscribers():
+    return global_subscribers.copy()
+
+def save_subscribers(subscribers):
+    global global_subscribers
+    global_subscribers = subscribers.copy()
+
+def get_names():
+    return global_names.copy()
+
+def save_names(names):
+    global global_names
+    global_names = names.copy()
 
 # Some reports may be to big => need to split into few messages
 def handle_large_text(text):
@@ -27,49 +52,110 @@ def handle_large_text(text):
 
 # Response on start command
 def start_command(update, context):
-    update.message.reply_text('Print /help to get help')
+    names = get_names()
+    names[update.message.chat.id] = update.message.from_user.username
+    save_names(names)
+    update.message.reply_text('Hello ' +  names[update.message.chat.id] + '-senpai!\n' \
+        'I am your little sister and I will tell you about all your crushes <3')
 
 # Response on help command
 def help_command(update, context):
-     help_string = "Manga Jet Bot Commands:\n" \
-                "/subscribe - command to subscribe into report mail bot\n" \
-                "/unsubscribe - command to unsubscribe from report mail bot\n" \
-                "/help - command to get some help"
+     help_string = "Oh, Senpai, you want to know what I can?\n" \
+                "/subscribe - write this and I will report you about everything from mail bot\n" \
+                "/unsubscribe - write this and I will stop telling you about mail bot\n" \
+                "/subscribers - write this and I will tell you about other subscribers\n"\
+                "/pidor - write this and I will tell you who are the most gay from all subscribers today\n" \
+                "/nsfw - write this and I will send you something from my collection\n" \
+                "/help - write this and your little sister will help you with anything <3"
      update.message.reply_text(help_string)
 
 # Response on any message
 def handle_message(update, context):
-    update.message.reply_text('Are you retarded?\nGo read /help...\nYou need it')
+    names = get_names()
+    names[update.message.chat.id] = update.message.from_user.username
+    save_names(names)
+    update.message.reply_text('Baka...\nPlease read /help...\n')
 
 # Response on unsubscribe command
 def unsubscribe_command(update, context):
-    global subscribers
-    subscribers_mutex.acquire()
+    subscribers = get_subscribers()
     if update.message.chat.id not in subscribers:
-        update.message.reply_text("You are even not a subscriber!")
+        update.message.reply_text("Senpai, you are even not a subscriber!")
     else:
         subscribers.remove(update.message.chat.id)
-        update.message.reply_text("Unsubscribed!")
+        update.message.reply_text("If you say so...")
         print(str(update.message.chat.id) + " has just unsubscribed")
-    subscribers_mutex.release()
+    save_subscribers(subscribers)
+    names = get_names()
+    names[update.message.chat.id] = update.message.from_user.username
+    save_names(names)
+
+# Response on subscribers command
+def subscribers_command(update, context):
+    subscribers = get_subscribers()
+    names = get_names()
+    if update.message.chat.id not in subscribers:
+        update.message.reply_text("Senpai, I can show you other subscribers and even more if " +
+                                  "you will become my subscriber!\n" +
+                                  "Subscribe please!")
+        return
+    msg = "Senpai, you are only one for me!\nBut here:\n"
+    for subscriber in subscribers:
+        msg += names[subscriber] + "\n"
+    update.message.reply_text(msg[:-1])
+    names[update.message.chat.id] = update.message.from_user.username
+    save_names(names)
 
 # Response on subscribe command
 def subscribe_command(update, context):
-    global subscribers
-    subscribers_mutex.acquire()
+    subscribers = get_subscribers()
+    names = get_names()
     if update.message.chat.id in subscribers:
-        update.message.reply_text("You have already subscribed!")
-        subscribers_mutex.release()
+        update.message.reply_text("Senpai, you cannot subscribe two times!")
         return
     subscribers.append(update.message.chat.id)
-    update.message.reply_text("Subscribed!")
+    names[update.message.chat.id] = update.message.from_user.username
+    update.message.reply_text("I subscribed you, senpai!")
     print("New subscriber: " + str(update.message.chat.id))
     print("All subscribers: " + str(subscribers))
-    subscribers_mutex.release()
+    save_subscribers(subscribers)
+    save_names(names)
+
+# Response on reboot command
+def reboot_command(update, context):
+    send_to_all_subscribers(context, "Senpai, I feel a little sleepy... Please check on me on other day!\n"+
+                                      "I will be very sad if you won't /subscribe...")
+
+
+# Response on pidor command
+def pidor_command(update, context):
+    global today_pidor, prev_pidor_time
+    today = datetime.date.today()
+
+    if (today - prev_pidor_time).days == 0:
+        update.message.reply_text("Senpai, today`s Pidor is " + today_pidor)
+        return
+    subscribers = get_subscribers()
+
+    if update.message.chat.id not in subscribers:
+        update.message.reply_text("Senpai, it is not fair to choose a Pidor without you! Subscribe please!")
+        return
+
+    prev_pidor_time = today
+    send_to_all_subscribers(context, "Senpai, someone want to know who is Pidor today! Please get ready!")
+    time.sleep(1)
+    send_to_all_subscribers(context, "Result will be in 3!")
+    time.sleep(1)
+    send_to_all_subscribers(context, "2!")
+    time.sleep(1)
+    send_to_all_subscribers(context, "1!")
+    pidor_id = random.choice(subscribers)
+    today_pidor = get_names()[pidor_id]
+    send_to_all_subscribers(context, "Pidor of today is... " + today_pidor)
 
 # Main cycle where we get emails
 def bot_main_cycle(context):
-    global bot_login, bot_password, bot_inbox_amount, subscribers
+    global bot_login, bot_password, bot_inbox_amount
 
     bot_mutex.acquire()
     try:
@@ -89,37 +175,67 @@ def bot_main_cycle(context):
         send_zip(context, email.fileName)
     bot_mutex.release()
 
-# Notify about restart
-def notify_about_restart(context):
-    print("Restart message send")
-    text = "In a few minutes I'm going to restart\n"\
-           "Don't forget to /subscribe" 
-    subscribers_mutex.acquire()
-    for subscriber in subscribers:
-        context.bot.send_message(chat_id = subscriber,
-                                text=text, parse_mode=PARSEMODE_HTML)
-    subscribers_mutex.release()
+def send_nsfw(update, context):
+    nsfw_types = [
+        "ahegao",
+        "ass",
+        "bdsm",
+        "blowjob",
+        "boobjob",
+        "creampie",
+        "cum",
+        "elves",
+        "ero",
+        "femdom",
+        "foot",
+        "gangbang",
+        "glasses",
+        "hentai",
+        "incest",
+        "lick",
+        "masturbation",
+        "nsfwMW",
+        "nsfwNeko"
+        "orgy",
+        "panties",
+        "public",
+        "pussy",
+        "tentacles",
+        "yuri"
+    ]
+
+    subscribers = get_subscribers()
+    if update.message.chat.id not in subscribers:
+        update.message.reply_text("Senpai, it is not fair to get something from my collection if " +
+                                  "you are not a subscriber!\n" +
+                                  "Subscribe please!")
+        return
+
+    choice = random.choice(nsfw_types)
+    link = hmtai.useHM("29", choice)
+    update.message.reply_text("Everything for you, Senpai!")
+    context.bot.send_photo(
+        chat_id = update.message.chat.id,
+        photo=link)
 
 # Function to send texts
 def send_to_all_subscribers(context, text):
+    subscribers = get_subscribers()
     print("Mail send to all subscribers")
-    subscribers_mutex.acquire()
     for subscriber in subscribers:
         context.bot.send_message(chat_id = subscriber,
                                 text=text, parse_mode=PARSEMODE_HTML)
-    subscribers_mutex.release()
 
 # Function to send zips
 def send_zip(context, fileName):
     if fileName == "":
         return
-    file = open(fileName, "rb")
     print("Zip send to all subscribers")
-    subscribers_mutex.acquire()
+    subscribers = get_subscribers()
     for subscriber in subscribers:
+        file = open(fileName, "rb")
         context.bot.send_document(subscriber, file)
-    subscribers_mutex.release()
-    file.close()
+        file.close()
 
 # To log errors
 def error(update, context):
@@ -127,8 +243,7 @@ def error(update, context):
 
 def main():
     # Global variables of bot 
-    global bot_login, bot_password, bot_inbox_amount, subscribers
-    subscribers = list()
+    global bot_login, bot_password, bot_inbox_amount
 
     # Get bot token 
     try:
@@ -168,14 +283,17 @@ def main():
     # Add commands
     dp.add_handler(CommandHandler("start", start_command))
     dp.add_handler(CommandHandler("help", help_command))
+    dp.add_handler(CommandHandler("subscribers", subscribers_command))
     dp.add_handler(CommandHandler("subscribe", subscribe_command))
+    dp.add_handler(CommandHandler("reboot", reboot_command))
     dp.add_handler(CommandHandler("unsubscribe", unsubscribe_command))
+    dp.add_handler(CommandHandler("pidor", pidor_command))
+    dp.add_handler(CommandHandler("nsfw", send_nsfw))
     dp.add_handler(MessageHandler(Filters.text, handle_message))
     dp.add_error_handler(error)
 
     # Start bot
     updater.job_queue.run_repeating(bot_main_cycle, interval = check_mail_interval)
-    updater.job_queue.run_once(notify_about_restart, when = boat_life_in_seconds)
     updater.start_polling()
     updater.idle()
 
