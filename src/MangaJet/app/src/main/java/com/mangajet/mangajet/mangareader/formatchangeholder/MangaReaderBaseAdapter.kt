@@ -4,8 +4,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.mangareader.MangaReaderViewModel
@@ -37,6 +39,15 @@ abstract class MangaReaderBaseAdapter(viewModel: MangaReaderViewModel) :
     abstract inner class MangaReaderPageHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // ImageView on ViewPager2 pager with our page
         val imagePage = itemView.findViewById<SubsamplingScaleImageView>(R.id.mangaPage)
+        val loadingView = itemView.findViewById<CircularProgressIndicator>(R.id.loadIndicator)
+
+        inner class CustomImageEventListener : SubsamplingScaleImageView.DefaultOnImageEventListener() {
+            override fun onImageLoaded() {
+                loadingView.hide()
+                imagePage.maxScale = Librarian.settings.MAX_SCALE
+                super.onImageLoaded()
+            }
+        }
 
         // Function which will bind pager with content
         abstract fun bind(mangaPage : MangaPage, position : Int)
@@ -48,12 +59,11 @@ abstract class MangaReaderBaseAdapter(viewModel: MangaReaderViewModel) :
     // Function which will get chapter index for current reader format
     abstract fun getChapterIndex(position : Int) : Int
 
-    // Function which will update pages
-    fun updateSomePages(pageIndex : Int, chapterIndex : Int) : Int {
+    // Function which will fix pages
+    fun getFixedPageIndex(pageIndex : Int, chapterIndex : Int) : Int {
         var newPageIndex = pageIndex
         currentViewModelWithData.manga.chapters[chapterIndex].updateInfo()
-        if (pageIndex == -1)
-        {
+        if (pageIndex == -1) {
             newPageIndex = currentViewModelWithData.manga.chapters[chapterIndex].getPagesNum() - 1
         }
         return newPageIndex

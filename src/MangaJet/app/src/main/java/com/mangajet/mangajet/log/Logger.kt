@@ -1,5 +1,6 @@
 package com.mangajet.mangajet.log
 
+import android.util.Log
 import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.MangaJetException
@@ -63,6 +64,7 @@ object Logger {
     // Function to add info to the log
     fun log(msg : String, level : Lvl = Lvl.INFO){
         l.log(level.get(), msg)
+        Log.d("MJA", msg)
     }
 
 }

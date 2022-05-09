@@ -9,6 +9,10 @@
         android:icon="@drawable/search_black_36dp"
         android:title="@string/title_search" />
     <item
+        android:id="@+id/navigation_for_you"
+        android:icon="@drawable/recommend_black_24dp"
+        android:title="@string/title_for_you" />
+    <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/settings_black_24dp__2_"
         android:title="@string/title_settings" />

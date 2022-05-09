@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.BuildConfig;
+import com.mangajet.mangajet.game.GameActivity
 import com.mangajet.mangajet.log.Logger
 
 // Dialog with authors
@@ -40,6 +41,7 @@ class AuthorsDialog : DialogFragment() {
 // About App Activity with buttons 'support' and 'authors'
 class AboutAppActivity : AppCompatActivity() {
     companion object {
+        const val VERSION = 0   // 'Version' button index
         const val SUPPORT = 1   // 'Support' button index
         const val AUTHORS = 2   // 'Authors' button index
     }
@@ -78,6 +80,18 @@ class AboutAppActivity : AppCompatActivity() {
                     myDialogFragment.show(manager, "'Author' dialog")
                 }
             }
+        }
+        aboutAppList.isLongClickable = true
+        aboutAppList.setOnItemLongClickListener{ parent, view, position, id ->
+            when (id.toInt()) {
+                VERSION -> {
+                    Logger.log("Version clicked")
+                    val intent = Intent(this, GameActivity::class.java)
+                    startActivity(intent)
+                    return@setOnItemLongClickListener(true)
+                }
+            }
+            return@setOnItemLongClickListener(false)
         }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

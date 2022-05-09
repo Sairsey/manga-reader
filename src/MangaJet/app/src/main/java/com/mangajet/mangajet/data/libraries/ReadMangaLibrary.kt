@@ -1,7 +1,5 @@
 package com.mangajet.mangajet.data.libraries
 
-import android.os.Build
-import android.text.Html
 import androidx.core.text.isDigitsOnly
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaChapter
@@ -15,6 +13,49 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
                 "Chrome/41.0.2228.0 Safari/537.36",
         "accept" to "*/*")
+
+    // Map to transform tags for url
+    private val tagsMap = mapOf(
+        "боевик" to "action",
+        "боевые искусства" to "martial_arts",
+        "гарем" to "harem",
+        "гендерная интрига" to "gender_intriga",
+        "героическое фэнтези" to "heroic_fantasy",
+        "детектив" to "detective",
+        "дзёсэй" to "josei",
+        "драма" to "drama",
+        "игра" to "game",
+        "история" to "historical",
+        "исэкай" to "isekai",
+        "киберпанк" to "cyberpunk",
+        "кодомо" to "codomo",
+        "комедия" to "comedy",
+        "махо-сёдзё" to "maho_shoujo",
+        "меха" to "mecha",
+        "научная фантастика" to "sci_fi",
+        "повседневность" to "slice_of_life",
+        "постапокалиптика" to "postapocalypse",
+        "приключения" to "adventure",
+        "психология" to "psychological",
+        "романтика" to "romance",
+        "самурайский боевик" to "samurai",
+        "сверхъестественное" to "supernatural",
+        "сёдзё" to "shoujo",
+        "сёдзё-ай" to "shoujo_ai",
+        "сёнэн" to "shounen",
+        "сёнэн-ай" to "shounen_ai",
+        "спорт" to "sports",
+        "сэйнэн" to "seinen",
+        "сянься" to "xianxia",
+        "трагедия" to "tragedy",
+        "триллер" to "thriller",
+        "ужасы" to "horror",
+        "уся" to "wuxia",
+        "фэнтези" to "fantasy",
+        "школа" to "school",
+        "этти" to "ecchi",
+        "юри" to "yuri"
+    )
 
     // Function to get Manga class by its id(name)
     override fun createMangaById(id: String) : Manga {
@@ -55,6 +96,8 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
             if (link.contains("/person/") || link.contains("/tag/") || link.contains("/gournal/"))
                 continue
+            if(link.contains("/year/") || link.contains("/librebook/") || link.contains("live/"))
+                continue
             if (index >= offset + amount)
                 break
             if (index >= offset)
@@ -65,12 +108,57 @@ class ReadMangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         return res.toTypedArray()
     }
 
-    // Helper function to delete weird Html symbols
-    private fun transformFromHtml(text : String) : String{
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString()
-        else
-            Html.fromHtml(text).toString()
+    // Function to get array of Manga classes by tags, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun searchMangaByTags(tags: Array<String>, amount: Int, offset: Int) : Array<Manga>{
+        val tag = tags[0]// Sorry, ReadManga does not support multiple tags
+        val url = getURL() + "/list/genre/" + tagsMap.getOrDefault(tag,"action")
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+        var f = text.indexOf("tile col-md-6")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("a href=\"", f) + "a href=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("tile col-md-6", f)
+            index++
+        }
+
+        return res.toTypedArray()
+    }
+
+    // Function to get array of Manga classes by popularity, amount of mangas(optional)
+    // and offset from start(optional)
+    // MAY THROW MangaJetException
+    override fun getPopularManga(amount: Int, offset: Int) : Array<Manga>{
+        val url = getURL() + "/list?sortType=rate"
+        val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
+        var f = text.indexOf("tile col-md-6")
+
+        val res = ArrayList<Manga>()
+
+        var index = 0
+        while (f != -1) {
+            f = text.indexOf("a href=\"", f) + "a href=\"".length
+            val s = text.indexOf("\"", f)
+            if (index >= offset + amount)
+                break
+
+            if (index >= offset)
+                res.add(Manga(this, text.subSequence(f, s).toString()))
+            f = text.indexOf("tile col-md-6", f)
+            index++
+        }
+
+        return res.toTypedArray()
     }
 
     // Helper class for some functions

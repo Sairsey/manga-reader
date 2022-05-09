@@ -2,6 +2,8 @@ package com.mangajet.mangajet.mangareader
 
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.widget.ViewPager2
+import com.mangajet.mangajet.data.Manga
+import com.mangajet.mangajet.data.MangaPage
 
 // Class which will handle actions with menu
 class MangaReaderMenuHandler(mangaReaderVM : MangaReaderViewModel,
@@ -19,15 +21,16 @@ class MangaReaderMenuHandler(mangaReaderVM : MangaReaderViewModel,
         val chapter = mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
         // at this point we already downloaded whole chapter so no need to worry about exception
-        val page = chapter.getPage(chapter.lastViewedPage)
+        var page = chapter.getPage(chapter.lastViewedPage)
 
         // this can only fail if we do not have storage permission
         // We have blocking dialog in this case, so it someone still
         // manges to go here, I think we should crash
         page.upload(true)
+        // recreate AsyncLoadPage
+        mangaReaderViewModel.mutablePagesLoaderMap[page.url] = AsyncLoadPage(page)
 
-        var delta = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
-        var position = chapter.lastViewedPage + delta
+        var position = viewPager.currentItem
 
         val pagerAdapter = viewPager.adapter
         viewPager.adapter = null

@@ -1,20 +1,10 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle" >
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="@android:integer/config_shortAnimTime"
+    android:exitFadeDuration="@android:integer/config_shortAnimTime">
 
-    <!-- View background color -->
-    <solid
-        android:color="@android:color/transparent" >
-    </solid>
-
-    <!-- View border color and width -->
-    <stroke
-        android:width="1dp"
-        android:color="@color/primary_dark" >
-    </stroke>
-
-    <!-- The radius makes the corners rounded -->
-    <corners
-        android:radius="30dp"   >
-    </corners>
-
-</shape>
+    <item android:state_pressed="true" android:drawable="@drawable/tag_border_pressed">
+    </item>
+    <item android:state_enabled="true" android:drawable="@drawable/tag_border_unpressed">
+    </item>
+</selector>
