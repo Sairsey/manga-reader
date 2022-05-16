@@ -40,4 +40,7 @@
     <string name="recommendations_fragment_no_recommendations">
         There are no mangas which we can recommend to you :(
     </string>
+    <string name="channel_name">UpdateManga</string>
+    <string name="channel_description">Channel for manga update notification</string>
+    <string name="channel_id">mangaJetNotificationChannel</string>
 </resources>
