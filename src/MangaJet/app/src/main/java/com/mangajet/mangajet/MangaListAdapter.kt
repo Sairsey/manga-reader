@@ -148,12 +148,12 @@ class MangaListAdapter(
                 GlobalScope.launch(Dispatchers.Default) {
                     // POTENTIAL EXCEPTION and ERROR
                     // Cover isn't downloaded but we try to draw it => terminate
-                    val bitmap = loadBitmap(coverPage)
+                    loadBitmap(coverPage)
                     withContext(Dispatchers.Main) {
-                        if (bitmap != null) {
-                            viewHolder.coverView.setImageBitmap(bitmap)
-                            viewHolder.coverView.imageAlpha = MAX_ALPHA_COVER_VALUE
-                        }
+                        // lets redraw everything if we loaded bitmap to cache
+                        // this way we put image during getView,
+                        // not in coroutine and everything is great
+                        notifyDataSetChanged()
                     }
                 }
             }
