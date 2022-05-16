@@ -113,6 +113,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         handleStoragePermissions()
 
         // start service on notifications
+        MangaJetApp.recv.cancelAlarm(context!!)
         MangaJetApp.recv.setAlarm(context!!)
 
         // Set logger and UEH

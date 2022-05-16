@@ -18,6 +18,10 @@ import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.log.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Math.max
 import java.util.Random
 
@@ -84,39 +88,49 @@ class UpdateReceiver : BroadcastReceiver() {
         // at first get all our mangas
         var paths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
         for (path in paths) {
-            // load manga
-            var manga : Manga
-            try {
-                manga = Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
-            }
-            catch (ex : MangaJetException) {
-                // skip it
-                Logger.log(ex.message.toString())
-                continue
-            }
-            // get previous amount
-            var prevAmountOfChapters = manga.chapters.size
+            GlobalScope.launch (Dispatchers.Default) {
+                // load manga
+                var manga: Manga
+                try {
+                    manga =
+                        Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
+                } catch (ex: MangaJetException) {
+                    // skip it
+                    Logger.log(ex.message.toString())
+                    return@launch
+                }
+                // get previous amount
+                var prevAmountOfChapters = manga.chapters.size
 
-            // for dev we always show at least last 2
-            if (BuildConfig.VERSION_NAME.endsWith("dev"))
-                prevAmountOfChapters = max(manga.chapters.size - 2, 0)
+                // for dev we always show at least last 2
+                if (BuildConfig.VERSION_NAME.endsWith("dev"))
+                    prevAmountOfChapters = max(manga.chapters.size - 2, 0)
 
-            // get current amount
-            manga.updateChapters()
+                try {
+                    // get current amount
+                    manga.updateChapters()
+                }
+                catch (ex : MangaJetException) {
+                    Logger.log(ex.message.toString())
+                    return@launch
+                }
 
-            // if differs
-            if (manga.chapters.size != prevAmountOfChapters) {
-                // build notification string
-                var str = manga.originalName + "\n\n"
-                var shortStr = str
+                // if differs
+                if (manga.chapters.size != prevAmountOfChapters) {
+                    // build notification string
+                    var str = manga.originalName + "\n\n"
+                    var shortStr = str
 
-                for (chapterIndex in prevAmountOfChapters until manga.chapters.size)
-                    str += manga.chapters[chapterIndex].fullName + "\n"
+                    for (chapterIndex in prevAmountOfChapters until manga.chapters.size)
+                        str += manga.chapters[chapterIndex].fullName + "\n"
 
-                // show notification
-                showNotification(context!!, "New chapters", shortStr, str, manga.cover)
-                // and save manga, so in history we can see our updated manga at top
-                manga.saveToFile()
+                    withContext(Dispatchers.Main) {
+                        // show notification
+                        showNotification(context!!, "New chapters", shortStr, str, manga.cover)
+                        // and save manga, so in history we can see our updated manga at top
+                        manga.saveToFile()
+                    }
+                }
             }
         }
     }
@@ -127,13 +141,8 @@ class UpdateReceiver : BroadcastReceiver() {
         val i = Intent(context, UpdateReceiver::class.java)
         val pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // do update in a minute
-        am.set(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() +
-                    MINUTE.toLong(),
-            pi
-        )
+        // do update now
+        checkForNewManga(context)
 
         if (BuildConfig.VERSION_NAME.endsWith("dev")) {
             // and once per minute if we in DEV
@@ -161,6 +170,7 @@ class UpdateReceiver : BroadcastReceiver() {
     fun cancelAlarm(context: Context) {
         val intent = Intent(context, UpdateReceiver::class.java)
         val sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE)
+        am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(sender)
     }
 
