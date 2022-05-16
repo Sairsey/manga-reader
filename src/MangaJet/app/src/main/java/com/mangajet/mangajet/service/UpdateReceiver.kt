@@ -18,6 +18,7 @@ import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
 import com.mangajet.mangajet.log.Logger
+import java.lang.Math.max
 import java.util.Random
 
 // class which will check mangas and draw notifications
@@ -98,7 +99,7 @@ class UpdateReceiver : BroadcastReceiver() {
 
             // for dev we always show at least last 2
             if (BuildConfig.VERSION_NAME.endsWith("dev"))
-                prevAmountOfChapters = manga.chapters.size - 2
+                prevAmountOfChapters = max(manga.chapters.size - 2, 0)
 
             // get current amount
             manga.updateChapters()
