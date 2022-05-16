@@ -112,6 +112,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
 
+        // start service on notifications
+        MangaJetApp.recv.cancelAlarm(context!!)
+        MangaJetApp.recv.setAlarm(context!!)
+
         // Set logger and UEH
         Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
         checkForCrash(UncaughtExceptionHandler().getCrashReport())
@@ -208,6 +212,5 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val alert = builder.create()
         alert.show()
         alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        
     }
 }
