@@ -1,4 +1,4 @@
-package com.mangajet.mangajet.ui.search
+package com.mangajet.mangajet.ui.forYou
 
 import android.app.Dialog
 import android.os.Bundle
@@ -9,12 +9,11 @@ import com.mangajet.mangajet.data.Settings
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONException
 
-// Class for creating dialog for select search sources
-class SearchSetSourcesDialog(sourcesNames : Array<String>, checkedItems : BooleanArray) : DialogFragment() {
-    // all manga sources names
-    private val mSourcesNames = sourcesNames
-    // flags for selected sources
-    val mCheckedItems = checkedItems
+class ForYouSetSourcesDialog(
+    private val mSourcesNames : Array<String>,      // names of selected sources
+    private val mCheckedItems : BooleanArray,       // flags for selected sources
+    private val forYouViewModel: ForYouViewModel    // reference of parent view model
+) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -43,6 +42,7 @@ class SearchSetSourcesDialog(sourcesNames : Array<String>, checkedItems : Boolea
                                 + ex.message, Logger.Lvl.WARNING)
                         // Sad, but really doesn't matter
                     }
+                    forYouViewModel.initMangas(forYouViewModel.adapter!!, true)
                 }
                 .setNegativeButton("Cancel") {
                         dialog, _ ->  dialog.cancel()

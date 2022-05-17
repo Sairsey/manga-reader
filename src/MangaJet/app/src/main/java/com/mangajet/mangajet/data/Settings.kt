@@ -20,6 +20,9 @@ object Settings {
     // Chosen resources in search
     val CHOSEN_RESOURCES : BooleanArray
 
+    // Chosen resources in 'For you'
+    val CHOSEN_FOR_YOU_RESOURCES : BooleanArray
+
     // Load repeat count (if prev load failed -> repeat)
     val LOAD_REPEATS : Int
 
@@ -46,6 +49,8 @@ object Settings {
         var mangaSearchAmount = "20".toInt()
         var chosenResources = BooleanArray(Librarian.LibraryName.values().size)
         chosenResources[0] = true
+        var chosenForYouResources = BooleanArray(Librarian.LibraryName.values().size)
+        chosenForYouResources[0] = true
         var loadRepeats = "5".toInt()
         var logFileName = "log.txt"
         var stackTraceName = "stackTrace.txt"
@@ -67,6 +72,11 @@ object Settings {
                 if(chosenResources.size == strArray.size)
                     for(i in chosenResources.indices)
                         chosenResources[i] = strArray[i].toBoolean()
+                if(json.has("chosenForYouResources"))
+                    strArray = json.getString("chosenForYouResources").split(" ").toTypedArray()
+                if(chosenForYouResources.size == strArray.size)
+                    for(i in chosenForYouResources.indices)
+                        chosenForYouResources[i] = strArray[i].toBoolean()
                 if(json.has("loadRepeats"))
                     loadRepeats = json.getInt("loadRepeats")
                 if(json.has("logFileName"))
@@ -93,6 +103,7 @@ object Settings {
 
         MANGA_SEARCH_AMOUNT = mangaSearchAmount
         CHOSEN_RESOURCES = chosenResources
+        CHOSEN_FOR_YOU_RESOURCES = chosenForYouResources
         LOAD_REPEATS = loadRepeats
         LOG_FILE_NAME = logFileName
         STACK_TRACE_FILE_NAME = stackTraceName
@@ -117,6 +128,10 @@ object Settings {
         for (element in CHOSEN_RESOURCES)
             res += Boolean.toString(element) + " "
         json.put("chosenResources", res.trim())
+        res = ""
+        for (element in CHOSEN_FOR_YOU_RESOURCES)
+            res += Boolean.toString(element) + " "
+        json.put("chosenForYouResources", res.trim())
         json.put("loadRepeats", LOAD_REPEATS)
         json.put("logFileName", LOG_FILE_NAME)
         json.put("stackTraceName", STACK_TRACE_FILE_NAME)
