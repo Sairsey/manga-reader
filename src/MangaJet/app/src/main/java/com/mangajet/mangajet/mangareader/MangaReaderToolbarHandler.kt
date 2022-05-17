@@ -2,11 +2,19 @@ package com.mangajet.mangajet.mangareader
 
 import android.animation.ObjectAnimator
 import android.view.MotionEvent
+import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
 import com.google.android.material.appbar.MaterialToolbar
 import com.mangajet.mangajet.MangaJetApp
 
 // Class which will handle actions with toolbars
-class MangaReaderToolbarHandler(headerToolbar: MaterialToolbar, bottomToolbar: MaterialToolbar) {
+class MangaReaderToolbarHandler(
+    headerToolbar: MaterialToolbar,
+    bottomToolbar: MaterialToolbar,
+    prevButton: ImageButton,
+    nextButton: ImageButton
+) {
     companion object {
         // radius of touch, that we can describe as 'single-tap'
         const val SINGLE_TOUCH_RAD = 100
@@ -26,6 +34,11 @@ class MangaReaderToolbarHandler(headerToolbar: MaterialToolbar, bottomToolbar: M
     private val topMenu = headerToolbar
     // reference to bottom toolbar
     private val bottomMenu = bottomToolbar
+
+    // previous button reference
+    private val prevBut = prevButton
+    // next button reference
+    private val nextBut = nextButton
 
     // touch down coordinates
     private var xTouch : Float = 0.0F
@@ -89,5 +102,18 @@ class MangaReaderToolbarHandler(headerToolbar: MaterialToolbar, bottomToolbar: M
                 }
             }
         }
+    }
+
+    // Function which will show or hide buttons
+    fun manageButtonsShowStatus(isShowenPrev : Boolean, isShowenNext : Boolean) {
+        if (isShowenNext)
+            nextBut.visibility = View.VISIBLE
+        else
+            nextBut.visibility = View.INVISIBLE
+
+        if (isShowenPrev)
+            prevBut.visibility = View.VISIBLE
+        else
+            prevBut.visibility = View.INVISIBLE
     }
 }
