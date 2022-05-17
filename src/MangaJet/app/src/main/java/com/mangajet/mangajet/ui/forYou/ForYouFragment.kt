@@ -84,7 +84,7 @@ class ForYouFragment : Fragment() {
                 R.layout.manga_list_element,
                 forYouFragmentViewModel!!.mangas
             )
-            forYouFragmentViewModel!!.initMangas(adapter)
+            forYouFragmentViewModel!!.initMangas(adapter, true)
 
             listView.adapter = adapter
             listView.setOnItemClickListener{ parent, view, position, id ->
