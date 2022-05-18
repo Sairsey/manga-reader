@@ -25,39 +25,6 @@ class ForYouViewModel : ViewModel() {
     var adapter : MangaListAdapter? = null          // adapter for list
     var binding : ForYouFragmentBinding? = null     // binding with all UI elements
 
-    // Function which will load info about each manga from "manga names"
-    suspend fun addElementsToMangas() {
-        val mangasSearchWords = listOf("Гуль", "Берсерк", "Onepunchman")
-        for (name in mangasSearchWords) {
-            var manga : Manga
-            try {
-                manga = Librarian.getLibrary(Librarian.LibraryName.Mangachan)!!.searchManga(name)[2]
-            }
-            catch (ex: MangaJetException) {
-                Logger.log("Catch MJE while trying to load info about manga with " + name +
-                        " name: " + ex.message, Logger.Lvl.WARNING)
-                // nothing too tragic. If manga not found we can just skip it
-                continue
-            }
-
-            try {
-                manga.updateInfo()
-            }
-            catch (ex: MangaJetException) {
-                Logger.log("Catch MJE while trying to update info in " + manga.id +
-                    " : " + ex.message, Logger.Lvl.WARNING)
-                // This not so tragic.
-                // just continue
-                continue
-            }
-
-            withContext (Dispatchers.Main) {
-                mangas.add(manga)
-                adapter?.notifyDataSetChanged()
-            }
-        }
-    }
-
     // Function which will update all sources flags in 'chosenLibraries', where will be searching
     fun updateLibsSources(fragmentManager : FragmentManager?) {
         val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
