@@ -5,17 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.forYou.ForYouFragment"
-    android:paddingBottom="?attr/actionBarSize"
-    android:paddingTop="?attr/actionBarSize">
+    android:paddingBottom="?attr/actionBarSize">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="@string/title_for_you"
+        android:id="@+id/forYouToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints"/>
 
     <ListView
         android:id="@+id/forYouListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/forYouToolbar"/>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/loadRecommendationsIndicator"
@@ -25,7 +34,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/forYouToolbar"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/noResultLayout"
@@ -34,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/forYouToolbar">
 
         <ImageView
             android:id="@+id/noRecommendationsImage"

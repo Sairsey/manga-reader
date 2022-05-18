@@ -37,6 +37,7 @@
     <string name="tag_search">Tag := </string>
     <string name="for_example">For example: </string>
     <!-- Strings, using in For you -->
+    <string name="for_you_set_sources">Set sources</string>
     <string name="recommendations_fragment_no_recommendations">
         There are no mangas which we can recommend to you :(
     </string>
