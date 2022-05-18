@@ -96,6 +96,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if (permissionsToAsk.size != 0) {
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
         }
+        else if (!BuildConfig.VERSION_NAME.endsWith("dev")){
+            // start service on notifications
+            MangaJetApp.recv.setAlarm(context!!)
+        }
     }
 
     override fun onRestart() {
@@ -111,9 +115,6 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         // you can re-run this function as many times as you want
         // It will show message-box only if permission is not granted
         handleStoragePermissions()
-
-        // start service on notifications
-        MangaJetApp.recv.setAlarm(context!!)
 
         // Set logger and UEH
         Thread.setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler())
@@ -162,6 +163,8 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         // Check zip file
         try {
+            if (!StorageManager.readPermission || !StorageManager.writePermission)
+                return
             // To Download pages, because it won't be in archive
             if(StorageManager.isExist(tmpFileName, StorageManager.FileType.DownloadedPages))
                 StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages).delete()

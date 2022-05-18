@@ -65,7 +65,14 @@ class ForYouViewModel : ViewModel() {
             isInited = true
             adapter = adapterNew
             job = GlobalScope.launch(Dispatchers.IO) {
-                var recomMangas = Librarian.getRecommendedMangas()
+                var recomMangas : ArrayList<Manga>
+                try {
+                    recomMangas = Librarian.getRecommendedMangas()
+                }
+                catch (ex: MangaJetException) {
+                    Logger.log(ex.message.toString())
+                    return@launch
+                }
                 for (manga in recomMangas) {
                     try {
                         manga.updateInfo()

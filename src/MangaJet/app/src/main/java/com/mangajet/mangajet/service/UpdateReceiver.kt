@@ -64,9 +64,14 @@ class UpdateReceiver : BroadcastReceiver() {
 
         if (url != null)
         {
-            var page = MangaPage(url)
-            val bitmap = BitmapFactory.decodeFile(page.getFile().absolutePath)
-            builder = builder.setLargeIcon(bitmap)
+            try {
+                var page = MangaPage(url)
+                val bitmap = BitmapFactory.decodeFile(page.getFile().absolutePath)
+                builder = builder.setLargeIcon(bitmap)
+            }
+            catch (ex: MangaJetException){
+                Logger.log(ex.message.toString())
+            }
         }
 
         with(NotificationManagerCompat.from(context)) {
@@ -86,52 +91,61 @@ class UpdateReceiver : BroadcastReceiver() {
         }
 
         // at first get all our mangas
-        var paths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
-        for (path in paths) {
-            GlobalScope.launch (Dispatchers.Default) {
-                // load manga
-                var manga: Manga
-                try {
-                    manga =
-                        Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
-                } catch (ex: MangaJetException) {
-                    // skip it
-                    Logger.log(ex.message.toString())
-                    return@launch
-                }
-                // get previous amount
-                var prevAmountOfChapters = manga.chapters.size
+        try {
+            var paths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
+            for (path in paths) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    // load manga
+                    var manga: Manga
+                    try {
+                        manga =
+                            Manga(
+                                StorageManager.loadString(
+                                    path,
+                                    StorageManager.FileType.MangaInfo
+                                )
+                            )
+                    } catch (ex: MangaJetException) {
+                        // skip it
+                        Logger.log(ex.message.toString())
+                        return@launch
+                    }
+                    // get previous amount
+                    var prevAmountOfChapters = manga.chapters.size
 
-                // for dev we always show at least last 2
-                if (BuildConfig.VERSION_NAME.endsWith("dev"))
-                    prevAmountOfChapters = max(manga.chapters.size - 2, 0)
+                    // for dev we always show at least last 2
+                    if (BuildConfig.VERSION_NAME.endsWith("dev"))
+                        prevAmountOfChapters = max(manga.chapters.size - 2, 0)
 
-                try {
-                    // get current amount
-                    manga.updateChapters()
-                }
-                catch (ex : MangaJetException) {
-                    Logger.log(ex.message.toString())
-                    return@launch
-                }
+                    try {
+                        // get current amount
+                        manga.updateChapters()
+                    } catch (ex: MangaJetException) {
+                        Logger.log(ex.message.toString())
+                        return@launch
+                    }
 
-                // if differs
-                if (manga.chapters.size != prevAmountOfChapters) {
-                    // build notification string
-                    var str = manga.originalName + "\n\n"
-                    var shortStr = str
+                    // if differs
+                    if (manga.chapters.size != prevAmountOfChapters) {
+                        // build notification string
+                        var str = manga.originalName + "\n\n"
+                        var shortStr = str
 
-                    for (chapterIndex in prevAmountOfChapters until manga.chapters.size)
-                        str += manga.chapters[chapterIndex].fullName + "\n"
+                        for (chapterIndex in prevAmountOfChapters until manga.chapters.size)
+                            str += manga.chapters[chapterIndex].fullName + "\n"
 
-                    withContext(Dispatchers.Main) {
-                        // show notification
-                        showNotification(context!!, "New chapters", shortStr, str, manga.cover)
-                        // and save manga, so in history we can see our updated manga at top
-                        manga.saveToFile()
+                        withContext(Dispatchers.Main) {
+                            // show notification
+                            showNotification(context!!, "New chapters", shortStr, str, manga.cover)
+                            // and save manga, so in history we can see our updated manga at top
+                            manga.saveToFile()
+                        }
                     }
                 }
             }
+        }
+        catch (ex: MangaJetException) {
+            Logger.log(ex.message.toString())
         }
     }
 
