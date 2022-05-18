@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.settings.options.ExtraSettings">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="@string/setting_extra"
+        android:id="@+id/extraToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints" />
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/searchMaxResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintTop_toBottomOf="@id/extraToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/searchMaxResultsText"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:text="@string/extra_maxSearchResInfo" />
+
+        <EditText
+            android:id="@+id/searchMaxResultsValue"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="30"
+            android:minEms="3"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/forYouMaxTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintTop_toBottomOf="@id/searchMaxResults"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/forYouMaxTagsText"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:text="@string/extra_maxForYouTagsInfo" />
+
+        <EditText
+            android:id="@+id/forYouMaxTagsValue"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="30"
+            android:minEms="3"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/forYouMaxResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintTop_toBottomOf="@id/forYouMaxTags"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/forYouMaxResultsText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:text="@string/extra_maxForYouMangasInfo" />
+
+        <EditText
+            android:id="@+id/forYouMaxResultsValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="30"
+            android:minEms="3"
+            android:layout_gravity="center"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

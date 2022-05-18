@@ -17,11 +17,12 @@ import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.log.Logger
-import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity
 import com.mangajet.mangajet.ui.settings.options.MangaAuthorizationActivity
 import com.mangajet.mangajet.ui.settings.options.StoragePathDialog
 import com.mangajet.mangajet.ui.settings.options.ThemePickerDialog
+import com.mangajet.mangajet.ui.settings.options.AboutAppActivity
+import com.mangajet.mangajet.ui.settings.options.ExtraSettings
 import com.mangajet.mangajet.ui.settings.options.TesterButtonsActivity
 
 
@@ -33,8 +34,9 @@ class SettingFragment : Fragment() {
         const val THEME_PICKER_ID = 1   // Theme picker dialog id
         const val STORAGE_ID = 2        // Storage submenu id
         const val STORAGE_PATH_ID = 3   // Storage path dialog id
-        const val ABOUTAPP_ID = 4       // About app submenu id
-        const val TESTBUTTONS_ID = 5    // Test button submenu id
+        const val EXTRAS_ID = 4         // Extra settings submenu id
+        const val ABOUTAPP_ID = 5       // About app submenu id
+        const val TESTBUTTONS_ID = 6    // Test button submenu id
     }
 
     // Binding tool to get layout elements
@@ -117,6 +119,10 @@ class SettingFragment : Fragment() {
                         if (manager != null) {
                             myDialogFragment.show(manager, "Storage path dialog")
                         }
+                    }
+                    EXTRAS_ID -> {
+                        var intent = Intent(it, ExtraSettings::class.java)
+                        startActivity(intent)
                     }
                     ABOUTAPP_ID -> {
                         var intent = Intent(it, AboutAppActivity::class.java)

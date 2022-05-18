@@ -20,6 +20,7 @@
     <string name="setting_Settings">Settings</string>
     <string name="setting_cache">Cache options</string>
     <string name="setting_aboutapp">About app</string>
+    <string name="setting_extra">Extra settings</string>
 
     <string name="aboutMangaFragmentTagsText">Tags</string>
     <string name="aboutMangaDescriptionText">Description</string>
@@ -43,4 +44,9 @@
     <string name="channel_name">UpdateManga</string>
     <string name="channel_description">Channel for manga update notification</string>
     <string name="channel_id">mangaJetNotificationChannel</string>
+
+    <!-- Strings, using in extras -->
+    <string name="extra_maxSearchResInfo">Max mangas results in Search from every source \n(min: 3; max: 20)</string>
+    <string name="extra_maxForYouTagsInfo">Max recommended tags in \'For you\' \n(min: 3; max: 10)</string>
+    <string name="extra_maxForYouMangasInfo">Max recommended mangas for each recommended tag in \'For you\' \n(min: 1; max: 10)</string>
 </resources>

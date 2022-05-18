@@ -18,6 +18,7 @@ class SettingViewModel : ViewModel() {
                 SettingListElement("Theme picker", R.drawable.ic_theme_picker),
                 SettingListElement("Storage management", R.drawable.ic_storage),
                 SettingListElement("Storage path", R.drawable.ic_storage_path),
+                SettingListElement("Extra settings", R.drawable.ic_extra_settings),
                 SettingListElement("About app",R.drawable.ic_about_app),
                 SettingListElement("!TEST!", R.drawable.ic_test))
         // release version
@@ -27,5 +28,6 @@ class SettingViewModel : ViewModel() {
                 SettingListElement("Theme picker", R.drawable.ic_theme_picker),
                 SettingListElement("Storage management", R.drawable.ic_storage),
                 SettingListElement("Storage path", R.drawable.ic_storage_path),
+                SettingListElement("Extra settings", R.drawable.ic_extra_settings),
                 SettingListElement("About app",R.drawable.ic_about_app))
 }
