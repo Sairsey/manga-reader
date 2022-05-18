@@ -46,7 +46,7 @@
     <string name="channel_id">mangaJetNotificationChannel</string>
 
     <!-- Strings, using in extras -->
-    <string name="extra_maxSearchResInfo">Max mangas results in Search from every source \n(min: 3; max: 20)</string>
-    <string name="extra_maxForYouTagsInfo">Max recommended tags in \'For you\' \n(min: 3; max: 10)</string>
-    <string name="extra_maxForYouMangasInfo">Max recommended mangas for each recommended tag in \'For you\' \n(min: 1; max: 10)</string>
+    <string name="extra_maxSearchResInfo">Max mangas results in Search from every source</string>
+    <string name="extra_maxForYouTagsInfo">Max recommended tags in \'For you\'</string>
+    <string name="extra_maxForYouMangasInfo">Max recommended mangas for each recommended tag in \'For you\'</string>
 </resources>

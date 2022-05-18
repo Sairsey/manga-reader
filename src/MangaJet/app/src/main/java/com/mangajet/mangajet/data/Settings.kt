@@ -14,10 +14,6 @@ object Settings {
     // Setting file name
     private const val settingFileName = "settings.json"
 
-    // bounds of 'MANGA_SEARCH_AMOUNT' value
-    const val MIN_MANGA_SEARCH_AMOUNT = 3
-    const val MAX_MANGA_SEARCH_AMOUNT = 20
-
     // Amount of searchable mangas
     var MANGA_SEARCH_AMOUNT : Int
 
@@ -39,16 +35,8 @@ object Settings {
     // Maximum scale of image
     var MAX_SCALE : kotlin.Float
 
-    // bounds of 'MANGA_SEARCH_AMOUNT' value
-    const val MIN_AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = 3
-    const val MAX_AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = 10
-
     // Amount of tags used for recommendations
     var AMOUNT_OF_TAGS_IN_RECOMMENDATIONS : kotlin.Int
-
-    // bounds of 'MANGA_SEARCH_AMOUNT' value
-    const val MIN_AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = 1
-    const val MAX_AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = 10
 
     // Amount of mangas for recommendations
     var AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS : kotlin.Int

@@ -16,7 +16,7 @@
         android:minHeight="?attr/actionBarSize"
         tools:ignore="MissingConstraints" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginStart="@dimen/inner_horizontal_margin"
         android:layout_marginEnd="@dimen/inner_horizontal_margin"
         android:layout_marginTop="@dimen/inner_vertical_margin"
@@ -24,31 +24,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="100"
         app:layout_constraintTop_toBottomOf="@id/extraToolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/searchMaxResultsText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:layout_weight="70"
             android:textSize="16sp"
-            android:text="@string/extra_maxSearchResInfo" />
+            android:text="@string/extra_maxSearchResInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-        <EditText
+        <SeekBar
             android:id="@+id/searchMaxResultsValue"
-            android:layout_width="0dp"
-            android:layout_gravity="center"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="30"
-            android:minEms="3"
-            android:inputType="numberDecimal" />
-    </LinearLayout>
+            android:max="30"
+            android:min="3"
+            android:progress="3"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/searchMaxResultsText"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-    <LinearLayout
+        <TextView
+            android:id="@+id/searchMaxResultsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/searchMaxResultsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginStart="@dimen/inner_horizontal_margin"
         android:layout_marginEnd="@dimen/inner_horizontal_margin"
         android:layout_marginTop="@dimen/inner_vertical_margin"
@@ -68,19 +80,33 @@
             android:layout_height="wrap_content"
             android:layout_weight="70"
             android:textSize="16sp"
-            android:text="@string/extra_maxForYouTagsInfo" />
+            android:text="@string/extra_maxForYouTagsInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-        <EditText
+        <SeekBar
             android:id="@+id/forYouMaxTagsValue"
-            android:layout_width="0dp"
-            android:layout_gravity="center"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="30"
-            android:minEms="3"
-            android:inputType="numberDecimal" />
-    </LinearLayout>
+            android:max="10"
+            android:min="3"
+            android:progress="3"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxTagsText"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-    <LinearLayout
+        <TextView
+            android:id="@+id/forYouMaxTagsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxTagsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginStart="@dimen/inner_horizontal_margin"
         android:layout_marginEnd="@dimen/inner_horizontal_margin"
         android:layout_marginTop="@dimen/inner_vertical_margin"
@@ -88,7 +114,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="100"
         app:layout_constraintTop_toBottomOf="@id/forYouMaxTags"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -102,13 +127,26 @@
             android:layout_gravity="center"
             android:text="@string/extra_maxForYouMangasInfo" />
 
-        <EditText
+        <SeekBar
             android:id="@+id/forYouMaxResultsValue"
-            android:layout_width="0dp"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="30"
-            android:minEms="3"
-            android:layout_gravity="center"
-            android:inputType="numberDecimal" />
-    </LinearLayout>
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            android:max="10"
+            android:min="1"
+            android:progress="3"
+            android:splitTrack="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxResultsText" />
+
+        <TextView
+            android:id="@+id/forYouMaxResultsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxResultsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
