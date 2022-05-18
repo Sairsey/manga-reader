@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.ui.search
 
-import android.database.Cursor
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
@@ -37,7 +36,6 @@ class SearchViewModel : ViewModel() {
     //private var searchListMutex = true
 
     // Data for suggestions list in search view
-    var searchSuggestionsCursor : Cursor? = null
     var suggestionsStrings : Array<String>? = null
 
     // Function which will upload manga into mangas array and catch exceptions
@@ -129,13 +127,8 @@ class SearchViewModel : ViewModel() {
         val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
             Librarian.LibraryName.values()[i].resource}
         val choseResourceDialog = SearchSetSourcesDialog(librariesNames, Librarian.settings.CHOSEN_RESOURCES)
-        if (fragmentManager != null) {
+        if (fragmentManager != null)
             choseResourceDialog.show(fragmentManager, "Choose resource dialog")
-            if (choseResourceDialog.wasSelected) {
-                for (i in choseResourceDialog.mCheckedItems.indices)
-                    Librarian.settings.CHOSEN_RESOURCES[i] = choseResourceDialog.mCheckedItems[i]
-            }
-        }
     }
 
     // Function which will destroy and clear all fields and threads
