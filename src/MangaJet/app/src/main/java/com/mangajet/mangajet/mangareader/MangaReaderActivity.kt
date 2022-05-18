@@ -112,7 +112,16 @@ class MangaReaderActivity : AppCompatActivity() {
         // init toolbar handler (which will be shown and hidden by tap)
         val headerToolbar = findViewById<MaterialToolbar>(R.id.headerToolbar)
         val bottomToolbar = findViewById<MaterialToolbar>(R.id.bottomToolbar)
-        mangaReaderViewModel.toolbarHandler = MangaReaderToolbarHandler(headerToolbar, bottomToolbar)
+        mangaReaderViewModel.toolbarHandler = MangaReaderToolbarHandler(
+            headerToolbar,
+            bottomToolbar,
+            prevChapterButton,
+            nextChapterButton
+        )
+        mangaReaderViewModel.toolbarHandler.manageButtonsShowStatus(
+            !mangaReaderViewModel.isOnFirstChapter(),
+            !mangaReaderViewModel.isOnLastChapter()
+        )
 
         // init menu handler (reload + format buttons)
         mangaReaderViewModel.menuHandler = MangaReaderMenuHandler(mangaReaderViewModel, viewPager,

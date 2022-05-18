@@ -344,7 +344,11 @@ class MangaReaderViewModel : ViewModel() {
     fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
         // update chapter
         manga.lastViewedChapter--
-
+        toolbarHandler.manageButtonsShowStatus(
+            !isOnFirstChapter(),
+            !isOnLastChapter()
+        )
+        
         // update pages count (and load chapter)
         try {
             pagesCount = manga
@@ -398,6 +402,10 @@ class MangaReaderViewModel : ViewModel() {
     fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
         // update chapter
         manga.lastViewedChapter++
+        toolbarHandler.manageButtonsShowStatus(
+            !isOnFirstChapter(),
+            !isOnLastChapter()
+        )
 
         // update pages count (and load chapter)
         try {
