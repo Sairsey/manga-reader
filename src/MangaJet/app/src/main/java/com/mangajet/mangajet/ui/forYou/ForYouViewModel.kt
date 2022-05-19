@@ -55,7 +55,14 @@ class ForYouViewModel : ViewModel() {
                 for (i in Librarian.LibraryName.values().indices)
                     if (Librarian.settings.CHOSEN_FOR_YOU_RESOURCES[i])
                         resourcesArrayList.add(Librarian.LibraryName.values()[i])
-                var recomMangas = Librarian.getRecommendedMangas(resourcesArrayList)
+                var recomMangas : ArrayList<Manga>
+                try {
+                    recomMangas = Librarian.getRecommendedMangas()
+                }
+                catch (ex: MangaJetException) {
+                    Logger.log(ex.message.toString())
+                    return@launch
+                }
                 for (manga in recomMangas) {
                     try {
                         manga.updateInfo()

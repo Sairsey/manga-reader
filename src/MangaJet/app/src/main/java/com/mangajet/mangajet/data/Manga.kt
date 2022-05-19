@@ -90,6 +90,10 @@ class Manga {
             Logger.log("Unknown library: " + expected.message, Logger.Lvl.WARNING)
             throw MangaJetException("Unknown library")
         }
+        catch (expected: NoSuchElementException) {
+            Logger.log("Unknown library: " + expected.message, Logger.Lvl.WARNING)
+            throw MangaJetException("Unknown library")
+        }
         this.lastViewedChapter = json.optInt("lastViewedChapter", 0)
         fillMangaFromJSON(json)
         val chaptersJson = json.getJSONObject("chapters")

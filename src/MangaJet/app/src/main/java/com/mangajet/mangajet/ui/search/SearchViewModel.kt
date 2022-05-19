@@ -33,7 +33,7 @@ class SearchViewModel : ViewModel() {
     var hintJob : Job? = null                               // job for hint loading
 
     // Mutex data sync protection
-    private var searchListMutex = true
+    //private var searchListMutex = true
 
     // Data for suggestions list in search view
     var suggestionsStrings : Array<String>? = null
@@ -45,9 +45,9 @@ class SearchViewModel : ViewModel() {
             manga.updateInfo()
             job?.ensureActive()
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     mangas.add(manga)
-                }
+                //}
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
@@ -134,9 +134,9 @@ class SearchViewModel : ViewModel() {
     // Function which will destroy and clear all fields and threads
     private fun destroyAll() {
         job?.cancel()
-        synchronized(searchListMutex) {
+        //synchronized(searchListMutex) {
             mangas.clear()
-        }
+        //}
     }
 
     // Function which will async load mangas info
@@ -166,11 +166,11 @@ class SearchViewModel : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     if (mangas.size == 0)
                         binding.noResultLayout.visibility = View.VISIBLE
                     binding.progressBar.hide()
-                }
+                //}
             }
         }
     }
@@ -227,11 +227,11 @@ class SearchViewModel : ViewModel() {
             addElementsToMangas(mangas)
 
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     if (mangas.isEmpty())
                         binding.noResultLayout.visibility = View.VISIBLE
                     binding.progressBar.hide()
-                }
+                //}
             }
         }
     }
