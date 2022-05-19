@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.settings.options.ExtraSettings">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        app:title="@string/setting_extra"
+        android:id="@+id/extraToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/android:navigationBarColor"
+        app:titleTextColor="?attr/android:textColorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/searchMaxResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/extraToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/searchMaxResultsText"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/extra_maxSearchResInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <SeekBar
+            android:id="@+id/searchMaxResultsValue"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="30"
+            android:min="3"
+            android:progress="3"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/searchMaxResultsText"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/searchMaxResultsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/searchMaxResultsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/forYouMaxTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintTop_toBottomOf="@id/searchMaxResults"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/forYouMaxTagsText"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:text="@string/extra_maxForYouTagsInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <SeekBar
+            android:id="@+id/forYouMaxTagsValue"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:min="3"
+            android:progress="3"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxTagsText"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/forYouMaxTagsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxTagsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/forYouMaxResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/forYouMaxTags"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/forYouMaxResultsText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:text="@string/extra_maxForYouMangasInfo" />
+
+        <SeekBar
+            android:id="@+id/forYouMaxResultsValue"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            android:max="10"
+            android:min="1"
+            android:progress="3"
+            android:splitTrack="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxResultsText" />
+
+        <TextView
+            android:id="@+id/forYouMaxResultsNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            app:layout_constraintTop_toBottomOf="@id/forYouMaxResultsValue"
+            android:layout_marginStart="@dimen/inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

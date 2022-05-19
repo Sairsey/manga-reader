@@ -15,7 +15,7 @@ object Settings {
     private const val settingFileName = "settings.json"
 
     // Amount of searchable mangas
-    val MANGA_SEARCH_AMOUNT : Int
+    var MANGA_SEARCH_AMOUNT : Int
 
     // Chosen resources in search
     val CHOSEN_RESOURCES : BooleanArray
