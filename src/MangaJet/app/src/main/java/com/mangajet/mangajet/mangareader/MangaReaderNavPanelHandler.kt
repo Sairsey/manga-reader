@@ -22,6 +22,9 @@ class MangaReaderNavPanelHandler(
     private var someKindOfMutexToLockCallback = false
 
     private fun goToNextChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // we must not do anything while we are loading chapter
+        if (mangaReaderViewModel.isLoadingChapter())
+            return
         if (!mangaReaderViewModel.isOnLastChapter()) {
             mangaReaderViewModel.doToNextChapter(viewPager, pagerAdapter)
             seekBar.max = mangaReaderViewModel.pagesCount - 1
@@ -35,6 +38,9 @@ class MangaReaderNavPanelHandler(
     }
 
     private fun goToPrevChapter(viewPager: ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // we must not do anything while we are loading chapter
+        if (mangaReaderViewModel.isLoadingChapter())
+            return
         if (!mangaReaderViewModel.isOnFirstChapter()) {
             mangaReaderViewModel.doToPrevChapter(viewPager, pagerAdapter)
             var startPage = if (mangaReaderViewModel.isOnFirstChapter()) 0 else 1
