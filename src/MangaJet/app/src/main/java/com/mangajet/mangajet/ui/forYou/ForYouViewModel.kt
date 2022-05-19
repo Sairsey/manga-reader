@@ -57,7 +57,7 @@ class ForYouViewModel : ViewModel() {
                         resourcesArrayList.add(Librarian.LibraryName.values()[i])
                 var recomMangas : ArrayList<Manga>
                 try {
-                    recomMangas = Librarian.getRecommendedMangas()
+                    recomMangas = Librarian.getRecommendedMangas(resourcesArrayList)
                 }
                 catch (ex: MangaJetException) {
                     Logger.log(ex.message.toString())
