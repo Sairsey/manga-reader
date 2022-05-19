@@ -94,8 +94,12 @@ class ManhwaReaderVPAdapter(viewModel: MangaReaderViewModel) : MangaReaderBaseAd
             // otherwise
             else {
                 job = currentViewModelWithData.viewModelScope.launch(Dispatchers.IO) {
-                    // wait until loading finishes
-                    currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync.await()
+                    if (currentViewModelWithData.mutablePagesLoaderMap.containsKey(mangaPage.url)) {
+                        currentViewModelWithData.mutablePagesLoaderMap[mangaPage.url]!!.sync.await()
+                    }
+                    else {
+                        return@launch
+                    }
                     ensureActive()
                     // and set image same as in if
                     withContext(Dispatchers.Main) {

@@ -120,6 +120,10 @@ class MangaReaderViewModel : ViewModel() {
         return isOnFirstChapter() || isOnLastChapter()
     }
 
+    fun isLoadingChapter() : Boolean {
+        return !prevAndNextChapterSync.await(1, TimeUnit.MILLISECONDS)
+    }
+
     /**
      * Other functions
      */
@@ -342,6 +346,9 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will load previous chapter after scroll
     fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // at first we must wait our loading job
+        prevAndNextChapterSync.await()
+
         // update chapter
         manga.lastViewedChapter--
         toolbarHandler.manageButtonsShowStatus(
@@ -400,6 +407,9 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will load next chapter after scroll
     fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // at first we must wait our loading job
+        prevAndNextChapterSync.await()
+
         // update chapter
         manga.lastViewedChapter++
         toolbarHandler.manageButtonsShowStatus(
