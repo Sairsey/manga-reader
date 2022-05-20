@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.ui.settings
 
 import android.app.Activity
+import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mangajet.mangajet.BuildConfig
 import com.mangajet.mangajet.R
+import com.mangajet.mangajet.data.Settings
 import com.mangajet.mangajet.databinding.SettingsFragmentBinding
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.ui.settings.options.CacheSettingActivity

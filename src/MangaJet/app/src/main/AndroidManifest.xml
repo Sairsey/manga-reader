@@ -67,8 +67,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
-
+            android:screenOrientation="portrait"
+             />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
