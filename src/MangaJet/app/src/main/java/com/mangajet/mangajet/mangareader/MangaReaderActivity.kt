@@ -51,6 +51,7 @@ class MangaReaderActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.reloadPage -> mangaReaderViewModel.menuHandler.reloadCurrentPage()
             R.id.changeFormat -> mangaReaderViewModel.menuHandler.callChangeFormatDialog()
+            android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -136,7 +137,7 @@ class MangaReaderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.manga_reader_activity)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.headerToolbar))
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // get viewmodel
         mangaReaderViewModel = ViewModelProvider(this)[MangaReaderViewModel::class.java]
         // get screen width for auto-manhwa
@@ -167,4 +168,5 @@ class MangaReaderActivity : AppCompatActivity() {
         // standard Touch event
         return super.dispatchTouchEvent(event)
     }
+
 }
