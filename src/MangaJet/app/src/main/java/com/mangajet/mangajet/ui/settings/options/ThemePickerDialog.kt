@@ -15,7 +15,7 @@ import com.mangajet.mangajet.log.Logger
 
 class ThemePickerDialog : DialogFragment() {
     // Theme names for dialog list
-    private val themesNames = arrayOf("Day", "Night", "Auto")
+    private val themesNames = arrayOf("Day", "Night", "Match system")
     var themePickedIdFromDialog  = -1
     // Function will set chosen theme in shared preferences
     public fun setAppTheme(theme : Int, dialogListElementId : Int) {
