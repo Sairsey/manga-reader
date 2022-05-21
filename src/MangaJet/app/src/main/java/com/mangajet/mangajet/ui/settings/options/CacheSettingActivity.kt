@@ -30,7 +30,7 @@ class ClearCacheDialog : DialogFragment() {
             builder.setTitle("Clear cache")
                 .setMessage("Are you sure you want to clear your cache?")
                 .setCancelable(true)
-                .setPositiveButton("Delete") { dialog, id ->
+                .setPositiveButton("I'm sure") { dialog, id ->
                     StorageManager.removeFilesByType(StorageManager.FileType.CachedPages)
                     StorageManager.removeFilesByType(StorageManager.FileType.DownloadedPages)
                     StorageManager.removeFilesByType(StorageManager.FileType.MangaInfo)
