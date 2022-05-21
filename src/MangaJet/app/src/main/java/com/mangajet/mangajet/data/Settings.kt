@@ -10,6 +10,11 @@ import kotlin.String
 // Class for all important global constants
 // No logger here
 object Settings {
+    // Theme picked
+    const val DAY = 0           // Day theme
+    const val NIGHT = 1         // Night theme
+    const val SYSTEM_THEME = 2  // System match theme
+    var THEME_PICKED_ID : Int
 
     // Setting file name
     private const val settingFileName = "settings.json"
@@ -58,7 +63,7 @@ object Settings {
         MAX_SCALE = "5".toFloat()
         AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = "5".toInt()
         AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = "10".toInt()
-
+        THEME_PICKED_ID = SYSTEM_THEME
         // Try to get settings from file
         try{
             if(StorageManager.isExist(settingFileName, StorageManager.FileType.LibraryInfo)){
@@ -91,6 +96,8 @@ object Settings {
                     AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = json.getInt("amount_of_tags_in_recommend")
                 if(json.has("amount_of_manga_in_recommend"))
                     AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = json.getInt("amount_of_mangas_in_recommend")
+                if(json.has("theme_picked_id"))
+                    THEME_PICKED_ID = json.getInt("theme_picked_id")
             }
         }
         catch (ex : MangaJetException){
@@ -135,7 +142,7 @@ object Settings {
         json.put("loadRepeats", LOAD_REPEATS)
         json.put("logFileName", LOG_FILE_NAME)
         json.put("stackTraceName", STACK_TRACE_FILE_NAME)
-
+        json.put("theme_picked_id", THEME_PICKED_ID)
         StorageManager.saveString(settingFileName, json.toString(), StorageManager.FileType.LibraryInfo)
     }
 
