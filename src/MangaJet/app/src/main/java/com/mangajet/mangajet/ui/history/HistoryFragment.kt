@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AbsListView
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -14,6 +16,9 @@ import com.mangajet.mangajet.R
 import com.mangajet.mangajet.aboutmanga.AboutMangaActivity
 import com.mangajet.mangajet.databinding.HistoryFragmentBinding
 import com.mangajet.mangajet.log.Logger
+import com.hudomju.swipe.SwipeToDismissTouchListener
+import com.hudomju.swipe.adapter.ListViewAdapter
+import com.mangajet.mangajet.data.StorageManager
 
 
 // Class which represents "History" fragment of MainActivity
@@ -94,6 +99,38 @@ class HistoryFragment : Fragment() {
             MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
             startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
 
+
+        val touchListener = SwipeToDismissTouchListener(
+            ListViewAdapter(listView),
+            object : SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter> {
+                override fun canDismiss(position: Int): Boolean {
+                    return true
+                }
+
+                override fun onDismiss(view: ListViewAdapter, position: Int) {
+
+                    val id = historyViewModel.mangas[position].id
+                    var path = id.replace(".", "_") + ".json"
+                    var fileToDelete = StorageManager.getFile(path, StorageManager.FileType.MangaInfo)
+                    fileToDelete.delete()
+                    fileToDelete.delete()
+                    fileToDelete.delete()
+                    historyViewModel.mangas.removeAt(position)
+                    var tmpAdapter = listView.adapter as MangaListAdapter
+                    var state = listView.onSaveInstanceState()
+                    listView.adapter = null
+                    tmpAdapter.notifyDataSetChanged()
+                    listView.adapter = tmpAdapter
+                    listView.onRestoreInstanceState(state)
+                }
+            })
+        listView!!.setOnTouchListener(touchListener)
+        listView.setOnScrollListener(touchListener.makeScrollListener() as AbsListView.OnScrollListener)
+        listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, id ->
+            if (touchListener.existPendingDismisses()) {
+                touchListener.undoPendingDismiss()
+            }
+        }
         return root
     }
 
