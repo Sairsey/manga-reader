@@ -1,6 +1,7 @@
 package com.mangajet.mangajet.mangareader
 
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaPage
@@ -28,7 +29,7 @@ class MangaReaderMenuHandler(mangaReaderVM : MangaReaderViewModel,
         // manges to go here, I think we should crash
         page.upload(true)
         // recreate AsyncLoadPage
-        mangaReaderViewModel.mutablePagesLoaderMap[page.url] = AsyncLoadPage(page)
+        mangaReaderViewModel.mutablePagesLoaderMap[page.url] = AsyncLoadPage(page, mangaReaderViewModel.viewModelScope)
 
         var position = viewPager.currentItem
 
