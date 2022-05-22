@@ -14,11 +14,11 @@ import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
 import com.mangajet.mangajet.data.MangaPage
+import com.mangajet.mangajet.log.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.mangajet.mangajet.log.Logger
 
 // List adapter for "manga" list inner class
 class MangaListAdapter(
@@ -102,12 +102,13 @@ class MangaListAdapter(
         var autorView : TextView
         var sourceView : TextView
         var coverView : ImageView
-
+        var deleteTextView: TextView
         init {
             titleView = view.findViewById<TextView>(R.id.mangaTitle)
             autorView = view.findViewById<TextView>(R.id.authorTitle)
             sourceView = view.findViewById<TextView>(R.id.sourceLib)
             coverView = view.findViewById<ImageView>(R.id.coverManga)
+            deleteTextView = view.findViewById<TextView>(R.id.txt_delete)
         }
     }
 
@@ -160,8 +161,10 @@ class MangaListAdapter(
 
         }
 
-        if (currentItem.originalName.isNotEmpty() && currentItem.originalName != "")
+        if (currentItem.originalName.isNotEmpty() && currentItem.originalName != "") {
             viewHolder.titleView.text = currentItem.originalName
+            viewHolder.deleteTextView.text = "Manga `" + currentItem.originalName + "` was deleted from history"
+        }
         else if (currentItem.russianName.isNotEmpty() && currentItem.russianName != "")
             viewHolder.titleView.text = currentItem.russianName
         else
