@@ -94,11 +94,6 @@ class HistoryFragment : Fragment() {
         historyViewModel.makeListFromStorage(adapter, binding)
 
         listView.adapter = adapter
-        listView.setOnItemClickListener{ parent, view, position, id ->
-            val intent = Intent(requireActivity(), AboutMangaActivity::class.java)
-            MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
-            startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)}
-
 
         val touchListener = SwipeToDismissTouchListener(
             ListViewAdapter(listView),
@@ -129,6 +124,11 @@ class HistoryFragment : Fragment() {
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, id ->
             if (touchListener.existPendingDismisses()) {
                 touchListener.undoPendingDismiss()
+            }
+            else {
+                val intent = Intent(requireActivity(), AboutMangaActivity::class.java)
+                MangaJetApp.currentManga = historyViewModel.mangas[id.toInt()]
+                startActivityForResult(intent, MangaJetApp.ABOUT_MANGA_CALLBACK)
             }
         }
         return root
