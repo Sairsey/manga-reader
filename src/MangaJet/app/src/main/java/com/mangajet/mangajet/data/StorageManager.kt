@@ -80,13 +80,13 @@ object StorageManager {
         // lock this scope with java-style mutex
         // this means that only 1 thread can access to this block
         // at a time
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             // If we already loading this file - do not do anything
             if (loadPromises.containsKey(new_path)) {
                 println("loading of " + new_path + " in progress")
                 return
             }
-        }
+       // }
 
             // Create file handle
             val file = File(storageDirectory + new_path)
@@ -109,7 +109,7 @@ object StorageManager {
 
             println("start loading of" + new_path)
 
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             // If we already loading this file - do not do anything
             if (loadPromises.containsKey(new_path)) {
                 println("loading of " + new_path + " in progress")
@@ -121,7 +121,7 @@ object StorageManager {
                 new_path,
                 WebAccessor.writeBytesStream(url, file.outputStream(), headers)
             )
-        }
+        //}
     }
 
     // Function which will wait for specific file to load
@@ -136,13 +136,13 @@ object StorageManager {
         // lock this scope with java-style mutex
         // this means that only 1 thread can access to this block
         // at a time
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             // If we are not loading this file - do not do anything
             if (!loadPromises.containsKey(new_path))
                 return
             loadPromises[new_path]?.join() // Exception may be thrown here
             loadPromises.remove(new_path)
-        }
+        //}
     }
 
     // Function which will give File handler for specific path
@@ -150,7 +150,7 @@ object StorageManager {
     fun getFile(path: String, type: FileType= FileType.Auto) : File {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             if (type == FileType.Auto) {
                 for (typeIterator in FileType.values()) {
                     val f: File =
@@ -162,7 +162,7 @@ object StorageManager {
             }
 
             return File(storageDirectory + type.subdirectoryPath + "/" + path)
-        }
+        //}
     }
 
     // Function which will find folder size recursively
@@ -270,12 +270,12 @@ object StorageManager {
         if (!readPermission)
             throw MangaJetException("Read permission not granted")
 
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             val f = getFile(path, type)
             if (!f.exists())
                 throw MangaJetException("Cannot find file " + path)
             return f.readText()
-        }
+        //}
     }
 
     // Function which will create ZIP archive of specific file types
@@ -344,7 +344,7 @@ object StorageManager {
         // lock this scope with java-style mutex
         // this means that only 1 thread can access to this block
         // at a time
-        synchronized(loadPromises) {
+        //synchronized(loadPromises) {
             // Create file handle
             val file = File(storageDirectory + new_path)
 
@@ -365,7 +365,7 @@ object StorageManager {
                     "Cannot create file with path:" + storageDirectory.toString() + new_path.toString())
 
             file.writeBytes(fileIn.readBytes())
-        }
+        //}
     }
 
     // Function which will return paths for all elements of specific file type in order of modification date

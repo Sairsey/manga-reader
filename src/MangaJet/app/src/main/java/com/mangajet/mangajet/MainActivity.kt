@@ -96,6 +96,10 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if (permissionsToAsk.size != 0) {
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
         }
+        else if (false) {
+            // start service on notifications
+            MangaJetApp.recv.setAlarm(context!!)
+        }
     }
 
     override fun onRestart() {
@@ -159,6 +163,8 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
 
         // Check zip file
         try {
+            if (!StorageManager.readPermission || !StorageManager.writePermission)
+                return
             // To Download pages, because it won't be in archive
             if(StorageManager.isExist(tmpFileName, StorageManager.FileType.DownloadedPages))
                 StorageManager.getFile(tmpFileName, StorageManager.FileType.DownloadedPages).delete()
@@ -208,6 +214,5 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         val alert = builder.create()
         alert.show()
         alert.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        
     }
 }

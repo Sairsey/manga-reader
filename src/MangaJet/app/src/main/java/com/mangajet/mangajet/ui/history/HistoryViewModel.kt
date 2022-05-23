@@ -14,6 +14,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 // Class which represents "History" View Model
 class HistoryViewModel : ViewModel() {
@@ -23,7 +24,7 @@ class HistoryViewModel : ViewModel() {
     var historyMutex : Boolean = true               // Mutex for data sync  protection
 
     // Function which will load info about each manga from "manga names"
-    private suspend fun addElementsToMangas() {
+    private suspend fun addElementsToMangas(context : CoroutineContext) {
         var mangasPaths = arrayOf<String>()
         try {
             mangasPaths = StorageManager.getAllPathsForType(StorageManager.FileType.MangaInfo)
@@ -34,13 +35,13 @@ class HistoryViewModel : ViewModel() {
             // not a big problem, just not showing anything
         }
         for (path in mangasPaths) {
-            job?.ensureActive()
+            context.ensureActive()
             try {
                 var manga = Manga(StorageManager.loadString(path, StorageManager.FileType.MangaInfo))
                 withContext (Dispatchers.Main) {
-                    synchronized(historyMutex) {
+                    //synchronized(historyMutex) {
                         mangas.add(manga)
-                    }
+                    //}
                 }
             }
             catch (ex: MangaJetException) {
@@ -61,12 +62,12 @@ class HistoryViewModel : ViewModel() {
         // cancel job if we need
         adapter = adapterNew
         job?.cancel()
-        synchronized(historyMutex) {
+        //synchronized(historyMutex) {
             mangas.clear()
-        }
+        //}
 
         job = viewModelScope.launch(Dispatchers.Default) {
-            addElementsToMangas()
+            addElementsToMangas(coroutineContext)
 
             withContext(Dispatchers.Main) {
                 binding.progressBar.hide()
@@ -80,8 +81,8 @@ class HistoryViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         job?.cancel()
-        synchronized(historyMutex) {
+        //synchronized(historyMutex) {
             mangas.clear()
-        }
+        //}
     }
 }

@@ -20,6 +20,7 @@
     <string name="setting_Settings">Settings</string>
     <string name="setting_cache">Cache options</string>
     <string name="setting_aboutapp">About app</string>
+    <string name="setting_extra">Extra settings</string>
 
     <string name="aboutMangaFragmentTagsText">Tags</string>
     <string name="aboutMangaDescriptionText">Description</string>
@@ -37,7 +38,16 @@
     <string name="tag_search">Tag := </string>
     <string name="for_example">For example: </string>
     <!-- Strings, using in For you -->
+    <string name="for_you_set_sources">Set sources</string>
     <string name="recommendations_fragment_no_recommendations">
         There are no mangas which we can recommend to you :(
     </string>
+    <string name="channel_name">UpdateManga</string>
+    <string name="channel_description">Channel for manga update notification</string>
+    <string name="channel_id">mangaJetNotificationChannel</string>
+
+    <!-- Strings, using in extras -->
+    <string name="extra_maxSearchResInfo">Max mangas results in Search from every source</string>
+    <string name="extra_maxForYouTagsInfo">Max recommended tags in \'For you\'</string>
+    <string name="extra_maxForYouMangasInfo">Max recommended mangas for each recommended tag in \'For you\'</string>
 </resources>

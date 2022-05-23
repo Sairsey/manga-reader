@@ -80,7 +80,7 @@ class MangaPage {
 
          // wait while all operation will be completed
          try {
-             getFile()
+             StorageManager.await(this.localPath) // Exception may be thrown here
          }
          catch (ex: MangaJetException) {
              return success

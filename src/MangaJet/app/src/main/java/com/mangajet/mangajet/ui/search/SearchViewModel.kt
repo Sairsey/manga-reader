@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.ui.search
 
-import android.database.Cursor
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
@@ -34,10 +33,9 @@ class SearchViewModel : ViewModel() {
     var hintJob : Job? = null                               // job for hint loading
 
     // Mutex data sync protection
-    private var searchListMutex = true
+    //private var searchListMutex = true
 
     // Data for suggestions list in search view
-    var searchSuggestionsCursor : Cursor? = null
     var suggestionsStrings : Array<String>? = null
 
     // Function which will upload manga into mangas array and catch exceptions
@@ -47,9 +45,9 @@ class SearchViewModel : ViewModel() {
             manga.updateInfo()
             job?.ensureActive()
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     mangas.add(manga)
-                }
+                //}
                 adapter?.notifyDataSetChanged()
             }
         } catch (ex : MangaJetException) {
@@ -129,21 +127,16 @@ class SearchViewModel : ViewModel() {
         val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
             Librarian.LibraryName.values()[i].resource}
         val choseResourceDialog = SearchSetSourcesDialog(librariesNames, Librarian.settings.CHOSEN_RESOURCES)
-        if (fragmentManager != null) {
+        if (fragmentManager != null)
             choseResourceDialog.show(fragmentManager, "Choose resource dialog")
-            if (choseResourceDialog.wasSelected) {
-                for (i in choseResourceDialog.mCheckedItems.indices)
-                    Librarian.settings.CHOSEN_RESOURCES[i] = choseResourceDialog.mCheckedItems[i]
-            }
-        }
     }
 
     // Function which will destroy and clear all fields and threads
     private fun destroyAll() {
         job?.cancel()
-        synchronized(searchListMutex) {
+        //synchronized(searchListMutex) {
             mangas.clear()
-        }
+        //}
     }
 
     // Function which will async load mangas info
@@ -173,11 +166,11 @@ class SearchViewModel : ViewModel() {
             }
 
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     if (mangas.size == 0)
                         binding.noResultLayout.visibility = View.VISIBLE
                     binding.progressBar.hide()
-                }
+                //}
             }
         }
     }
@@ -234,11 +227,11 @@ class SearchViewModel : ViewModel() {
             addElementsToMangas(mangas)
 
             withContext(Dispatchers.Main) {
-                synchronized(searchListMutex) {
+                //synchronized(searchListMutex) {
                     if (mangas.isEmpty())
                         binding.noResultLayout.visibility = View.VISIBLE
                     binding.progressBar.hide()
-                }
+                //}
             }
         }
     }

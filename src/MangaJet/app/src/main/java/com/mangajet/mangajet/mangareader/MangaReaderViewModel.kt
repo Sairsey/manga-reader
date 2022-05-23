@@ -1,6 +1,5 @@
 package com.mangajet.mangajet.mangareader
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.TextView
 import android.widget.Toast
@@ -8,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.widget.ViewPager2
 import com.mangajet.mangajet.MangaJetApp
-import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
 import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
@@ -18,7 +16,7 @@ import com.mangajet.mangajet.mangareader.formatchangeholder.MangaReaderBaseAdapt
 import com.mangajet.mangajet.log.Logger
 import com.mangajet.mangajet.mangareader.manhwa.ManhwaReaderVPAdapter
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -31,11 +29,11 @@ class AsyncLoadPage {
     var page: MangaPage
     var sync = CountDownLatch(1) // 1 - not loaded, 0 - loaded
 
-    constructor(initPage: MangaPage)
+    constructor(initPage: MangaPage, coroutineScope: CoroutineScope)
     {
         page = initPage
         page.upload()
-        job = GlobalScope.launch (Dispatchers.IO) {
+        job = coroutineScope.launch (Dispatchers.IO) {
             for (i in 0 until Librarian.settings.LOAD_REPEATS) {
                 ensureActive()
                 try {
@@ -46,6 +44,7 @@ class AsyncLoadPage {
                     break
                 } catch (ex: MangaJetException) {
                     Logger.log("Catch MJE exception in loadBitmap: " + ex.message, Logger.Lvl.WARNING)
+                    Thread.sleep(2 + 2)
                     continue
                 }
             }
@@ -53,7 +52,6 @@ class AsyncLoadPage {
             sync.countDown()
         }
     }
-
 }
 
 // Class which represents "Manga Reader" ViewModel
@@ -118,6 +116,10 @@ class MangaReaderViewModel : ViewModel() {
     // Function which check if we reached last or first chapter
     fun isOnSideChapter() : Boolean {
         return isOnFirstChapter() || isOnLastChapter()
+    }
+
+    fun isLoadingChapter() : Boolean {
+        return !prevAndNextChapterSync.await(1, TimeUnit.MILLISECONDS)
     }
 
     /**
@@ -243,7 +245,7 @@ class MangaReaderViewModel : ViewModel() {
             // if not already cached
             if (!mutablePagesLoaderMap.containsKey(page.url)) {
                 // start loading
-                mutablePagesLoaderMap[page.url] = AsyncLoadPage(page)
+                mutablePagesLoaderMap[page.url] = AsyncLoadPage(page, viewModelScope)
             }
         }
 
@@ -257,12 +259,12 @@ class MangaReaderViewModel : ViewModel() {
                 // load first Page
                 if (!mutablePagesLoaderMap.containsKey(firstPage.url)) {
                     // start loading
-                    mutablePagesLoaderMap[firstPage.url] = AsyncLoadPage(firstPage)
+                    mutablePagesLoaderMap[firstPage.url] = AsyncLoadPage(firstPage, viewModelScope)
                 }
                 // load last Page
                 if (!mutablePagesLoaderMap.containsKey(lastPage.url)) {
                     // start loading
-                    mutablePagesLoaderMap[lastPage.url] = AsyncLoadPage(lastPage)
+                    mutablePagesLoaderMap[lastPage.url] = AsyncLoadPage(lastPage, viewModelScope)
                 }
             }
 
@@ -274,12 +276,12 @@ class MangaReaderViewModel : ViewModel() {
                 // load first Page
                 if (!mutablePagesLoaderMap.containsKey(firstPage.url)) {
                     // start loading
-                    mutablePagesLoaderMap[firstPage.url] = AsyncLoadPage(firstPage)
+                    mutablePagesLoaderMap[firstPage.url] = AsyncLoadPage(firstPage, viewModelScope)
                 }
                 // load last Page
                 if (!mutablePagesLoaderMap.containsKey(lastPage.url)) {
                     // start loading
-                    mutablePagesLoaderMap[lastPage.url] = AsyncLoadPage(lastPage)
+                    mutablePagesLoaderMap[lastPage.url] = AsyncLoadPage(lastPage, viewModelScope)
                 }
             }
             prevAndNextChapterSync.countDown()
@@ -342,9 +344,16 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will load previous chapter after scroll
     fun doToPrevChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // at first we must wait our loading job
+        prevAndNextChapterSync.await()
+
         // update chapter
         manga.lastViewedChapter--
-
+        toolbarHandler.manageButtonsShowStatus(
+            !isOnFirstChapter(),
+            !isOnLastChapter()
+        )
+        
         // update pages count (and load chapter)
         try {
             pagesCount = manga
@@ -396,8 +405,15 @@ class MangaReaderViewModel : ViewModel() {
 
     // Function which will load next chapter after scroll
     fun doToNextChapter(viewPager : ViewPager2, pagerAdapter : MangaReaderBaseAdapter) {
+        // at first we must wait our loading job
+        prevAndNextChapterSync.await()
+
         // update chapter
         manga.lastViewedChapter++
+        toolbarHandler.manageButtonsShowStatus(
+            !isOnFirstChapter(),
+            !isOnLastChapter()
+        )
 
         // update pages count (and load chapter)
         try {

@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import com.mangajet.mangajet.MangaJetApp
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Librarian
+import com.mangajet.mangajet.data.Manga
 import com.mangajet.mangajet.data.MangaJetException
+import com.mangajet.mangajet.service.UpdateReceiver
 import java.lang.NullPointerException
 
 // Activity with some buttons which will be avaliable only in develop build
@@ -17,6 +20,7 @@ class TesterButtonsActivity : AppCompatActivity() {
         const val GEN_BIG_HISTORY = 1;   // Button on generating big history
         const val GEN_HUGE_HISTORY = 2;  // Button on generating very big history
         const val CRASH_APP = 3;         // Button on crash app
+        const val START_NOTIFICATIONS = 4;// Button to start notifications
     }
 
     // names of every button
@@ -24,7 +28,8 @@ class TesterButtonsActivity : AppCompatActivity() {
         "Generate small history",
         "Generate big history",
         "Generate fucking huge history",
-        "Crash app")
+        "Crash app",
+        "Start notifications")
 
     // Function for generating history based on search words
     private fun genHistory(words : ArrayList<String>) {
@@ -78,6 +83,7 @@ class TesterButtonsActivity : AppCompatActivity() {
                     "Блич",
                     "Человек"))
                 CRASH_APP -> crashApp()
+                START_NOTIFICATIONS -> MangaJetApp.recv.setAlarm(MangaJetApp.context!!)
             }
         }
 

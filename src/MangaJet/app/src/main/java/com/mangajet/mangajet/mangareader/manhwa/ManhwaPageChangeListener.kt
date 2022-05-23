@@ -22,6 +22,10 @@ class ManhwaPageChangeListener(
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
 
+        // we must not do anything while we are loading chapter
+        if (mangaReaderViewModel.isLoadingChapter())
+            return
+
         mangaReaderViewModel.manga
             .chapters[mangaReaderViewModel.manga.lastViewedChapter]
             .lastViewedPage = if (mangaReaderViewModel.isOnFirstChapter()) position

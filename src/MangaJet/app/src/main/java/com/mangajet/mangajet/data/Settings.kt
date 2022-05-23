@@ -10,15 +10,23 @@ import kotlin.String
 // Class for all important global constants
 // No logger here
 object Settings {
+    // Theme picked
+    const val DAY = 0           // Day theme
+    const val NIGHT = 1         // Night theme
+    const val SYSTEM_THEME = 2  // System match theme
+    var THEME_PICKED_ID : Int
 
     // Setting file name
     private const val settingFileName = "settings.json"
 
     // Amount of searchable mangas
-    val MANGA_SEARCH_AMOUNT : Int
+    var MANGA_SEARCH_AMOUNT : Int
 
     // Chosen resources in search
     val CHOSEN_RESOURCES : BooleanArray
+
+    // Chosen resources in 'For you'
+    val CHOSEN_FOR_YOU_RESOURCES : BooleanArray
 
     // Load repeat count (if prev load failed -> repeat)
     val LOAD_REPEATS : Int
@@ -46,6 +54,8 @@ object Settings {
         var mangaSearchAmount = "20".toInt()
         var chosenResources = BooleanArray(Librarian.LibraryName.values().size)
         chosenResources[0] = true
+        var chosenForYouResources = BooleanArray(Librarian.LibraryName.values().size)
+        chosenForYouResources[0] = true
         var loadRepeats = "5".toInt()
         var logFileName = "log.txt"
         var stackTraceName = "stackTrace.txt"
@@ -53,7 +63,7 @@ object Settings {
         MAX_SCALE = "5".toFloat()
         AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = "5".toInt()
         AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = "10".toInt()
-
+        THEME_PICKED_ID = SYSTEM_THEME
         // Try to get settings from file
         try{
             if(StorageManager.isExist(settingFileName, StorageManager.FileType.LibraryInfo)){
@@ -67,6 +77,11 @@ object Settings {
                 if(chosenResources.size == strArray.size)
                     for(i in chosenResources.indices)
                         chosenResources[i] = strArray[i].toBoolean()
+                if(json.has("chosenForYouResources"))
+                    strArray = json.getString("chosenForYouResources").split(" ").toTypedArray()
+                if(chosenForYouResources.size == strArray.size)
+                    for(i in chosenForYouResources.indices)
+                        chosenForYouResources[i] = strArray[i].toBoolean()
                 if(json.has("loadRepeats"))
                     loadRepeats = json.getInt("loadRepeats")
                 if(json.has("logFileName"))
@@ -81,6 +96,8 @@ object Settings {
                     AMOUNT_OF_TAGS_IN_RECOMMENDATIONS = json.getInt("amount_of_tags_in_recommend")
                 if(json.has("amount_of_manga_in_recommend"))
                     AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS = json.getInt("amount_of_mangas_in_recommend")
+                if(json.has("theme_picked_id"))
+                    THEME_PICKED_ID = json.getInt("theme_picked_id")
             }
         }
         catch (ex : MangaJetException){
@@ -93,6 +110,7 @@ object Settings {
 
         MANGA_SEARCH_AMOUNT = mangaSearchAmount
         CHOSEN_RESOURCES = chosenResources
+        CHOSEN_FOR_YOU_RESOURCES = chosenForYouResources
         LOAD_REPEATS = loadRepeats
         LOG_FILE_NAME = logFileName
         STACK_TRACE_FILE_NAME = stackTraceName
@@ -117,10 +135,14 @@ object Settings {
         for (element in CHOSEN_RESOURCES)
             res += Boolean.toString(element) + " "
         json.put("chosenResources", res.trim())
+        res = ""
+        for (element in CHOSEN_FOR_YOU_RESOURCES)
+            res += Boolean.toString(element) + " "
+        json.put("chosenForYouResources", res.trim())
         json.put("loadRepeats", LOAD_REPEATS)
         json.put("logFileName", LOG_FILE_NAME)
         json.put("stackTraceName", STACK_TRACE_FILE_NAME)
-
+        json.put("theme_picked_id", THEME_PICKED_ID)
         StorageManager.saveString(settingFileName, json.toString(), StorageManager.FileType.LibraryInfo)
     }
 
