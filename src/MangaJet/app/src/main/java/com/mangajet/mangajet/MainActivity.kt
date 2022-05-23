@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), ActivityResultCallback<Map<String, Boo
         if (permissionsToAsk.size != 0) {
             permissionsRequest.launch(permissionsToAsk.toTypedArray())
         }
-        else if (!BuildConfig.VERSION_NAME.endsWith("dev")){
+        else if (false) {
             // start service on notifications
             MangaJetApp.recv.setAlarm(context!!)
         }
