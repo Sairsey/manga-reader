@@ -1,11 +1,14 @@
 package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import com.mangajet.mangajet.data.libraries.MangaLibLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
 import com.mangajet.mangajet.data.libraries.AcomicsLibrary
-import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
-import com.mangajet.mangajet.databinding.SettingListElementBinding
+import com.mangajet.mangajet.data.libraries.NineMangaLibrary
+import com.mangajet.mangajet.data.libraries.TAADDLibrary
+import com.mangajet.mangajet.data.libraries.Vegeta365MangaLibrary
+
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONObject
 
@@ -17,7 +20,16 @@ object Librarian {
         Readmanga("https://readmanga.io"),
         Mangalib("https://mangalib.me"),
         Mangachan("https://manga-chan.me"),
-        Acomics("https://acomics.ru");
+        Acomics("https://acomics.ru"),
+        NineMangaEN("https://en.ninemanga.com"),
+        NineMangaDE("https://de.ninemanga.com"),
+        NineMangaRU("https://ru.ninemanga.com"),
+        NineMangaIT("https://it.ninemanga.com"),
+        NineMangaBR("https://br.ninemanga.com"),
+        NineMangaFR("https://fr.ninemanga.com"),
+        TAADD("https://www.taadd.com"),
+        AquaManga("https://aquamanga.com"),
+        Vegeta365MangaLibrary("https://365manga.com");
 
         companion object {
             fun from(findResource: String): LibraryName = LibraryName.values().first { it.resource == findResource}
@@ -38,6 +50,15 @@ object Librarian {
         map[LibraryName.Mangalib] = MangaLibLibrary(LibraryName.Mangalib.resource)
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = AcomicsLibrary(LibraryName.Acomics.resource)
+        map[LibraryName.NineMangaEN] = NineMangaLibrary(LibraryName.NineMangaEN.resource)
+        map[LibraryName.NineMangaDE] = NineMangaLibrary(LibraryName.NineMangaDE.resource)
+        map[LibraryName.NineMangaRU] = NineMangaLibrary(LibraryName.NineMangaRU.resource)
+        map[LibraryName.NineMangaIT] = NineMangaLibrary(LibraryName.NineMangaIT.resource)
+        map[LibraryName.NineMangaBR] = NineMangaLibrary(LibraryName.NineMangaBR.resource)
+        map[LibraryName.NineMangaFR] = NineMangaLibrary(LibraryName.NineMangaFR.resource)
+        map[LibraryName.TAADD] = TAADDLibrary(LibraryName.TAADD.resource)
+        map[LibraryName.AquaManga] = Vegeta365MangaLibrary(LibraryName.AquaManga.resource, "read")
+        map[LibraryName.Vegeta365MangaLibrary] = Vegeta365MangaLibrary(LibraryName.Vegeta365MangaLibrary.resource)
     }
 
     // Function to get abstractLibrary from map by key(enum)
