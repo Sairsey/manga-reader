@@ -6,6 +6,7 @@ import com.mangajet.mangajet.data.libraries.MangaLibLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
 import com.mangajet.mangajet.data.libraries.AcomicsLibrary
 import com.mangajet.mangajet.data.libraries.NineMangaLibrary
+import com.mangajet.mangajet.data.libraries.TAADDLibrary
 
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONObject
@@ -24,6 +25,7 @@ object Librarian {
         NineMangaRU("https://ru.ninemanga.com"),
         NineMangaIT("https://it.ninemanga.com"),
         NineMangaBR("https://br.ninemanga.com"),
+        TAADD("https://www.taadd.com"),
         NineMangaFR("https://fr.ninemanga.com");
 
         companion object {
@@ -51,6 +53,7 @@ object Librarian {
         map[LibraryName.NineMangaIT] = NineMangaLibrary(LibraryName.NineMangaIT.resource)
         map[LibraryName.NineMangaBR] = NineMangaLibrary(LibraryName.NineMangaBR.resource)
         map[LibraryName.NineMangaFR] = NineMangaLibrary(LibraryName.NineMangaFR.resource)
+        map[LibraryName.TAADD] = TAADDLibrary(LibraryName.TAADD.resource)
     }
 
     // Function to get abstractLibrary from map by key(enum)
