@@ -9,6 +9,11 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga") : AbstractLibrary(uniqueID) {
+    // specialWord is a part of path that differs between sources. For example:
+    // in https://aquamanga.com/read/reincarnated-as-a-fish/chapter-1/ specialWord="read"
+    // in https://365manga.com/manga/one-piece/chapter-1053/ specialWord = "manga"
+    // in https://hentai4free.net/hentai/kitty-panic-naruto/ specialWord = "hentai"
+    // and so on
 
     val headers = mutableMapOf(
         "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
