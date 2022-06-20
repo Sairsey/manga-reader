@@ -28,6 +28,7 @@ object Librarian {
         NineMangaBR("https://br.ninemanga.com"),
         NineMangaFR("https://fr.ninemanga.com"),
         TAADD("https://www.taadd.com"),
+        AquaManga("https://aquamanga.com"),
         Vegeta365MangaLibrary("https://365manga.com");
 
         companion object {
@@ -56,6 +57,7 @@ object Librarian {
         map[LibraryName.NineMangaBR] = NineMangaLibrary(LibraryName.NineMangaBR.resource)
         map[LibraryName.NineMangaFR] = NineMangaLibrary(LibraryName.NineMangaFR.resource)
         map[LibraryName.TAADD] = TAADDLibrary(LibraryName.TAADD.resource)
+        map[LibraryName.AquaManga] = Vegeta365MangaLibrary(LibraryName.AquaManga.resource, "read")
         map[LibraryName.Vegeta365MangaLibrary] = Vegeta365MangaLibrary(LibraryName.Vegeta365MangaLibrary.resource)
     }
 

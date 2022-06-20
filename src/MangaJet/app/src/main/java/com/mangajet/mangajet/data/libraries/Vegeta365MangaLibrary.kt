@@ -8,7 +8,7 @@ import org.json.JSONObject
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
+class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga") : AbstractLibrary(uniqueID) {
 
     val headers = mutableMapOf(
         "user-agent" to "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)" +
@@ -44,21 +44,21 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
         val res = ArrayList<Manga>()
 
-        var f = text.indexOf("Tab panes")
-        f = text.indexOf("<div role=\"tabpanel", f)
+        var f = text.indexOf("<div role=\"tabpanel")
 
-        var s = text.indexOf("<script", f)
+        var s = text.indexOf("<footer", f)
         var subtext = text.substring(f, s)
 
-        f = subtext.indexOf("<a")
+        f = subtext.indexOf("c-tabs-item__content")
 
         var index = 0
         while (f != -1) {
+            f = subtext.indexOf("<a", f)
             var tagEnd = subtext.indexOf("</a", f)
             var imgTag = subtext.indexOf("<img", f)
             // we found valid tag
             if (imgTag != -1 && imgTag < tagEnd) {
-                f = subtext.indexOf("manga/", f) + "manga/".length
+                f = subtext.indexOf(specialWord + "/", f) + (specialWord + "/").length
                 var s = subtext.indexOf("/", f)
                 val mID = subtext.substring(f, s)
                 if (index >= offset + amount)
@@ -66,10 +66,9 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
                 if (index >= offset)
                     res.add(Manga(this, mID))
-
                 index++
             }
-            f = subtext.indexOf("<a", f + 1)
+            f = subtext.indexOf("c-tabs-item__content", f + 1)
         }
 
         return res.toTypedArray()
@@ -90,8 +89,8 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve name of manga
         fun getName(text : String) : String {
-            var f = text.indexOf("post-title")
-            f = text.indexOf("<h1", f)
+            var f = text.indexOf("class=\"post-title")
+            f = text.indexOf("<h", f)
             f = text.indexOf(">", f) + ">".length
             val s = text.indexOf("<", f)
             val name = text.subSequence(f, s).toString()
@@ -109,7 +108,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var f = text.indexOf("description-summary")
             f = text.indexOf("<div class=\"summary", f)
             f = text.indexOf(">", f) + ">".length
-            val s = text.indexOf("</div>", f)
+            val s = text.indexOf("<div class=\"c-content-readmore", f)
             if (f == -1 || s == -1)
                 return ""
             var descr = text.subSequence(f, s).toString()
@@ -120,16 +119,15 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
         // Retrieve Author name of manga
         fun getAuthor(text : String) : String {
-            var f = text.indexOf(" Author(s)")
+            var f = text.indexOf("Author(s)")
             f = text.indexOf("<div class=\"author-content", f)
-            f = text.indexOf("<a", f) + "<a".length
             f = text.indexOf(">", f) + ">".length
-            val s = text.indexOf("<", f)
+            val s = text.indexOf("</div", f)
             if (f == -1 || s == -1)
                 return ""
             val name = text.subSequence(f, s).toString()
 
-            return name
+            return removeTags(name)
         }
 
         // Retrieve title image URL
@@ -149,7 +147,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             if (f == -1)
                 return arrayOf("")
 
-            val end = text.indexOf("/div", f)
+            var end = text.indexOf("/div", f)
 
             val res = ArrayList<String>()
             f = text.indexOf("<a", f)
@@ -161,6 +159,22 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
                 res.add(name)
                 f = text.indexOf("<a", f)
             }
+
+            // not work on search
+            /*
+            f = text.indexOf("wp-manga-tags-list")
+            if (f != -1) {
+                end = text.indexOf("/div", f)
+                f = text.indexOf("<a", f)
+                while (f < end && f != -1) {
+                    f = text.indexOf(">", f) + ">".length
+                    var s = text.indexOf("<", f)
+                    var name = text.substring(f, s)
+                    res.add(name)
+                    f = text.indexOf("<a", f)
+                }
+            }
+            */
             return res.toTypedArray()
         }
     }
@@ -176,21 +190,21 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
         val res = ArrayList<Manga>()
 
-        var f = text.indexOf("Tab panes")
-        f = text.indexOf("<div role=\"tabpanel", f)
+        var f = text.indexOf("<div role=\"tabpanel")
 
-        var s = text.indexOf("<script", f)
+        var s = text.indexOf("<footer", f)
         var subtext = text.substring(f, s)
 
-        f = subtext.indexOf("<a")
+        f = subtext.indexOf("c-tabs-item__content")
 
         var index = 0
         while (f != -1) {
+            f = subtext.indexOf("<a", f)
             var tagEnd = subtext.indexOf("</a", f)
             var imgTag = subtext.indexOf("<img", f)
             // we found valid tag
             if (imgTag != -1 && imgTag < tagEnd) {
-                f = subtext.indexOf("manga/", f) + "manga/".length
+                f = subtext.indexOf(specialWord + "/", f) + (specialWord + "/").length
                 var s = subtext.indexOf("/", f)
                 val mID = subtext.substring(f, s)
                 if (index >= offset + amount)
@@ -198,10 +212,9 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
 
                 if (index >= offset)
                     res.add(Manga(this, mID))
-
                 index++
             }
-            f = subtext.indexOf("<a", f + 1)
+            f = subtext.indexOf("c-tabs-item__content", f + 1)
         }
 
         return res.toTypedArray()
@@ -225,7 +238,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             var imgTag = subtext.indexOf("<img", f)
             // we found valid tag
             if (imgTag != -1 && imgTag < tagEnd) {
-                f = subtext.indexOf("manga/", f) + "manga/".length
+                f = subtext.indexOf(specialWord + "/", f) + (specialWord + "/").length
                 var s = subtext.indexOf("/", f)
                 val mID = subtext.substring(f, s)
                 if (index >= offset + amount)
@@ -244,7 +257,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     }
 
     override fun getMangaInfo(id: String): String {
-        val url = getURL() + "/manga/" + id
+        val url = getURL() + "/" + specialWord + "/" + id
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val json = JSONObject()
@@ -259,7 +272,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     }
 
     override fun getMangaChapters(manga: Manga): Array<MangaChapter> {
-        val url = getURL() + "/manga/" + manga.id
+        val url = getURL() + "/" + specialWord + "/" + manga.id
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val chapters = ArrayList<MangaChapter>()
@@ -273,7 +286,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
             f = text.indexOf(">", f) + ">".length
             s = text.indexOf("<", f)
             var name = text.substring(f, s)
-            var id = link.substring(url.length + 1, link.length - 1)
+            var id = link.substring(url.length)
 
             chapters.add(MangaChapter(manga, id, transformFromHtml(name)))
 
@@ -285,7 +298,7 @@ class Vegeta365MangaLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
     }
 
     override fun getChapterInfo(mangaID: String, chapterID: String): String {
-        val url = getURL() + "/manga/" + mangaID + "/" + chapterID
+        val url = getURL() + "/" + specialWord + "/" + mangaID + "/" + chapterID
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val pages = ArrayList<String>()
