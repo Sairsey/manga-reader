@@ -7,6 +7,7 @@ import com.mangajet.mangajet.data.libraries.AcomicsLibrary
 import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import com.mangajet.mangajet.databinding.SettingListElementBinding
 import com.mangajet.mangajet.log.Logger
+import org.json.JSONArray
 import org.json.JSONObject
 
 // Singleton class that stores all libraries with manga and provides access to them
@@ -29,8 +30,12 @@ object Librarian {
 
     // Settings class where we store all important global constants
     val settings = Settings
+
     // Filename for StorageManager
     public const val path = "libraries.json"
+
+    // Filename for StorageManager
+    public const val fav_path = "favorites.json"
 
     // Initializer block
     init {
@@ -182,5 +187,55 @@ object Librarian {
 
         // PART 5 (Golden Rain): return data
         return result
+    }
+
+    // Get array of Favorites mangas
+    fun getFavoritesMangas() : Array<Manga> {
+        try {
+            var favJSON = StorageManager.loadString(fav_path, StorageManager.FileType.LibraryInfo)
+            val jsonData = JSONArray(favJSON)
+            var mangas = arrayListOf<Manga>()
+            for (i in 0 until jsonData.length()) {
+                try {
+                    mangas.add(
+                        Manga(
+                            StorageManager.loadString(
+                                jsonData.getString(i),
+                                StorageManager.FileType.MangaInfo
+                            )))
+                }
+                catch (ex: MangaJetException) {
+                    Logger.log("Could not load manga :" + ex.message, Logger.Lvl.WARNING)
+                    return arrayOf()
+                    // in this case we can just skip, because if file not found it isnt a big deal.
+                }
+            }
+            return mangas.toTypedArray()
+        }
+        catch (ex: MangaJetException) {
+            Logger.log("Could not get favorites" + ex.message, Logger.Lvl.WARNING)
+            return arrayOf()
+            // in this case we can just skip, because if file not found it isnt a big deal.
+        }
+    }
+
+    fun addMangaToFavorites(manga: Manga) {
+        var jsonData = JSONArray()
+        try {
+            val favJSON = StorageManager.loadString(fav_path, StorageManager.FileType.LibraryInfo)
+            jsonData = JSONArray(favJSON)
+        }
+        catch (ex: MangaJetException) {
+            Logger.log("Could not get favorites" + ex.message, Logger.Lvl.WARNING)
+            // in this case we can just skip, because if file not found it isnt a big deal.
+        }
+        val new_entry = manga.id.replace(".", "_") + ".json"
+        for (i in 0 until jsonData.length()) {
+            if (jsonData.getString(i) == new_entry) { // no need to add new element to fav
+                return
+            }
+        }
+        jsonData.put(new_entry)
+        StorageManager.saveString(fav_path, jsonData.toString(), StorageManager.FileType.LibraryInfo)
     }
 }

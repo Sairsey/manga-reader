@@ -43,7 +43,6 @@ object StorageManager {
     // Also this variable used for mutex-es
     var loadPromises = mutableMapOf<String, WebAccessor.Promise?>()
 
-
     // Function which will say if path exist in local file
     // MAY THROW MangaJetException
     fun isExist(path: String, type: FileType = FileType.Auto) : Boolean {
