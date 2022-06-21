@@ -27,8 +27,8 @@ class ForYouViewModel : ViewModel() {
 
     // Function which will update all sources flags in 'chosenLibraries', where will be searching
     fun updateLibsSources(fragmentManager : FragmentManager?) {
-        val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
-            Librarian.LibraryName.values()[i].resource}
+        val librariesNames = Array(Librarian.getLibrariesNames().size) { i ->
+            Librarian.getLibrary(Librarian.getLibrariesNames()[i])!!.getURL() }
         val choseResourceDialog = ForYouSetSourcesDialog(
             librariesNames,
             Librarian.settings.CHOSEN_FOR_YOU_RESOURCES,
@@ -51,10 +51,10 @@ class ForYouViewModel : ViewModel() {
             isInited = true
             adapter = adapterNew
             job = GlobalScope.launch(Dispatchers.IO) {
-                val resourcesArrayList = arrayListOf<Librarian.LibraryName>()
-                for (i in Librarian.LibraryName.values().indices)
+                val resourcesArrayList = arrayListOf<String>()
+                for (i in Librarian.getLibrariesNames().indices)
                     if (Librarian.settings.CHOSEN_FOR_YOU_RESOURCES[i])
-                        resourcesArrayList.add(Librarian.LibraryName.values()[i])
+                        resourcesArrayList.add(Librarian.getLibrariesNames()[i])
                 var recomMangas : ArrayList<Manga>
                 try {
                     recomMangas = Librarian.getRecommendedMangas(resourcesArrayList)

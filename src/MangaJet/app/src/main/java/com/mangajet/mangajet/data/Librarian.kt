@@ -1,31 +1,37 @@
 package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
-import com.mangajet.mangajet.data.libraries.MangaLibLibrary
-import com.mangajet.mangajet.data.libraries.MangaChanLibrary
-import com.mangajet.mangajet.data.libraries.AcomicsLibrary
-import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
-import com.mangajet.mangajet.databinding.SettingListElementBinding
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONObject
+import kotlin.collections.ArrayList
+import kotlin.reflect.full.primaryConstructor
 
 // Singleton class that stores all libraries with manga and provides access to them
 object Librarian {
+    // Map for storing libraries names as keys and abstract libraries as value
+    private val map = hashMapOf<String, AbstractLibrary?>()
 
-    // Enum class that represents names for parsed sites
-    enum class LibraryName(val resource: String){
-        Readmanga("https://readmanga.io"),
-        Mangalib("https://mangalib.me"),
-        Mangachan("https://manga-chan.me"),
-        Acomics("https://acomics.ru");
+    // class which represents one of Library entry
+    class LibraryEntry(var name: String = "", var url: String = "",
+                       var className: String = "", var isNSFW : Boolean = false) {
 
-        companion object {
-            fun from(findResource: String): LibraryName = LibraryName.values().first { it.resource == findResource}
+        fun toJSON() : String {
+            var q = JSONObject()
+            q.put("name", name)
+            q.put("url", url)
+            q.put("className", className)
+            q.put("isNSFW", isNSFW)
+            return q.toString()
+        }
+        fun fromJSON(json: String) {
+            var q = JSONObject(json)
+            name = q.getString("name")
+            url = q.getString("url")
+            className = q.getString("className")
+            isNSFW = q.getBoolean("isNSFW")
+            return
         }
     }
-
-    // Map for storing libraries names as keys and abstract libraries as value
-    private val map = hashMapOf<LibraryName, AbstractLibrary?>()
 
     // Settings class where we store all important global constants
     val settings = Settings
@@ -34,15 +40,28 @@ object Librarian {
 
     // Initializer block
     init {
-        map[LibraryName.Readmanga] = ReadMangaLibrary(LibraryName.Readmanga.resource)
-        map[LibraryName.Mangalib] = MangaLibLibrary(LibraryName.Mangalib.resource)
-        map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
-        map[LibraryName.Acomics] = AcomicsLibrary(LibraryName.Acomics.resource)
+        for (el in Settings.INSTALLED_LIBRARIES) {
+            var cls = Class.forName(el.className).kotlin
+            var lib = cls.primaryConstructor!!.call(el.url, el.isNSFW)
+            map[el.name] = lib as AbstractLibrary
+        }
     }
 
     // Function to get abstractLibrary from map by key(enum)
-    public fun getLibrary(name: LibraryName) : AbstractLibrary? {
+    public fun getLibrary(name: String) : AbstractLibrary? {
         return map[name]
+    }
+
+    // Function to get array of avaliable libraries
+    public fun getLibrariesNames() : Array<String> {
+        var res = ArrayList<String>()
+        for (el in Settings.INSTALLED_LIBRARIES) {
+            if (!settings.filter(el))
+                continue
+            res.add(el.name)
+        }
+
+        return res.toTypedArray()
     }
 
     // Function to set cookies for each Library from JSON
@@ -50,7 +69,7 @@ object Librarian {
         val jsonData = JSONObject(jsonDataStr)
 
         map.forEach { libraryName, abstractLibrary ->
-            abstractLibrary?.setCookies(jsonData[libraryName.resource].toString())
+            abstractLibrary?.setCookies(jsonData[libraryName].toString())
         }
     }
 
@@ -59,7 +78,7 @@ object Librarian {
         val jsonData = JSONObject()
 
         map.forEach { libraryName, abstractLibrary ->
-            jsonData.put(libraryName.resource, abstractLibrary?.getCookies() ?: "")
+            jsonData.put(libraryName, abstractLibrary?.getCookies() ?: "")
         }
 
         return jsonData.toString()
@@ -132,7 +151,7 @@ object Librarian {
 
     // function to get mangas from sources by tags
     private fun getMangasByTags(
-        names : ArrayList<LibraryName>,
+        names : ArrayList<String>,
         tags : Array<String>,
         forbiddenManga: ArrayList<String>,
         offset : Int
@@ -151,8 +170,8 @@ object Librarian {
 
     // function to get Recommended mangas
     fun getRecommendedMangas(
-        searchLibraries : ArrayList<LibraryName> =
-            arrayListOf(LibraryName.Readmanga, LibraryName.Mangalib))
+        searchLibraries : ArrayList<String> =
+            arrayListOf("Readmanga", "Mangalib"))
     : ArrayList<Manga> {
         var result = arrayListOf<Manga>()
 

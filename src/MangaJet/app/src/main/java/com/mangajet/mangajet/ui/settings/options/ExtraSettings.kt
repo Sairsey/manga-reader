@@ -7,8 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mangajet.mangajet.R
 import com.mangajet.mangajet.data.Settings
 import com.mangajet.mangajet.log.Logger
@@ -33,6 +35,7 @@ class ExtraSettings : AppCompatActivity() {
         val searchResTextInfo = findViewById<TextView>(R.id.searchMaxResultsNumber)
         val recommendedTagsTextInfo = findViewById<TextView>(R.id.forYouMaxTagsNumber)
         val recommendedResTextInfo = findViewById<TextView>(R.id.forYouMaxResultsNumber)
+        val nsfwSwitch = findViewById<Switch>(R.id.nsfwSwitch)
 
         // set first values
         searchResTV.progress = Settings.MANGA_SEARCH_AMOUNT
@@ -41,6 +44,7 @@ class ExtraSettings : AppCompatActivity() {
         searchResTextInfo.text = Settings.MANGA_SEARCH_AMOUNT.toString()
         recommendedTagsTextInfo.text = Settings.AMOUNT_OF_TAGS_IN_RECOMMENDATIONS.toString()
         recommendedResTextInfo.text = Settings.AMOUNT_OF_MANGAS_IN_RECOMMENDATIONS.toString()
+        nsfwSwitch.isChecked = Settings.IS_NSFW_ENABLED
 
         // set listeners
         searchResTV.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -97,5 +101,10 @@ class ExtraSettings : AppCompatActivity() {
                 }
             }
         })
+
+        nsfwSwitch.setOnCheckedChangeListener{ buttonView, isChecked ->
+            Settings.IS_NSFW_ENABLED = isChecked
+            Settings.saveState()
+        }
     }
 }

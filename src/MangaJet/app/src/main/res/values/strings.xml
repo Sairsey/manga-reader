@@ -50,4 +50,5 @@
     <string name="extra_maxSearchResInfo">Max mangas results in Search from every source</string>
     <string name="extra_maxForYouTagsInfo">Max recommended tags in \'For you\'</string>
     <string name="extra_maxForYouMangasInfo">Max recommended mangas for each recommended tag in \'For you\'</string>
+    <string name="extra_nsfwInfo">Enable NSFW(not safe/suitable for work) content support</string>
 </resources>

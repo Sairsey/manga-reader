@@ -22,11 +22,10 @@ class MangaAuthorizationActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle(R.string.title_authorization)
 
-        val mangasLibraries = arrayListOf<String>()
-        Librarian.LibraryName.values().forEach { mangasLibraries.add(it.toString()) }
+        val mangasLibraries = Librarian.getLibrariesNames()
 
         val mangasLibrariesURL = arrayListOf<String>()
-        Librarian.LibraryName.values().forEach { mangasLibrariesURL.add(it.resource) }
+        Librarian.getLibrariesNames().forEach { mangasLibrariesURL.add(Librarian.getLibrary(it)!!.getURL()) }
 
         val mangaAuthorizationList = findViewById<ListView>(R.id.mangaAuthorizationList)
         val adapter = ArrayAdapter<String> (

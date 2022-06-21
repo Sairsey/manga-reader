@@ -125,7 +125,9 @@
             android:layout_weight="70"
             android:textSize="16sp"
             android:layout_gravity="center"
-            android:text="@string/extra_maxForYouMangasInfo" />
+            android:text="@string/extra_maxForYouMangasInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <SeekBar
             android:id="@+id/forYouMaxResultsValue"
@@ -148,5 +150,37 @@
             app:layout_constraintTop_toBottomOf="@id/forYouMaxResultsValue"
             android:layout_marginStart="@dimen/inner_horizontal_margin"
             app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginStart="@dimen/inner_horizontal_margin"
+        android:layout_marginEnd="@dimen/inner_horizontal_margin"
+        android:layout_marginTop="@dimen/inner_vertical_margin"
+        android:id="@+id/nsfwLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/forYouMaxResults"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/nsfwText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:text="@string/extra_nsfwInfo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <Switch
+            android:id="@+id/nsfwSwitch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/half_inner_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nsfwText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

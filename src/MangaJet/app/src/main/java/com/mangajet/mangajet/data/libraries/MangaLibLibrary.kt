@@ -6,7 +6,7 @@ import com.mangajet.mangajet.data.WebAccessor
 import org.json.JSONArray
 import org.json.JSONObject
 
-class MangaLibLibrary(uniqueID: String) : AbstractLibrary(uniqueID) {
+class MangaLibLibrary(uniqueID: String, isNSFW: Boolean = false) : AbstractLibrary(uniqueID, isNSFW) {
 
     val headers = mutableMapOf(
         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
