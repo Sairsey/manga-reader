@@ -7,12 +7,12 @@ import com.mangajet.mangajet.data.Librarian
 
 class AuthorizationViewModel : ViewModel() {
     lateinit var url : String
-    lateinit var key : Librarian.LibraryName
+    lateinit var key : String
     var library : AbstractLibrary? = null
 
     fun initAuthScreen(intent : Intent) {
         url = intent.getStringExtra("URL").toString()
-        key = Librarian.LibraryName.from(url)
+        key = url
         library = Librarian.getLibrary(key)
     }
 }

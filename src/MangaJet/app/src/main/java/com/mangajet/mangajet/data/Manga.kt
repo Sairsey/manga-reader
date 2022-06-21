@@ -82,9 +82,7 @@ class Manga {
     private fun fromJSON(json: JSONObject) {
         id = json.optString("id")
         try {
-            library = Librarian.getLibrary(
-                Librarian.LibraryName.from(json.optString("library"))
-            )!!
+            library = Librarian.getLibrary(json.optString("library"))!!
         }
         catch (expected: NullPointerException) {
             Logger.log("Unknown library: " + expected.message, Logger.Lvl.WARNING)

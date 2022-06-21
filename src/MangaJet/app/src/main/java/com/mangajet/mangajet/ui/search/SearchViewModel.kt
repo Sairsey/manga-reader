@@ -60,7 +60,7 @@ class SearchViewModel : ViewModel() {
     // Function which will find mangas by query
     private suspend fun searchMangasByQuery(
         queryString : String,
-        source : Librarian.LibraryName
+        source : String
     ) : Array<Manga> {
         try {
             val libsMangas = Librarian.getLibrary(source)!!
@@ -81,7 +81,7 @@ class SearchViewModel : ViewModel() {
     // Function which will find mangas by Tags
     private suspend fun searchMangasByTags(
         tags : Array<String>,
-        source : Librarian.LibraryName
+        source : String
     ) : Array<Manga> {
         try {
             val libsMangas = Librarian.getLibrary(source)!!
@@ -124,9 +124,9 @@ class SearchViewModel : ViewModel() {
 
     // Function which will update all sources flags in 'chosenLibraries', where will be searching
     fun updateLibsSources(fragmentManager : FragmentManager?) {
-        val librariesNames = Array(Librarian.LibraryName.values().size) { i ->
-            Librarian.LibraryName.values()[i].resource}
-        val choseResourceDialog = SearchSetSourcesDialog(librariesNames, Librarian.settings.CHOSEN_RESOURCES)
+        val librariesNames = Array(Librarian.getLibrariesNames().size) { i ->
+            Librarian.getLibrary(Librarian.getLibrariesNames()[i])!!.getURL() }
+        val choseResourceDialog = SearchSetSourcesDialog(librariesNames, Librarian.settings.FILTERED_CHOSEN_RESOURCES)
         if (fragmentManager != null)
             choseResourceDialog.show(fragmentManager, "Choose resource dialog")
     }
@@ -148,9 +148,9 @@ class SearchViewModel : ViewModel() {
 
         //All libraries
         var sources = ""
-        for(i in Librarian.LibraryName.values().indices)
-            if(Librarian.settings.CHOSEN_RESOURCES[i])
-                sources += Librarian.LibraryName.values()[i].resource + " "
+        for(i in Librarian.getLibrariesNames().indices)
+            if(Librarian.settings.FILTERED_CHOSEN_RESOURCES[i])
+                sources += Librarian.getLibrary(Librarian.getLibrariesNames()[i])!!.getURL() + " "
         Logger.log("Search \"$queryString\" with these sources: $sources")
 
         destroyAll()
@@ -158,9 +158,9 @@ class SearchViewModel : ViewModel() {
         job?.cancel()
 
         job = viewModelScope.launch(Dispatchers.IO) {
-            for (i in Librarian.LibraryName.values().indices) {
-                if (Librarian.settings.CHOSEN_RESOURCES[i]) {
-                    val mangas = searchMangasByQuery(queryString, Librarian.LibraryName.values()[i])
+            for (i in Librarian.getLibrariesNames().indices) {
+                if (Librarian.settings.FILTERED_CHOSEN_RESOURCES[i]) {
+                    val mangas = searchMangasByQuery(queryString, Librarian.getLibrariesNames()[i])
                     addElementsToMangas(mangas)
                 }
             }
@@ -180,14 +180,16 @@ class SearchViewModel : ViewModel() {
         hintJob = viewModelScope.launch(Dispatchers.IO) {
             // choose random resource
             var arrayOfResources = arrayListOf<Int>()
-            for (i in Librarian.LibraryName.values().indices)
-                if (Librarian.settings.CHOSEN_RESOURCES[i])
+            for (i in Librarian.getLibrariesNames().indices)
+                if (Librarian.settings.FILTERED_CHOSEN_RESOURCES[i])
                     arrayOfResources.add(i)
+            if (arrayOfResources.isEmpty())
+                arrayOfResources.add(0)
             val randomResource = (arrayOfResources.indices).random()
 
             // choose random manga
             val popularMangas =
-                Librarian.getLibrary(Librarian.LibraryName.values()[randomResource])!!.
+                Librarian.getLibrary(Librarian.getLibrariesNames()[randomResource])!!.
                 getPopularManga(RANDOM_POPULAR_MANGA_COUNT)
             val randomManga = popularMangas[(popularMangas.indices).random()]
             randomManga.updateInfo()
@@ -217,7 +219,7 @@ class SearchViewModel : ViewModel() {
         adapter =  adapterNew
 
         // init info for search
-        val source = Librarian.LibraryName.from(MangaJetApp.tagSearchInfo!!.second)
+        val source = MangaJetApp.tagSearchInfo!!.second
         val tag = arrayOf<String>(MangaJetApp.tagSearchInfo!!.first)
 
         job?.cancel()

@@ -34,7 +34,7 @@ class TesterButtonsActivity : AppCompatActivity() {
     // Function for generating history based on search words
     private fun genHistory(words : ArrayList<String>) {
         for (word in words) {
-            val res = Librarian.getLibrary(Librarian.LibraryName.Mangalib)!!.searchManga(word)
+            val res = Librarian.getLibrary("Mangalib")!!.searchManga(word)
             for (i in 0 until res.size) {
                 try {
                     res[i].updateInfo()

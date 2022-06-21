@@ -7,7 +7,7 @@ import com.mangajet.mangajet.data.MangaChapter
 
 // Abstract class that represents one site from which we parse manga
 @Suppress("TooManyFunctions")
-abstract class AbstractLibrary(uniqueID: String) {
+abstract class AbstractLibrary(uniqueID: String, var isNSFW: Boolean = false) {
     private val url: String = uniqueID
 
     // Function to get Url
