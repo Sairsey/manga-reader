@@ -1,11 +1,14 @@
 package com.mangajet.mangajet.data
 
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
+import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
 import com.mangajet.mangajet.data.libraries.MangaLibLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
 import com.mangajet.mangajet.data.libraries.AcomicsLibrary
-import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
-import com.mangajet.mangajet.databinding.SettingListElementBinding
+import com.mangajet.mangajet.data.libraries.NineMangaLibrary
+import com.mangajet.mangajet.data.libraries.TAADDLibrary
+import com.mangajet.mangajet.data.libraries.Vegeta365MangaLibrary
+
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONObject
 
@@ -17,7 +20,30 @@ object Librarian {
         Readmanga("https://readmanga.io"),
         Mangalib("https://mangalib.me"),
         Mangachan("https://manga-chan.me"),
-        Acomics("https://acomics.ru");
+        Acomics("https://acomics.ru"),
+        NineMangaEN("https://en.ninemanga.com"),
+        NineMangaDE("https://de.ninemanga.com"),
+        NineMangaRU("https://ru.ninemanga.com"),
+        NineMangaIT("https://it.ninemanga.com"),
+        NineMangaBR("https://br.ninemanga.com"),
+        NineMangaFR("https://fr.ninemanga.com"),
+        TAADD("https://www.taadd.com"),
+        AquaManga("https://aquamanga.com"),
+        Vegeta365MangaLibrary("https://365manga.com"),
+        MangaRead("https://www.mangaread.org"),
+        MangaWeebs("https://mangaweebs.in"),
+        MangaEffect("https://mangaeffect.com"),
+        IsekaiScan("https://isekaiscan.com"),
+        MangaKomi("https://mangakomi.io"),
+        Manga3s("https://manga3s.com"),
+        ManhwaKool("https://manhwakool.com"),
+        MangaDistrict("https://mangadistrict.com"),
+        Hentai4Free("https://hentai4free.net"),
+        ManhwaChill("https://manhwachill.love"),
+        TreeManga("https://treemanga.com"),
+        AllTopManga("https://alltopmanga.com"),
+        MangaManhua("https://mangamanhua.online"),
+        MangaClash("https://mangaclash.com");
 
         companion object {
             fun from(findResource: String): LibraryName = LibraryName.values().first { it.resource == findResource}
@@ -38,6 +64,30 @@ object Librarian {
         map[LibraryName.Mangalib] = MangaLibLibrary(LibraryName.Mangalib.resource)
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = AcomicsLibrary(LibraryName.Acomics.resource)
+        map[LibraryName.NineMangaEN] = NineMangaLibrary(LibraryName.NineMangaEN.resource)
+        map[LibraryName.NineMangaDE] = NineMangaLibrary(LibraryName.NineMangaDE.resource)
+        map[LibraryName.NineMangaRU] = NineMangaLibrary(LibraryName.NineMangaRU.resource)
+        map[LibraryName.NineMangaIT] = NineMangaLibrary(LibraryName.NineMangaIT.resource)
+        map[LibraryName.NineMangaBR] = NineMangaLibrary(LibraryName.NineMangaBR.resource)
+        map[LibraryName.NineMangaFR] = NineMangaLibrary(LibraryName.NineMangaFR.resource)
+        map[LibraryName.TAADD] = TAADDLibrary(LibraryName.TAADD.resource)
+        map[LibraryName.AquaManga] = Vegeta365MangaLibrary(LibraryName.AquaManga.resource, "read")
+        map[LibraryName.Vegeta365MangaLibrary] = Vegeta365MangaLibrary(LibraryName.Vegeta365MangaLibrary.resource)
+        map[LibraryName.MangaRead] = Vegeta365MangaLibrary(LibraryName.MangaRead.resource)
+        map[LibraryName.MangaWeebs] = Vegeta365MangaLibrary(LibraryName.MangaWeebs.resource)
+        map[LibraryName.MangaEffect] = Vegeta365MangaLibrary(LibraryName.MangaEffect.resource)
+        map[LibraryName.IsekaiScan] = Vegeta365MangaLibrary(LibraryName.IsekaiScan.resource)
+        map[LibraryName.MangaKomi] = Vegeta365MangaLibrary(LibraryName.MangaKomi.resource)
+        map[LibraryName.Manga3s] = Vegeta365MangaLibrary(LibraryName.Manga3s.resource, "manhwa")
+        map[LibraryName.ManhwaKool] = Vegeta365MangaLibrary(LibraryName.ManhwaKool.resource)
+        map[LibraryName.MangaDistrict] = Vegeta365MangaLibrary(LibraryName.MangaDistrict.resource, "read")
+        map[LibraryName.Hentai4Free] = Vegeta365MangaLibrary(LibraryName.Hentai4Free.resource, "hentai")
+        map[LibraryName.ManhwaChill] = Vegeta365MangaLibrary(LibraryName.ManhwaChill.resource)
+        map[LibraryName.TreeManga] = Vegeta365MangaLibrary(LibraryName.TreeManga.resource)
+        map[LibraryName.AllTopManga] = Vegeta365MangaLibrary(LibraryName.AllTopManga.resource)
+        map[LibraryName.MangaManhua] = Vegeta365MangaLibrary(LibraryName.MangaManhua.resource)
+        map[LibraryName.MangaClash] = Vegeta365MangaLibrary(LibraryName.MangaClash.resource)
+
     }
 
     // Function to get abstractLibrary from map by key(enum)
@@ -49,8 +99,8 @@ object Librarian {
     fun setLibrariesJSON(jsonDataStr : String) {
         val jsonData = JSONObject(jsonDataStr)
 
-        map.forEach { libraryName, abstractLibrary ->
-            abstractLibrary?.setCookies(jsonData[libraryName.resource].toString())
+        map.forEach { (libraryName, abstractLibrary) ->
+            abstractLibrary?.setCookies(jsonData.optString(libraryName.resource))
         }
     }
 
