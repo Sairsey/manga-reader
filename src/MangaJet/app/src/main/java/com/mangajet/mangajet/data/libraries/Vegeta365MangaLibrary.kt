@@ -50,7 +50,8 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
         val res = ArrayList<Manga>()
 
         var f = text.indexOf("<div role=\"tabpanel")
-
+        if (f == -1)
+            return res.toTypedArray()
         var s = text.indexOf("<footer", f)
         var subtext = text.substring(f, s)
 
@@ -97,10 +98,11 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
             var f = text.indexOf("class=\"post-title")
             f = text.indexOf("<h", f)
             f = text.indexOf(">", f) + ">".length
-            val s = text.indexOf("<", f)
-            val name = text.subSequence(f, s).toString()
+            val s = text.indexOf("</div>", f)
+            var name = text.subSequence(f, s).toString()
+            name = removeTags(name)
 
-            return name
+            return name.trim()
         }
 
         // Retrieve russian name of manga
@@ -110,10 +112,10 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
 
         // Retrieve Description
         fun getDescr(text : String) : String {
-            var f = text.indexOf("description-summary")
+            var f = text.indexOf("class=\"description-summary")
             f = text.indexOf("<div class=\"summary", f)
             f = text.indexOf(">", f) + ">".length
-            val s = text.indexOf("<div class=\"c-content-readmore", f)
+            val s = text.indexOf("<div", f)
             if (f == -1 || s == -1)
                 return ""
             var descr = text.subSequence(f, s).toString()
@@ -126,23 +128,32 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
         fun getAuthor(text : String) : String {
             var f = text.indexOf("Author(s)")
             f = text.indexOf("<div class=\"author-content", f)
+            if(f == -1)
+                return ""
             f = text.indexOf(">", f) + ">".length
             val s = text.indexOf("</div", f)
             if (f == -1 || s == -1)
                 return ""
             val name = text.subSequence(f, s).toString()
 
-            return removeTags(name)
+            return removeTags(name).trim()
         }
 
         // Retrieve title image URL
         fun getTitleImageURL(text : String) : String {
-            var f = text.indexOf("summary_image")
+            var f = text.indexOf("class=\"summary_image\"")
             f = text.indexOf("<img", f)
             f = text.indexOf("src=\"", f) + "src=\"".length
             val s = text.indexOf("\"", f)
             if (f == -1 || s == -1)
                 return ""
+            return text.subSequence(f, s).toString()
+        }
+
+        // Retrieve rating of manga
+        fun getRating(text : String) : String {
+            var f = text.indexOf("total_votes\">") + "total_votes\">".length
+            val s = text.indexOf("<", f)
             return text.subSequence(f, s).toString()
         }
 
@@ -269,6 +280,7 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
         json.put("name", transformFromHtml(Vegeta365MangaLibraryHelper().getName(text)))
         json.put("cover", transformFromHtml(Vegeta365MangaLibraryHelper().getTitleImageURL(text)))
         json.put("rus_name", transformFromHtml(Vegeta365MangaLibraryHelper().getRusName(text)))
+        json.put("rating", transformFromHtml(Vegeta365MangaLibraryHelper().getRating(text)))
         json.put("author", transformFromHtml(Vegeta365MangaLibraryHelper().getAuthor(text)))
         json.put("description", transformFromHtml(Vegeta365MangaLibraryHelper().getDescr(text)))
         val tagArray = JSONArray(Vegeta365MangaLibraryHelper().getTags(text))
@@ -303,7 +315,7 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
     }
 
     override fun getChapterInfo(mangaID: String, chapterID: String): String {
-        val url = getURL() + "/" + specialWord + "/" + mangaID + "/" + chapterID
+        val url = getURL() + "/" + specialWord + "/" + mangaID + chapterID
         val text = WebAccessor.getTextSync(url, headers) // Exception may be thrown here
 
         val pages = ArrayList<String>()
@@ -313,7 +325,7 @@ class Vegeta365MangaLibrary(uniqueID: String, val specialWord : String = "manga"
         while (f != -1) {
             f = text.indexOf("src=\"", f) + "src=\"".length
             var s = text.indexOf("\"", f)
-            pages.add(text.substring(f, s))
+            pages.add(text.substring(f, s).replace("\t", ""))
             f = text.indexOf("<img id=\"image-", f)
         }
 
