@@ -3,8 +3,9 @@ package com.mangajet.mangajet.data
 import com.mangajet.mangajet.data.libraries.AbstractLibrary
 import com.mangajet.mangajet.data.libraries.MangaLibLibrary
 import com.mangajet.mangajet.data.libraries.MangaChanLibrary
-import com.mangajet.mangajet.data.libraries.AcomicsLibrary
+import com.mangajet.mangajet.data.libraries.MangaReaderLibrary
 import com.mangajet.mangajet.data.libraries.ReadMangaLibrary
+import com.mangajet.mangajet.data.libraries.AcomicsLibrary
 import com.mangajet.mangajet.databinding.SettingListElementBinding
 import com.mangajet.mangajet.log.Logger
 import org.json.JSONObject
@@ -17,7 +18,8 @@ object Librarian {
         Readmanga("https://readmanga.io"),
         Mangalib("https://mangalib.me"),
         Mangachan("https://manga-chan.me"),
-        Acomics("https://acomics.ru");
+        Acomics("https://acomics.ru"),
+        MangaReader("https://mangareader.cc");
 
         companion object {
             fun from(findResource: String): LibraryName = LibraryName.values().first { it.resource == findResource}
@@ -38,6 +40,7 @@ object Librarian {
         map[LibraryName.Mangalib] = MangaLibLibrary(LibraryName.Mangalib.resource)
         map[LibraryName.Mangachan] = MangaChanLibrary(LibraryName.Mangachan.resource)
         map[LibraryName.Acomics] = AcomicsLibrary(LibraryName.Acomics.resource)
+        map[LibraryName.MangaReader] = MangaReaderLibrary(LibraryName.MangaReader.resource)
     }
 
     // Function to get abstractLibrary from map by key(enum)
@@ -49,8 +52,8 @@ object Librarian {
     fun setLibrariesJSON(jsonDataStr : String) {
         val jsonData = JSONObject(jsonDataStr)
 
-        map.forEach { libraryName, abstractLibrary ->
-            abstractLibrary?.setCookies(jsonData[libraryName.resource].toString())
+        map.forEach { (libraryName, abstractLibrary) ->
+            abstractLibrary?.setCookies(jsonData.optString(libraryName.resource))
         }
     }
 
